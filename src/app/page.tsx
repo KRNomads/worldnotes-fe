@@ -1,94 +1,60 @@
-import Image from "next/image";
+import React from "react";
+import Link from "next/link";
 import styles from "./page.module.css";
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
+    <div className={styles.container}>
+      <nav className={styles.nav}>
+        <div className={styles.navContainer}>
+          <Link href="/" className={styles.logo}>
+            WorldNote
+          </Link>
+          <Link href="/login" className={styles.loginButton}>
+            로그인
+          </Link>
         </div>
-      </main>
+      </nav>
+
+      <section className={styles.hero}>
+        <div className={styles.heroContent}>
+          <h1 className={styles.heading}>
+            스토리생성을위한 AI
+            <br />
+            World Note
+          </h1>
+          <p className={styles.subheading}>
+            웹소설 AI 창작툴 World Note
+            <br />
+            활용해보세요!
+          </p>
+          <div className={styles.buttonGroup}>
+            <Link href="/terms" className={styles.button}>
+              이용약관
+            </Link>
+            <Link href="/info" className={styles.button}>
+              제품안내
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className={styles.infoSection}>
+        <h2 className={styles.infoHeading}>
+          월드노트는 작가님들을 위한 AI툴입니다
+        </h2>
+      </section>
+
       <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+        <div className={styles.footerLinks}>
+          <Link href="/terms" className={styles.footerLink}>
+            서비스 이용약관
+          </Link>
+          <span className={styles.divider}>|</span>
+          <Link href="/privacy" className={styles.footerLink}>
+            개인정보 처리방침
+          </Link>
+        </div>
       </footer>
     </div>
   );
