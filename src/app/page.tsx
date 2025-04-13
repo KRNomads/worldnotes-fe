@@ -2,12 +2,11 @@
 
 import React from "react";
 import Link from "next/link";
-import { signIn } from "next-auth/react";
 import styles from "./page.module.css";
 
 export default function Home() {
   const handleGoogleLogin = () => {
-    signIn("google", { callbackUrl: "/" });
+    window.location.href = "https://localhost:3573/oauth2/authorization/google";
   };
 
   return (
