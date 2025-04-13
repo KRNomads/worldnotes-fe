@@ -1,8 +1,15 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 import styles from "./page.module.css";
 
 export default function Home() {
+  const handleGoogleLogin = () => {
+    signIn("google", { callbackUrl: "/" });
+  };
+
   return (
     <div className={styles.container}>
       <nav className={styles.nav}>
@@ -10,9 +17,9 @@ export default function Home() {
           <Link href="/" className={styles.logo}>
             WorldNote
           </Link>
-          <Link href="/login" className={styles.loginButton}>
+          <button onClick={handleGoogleLogin} className={styles.loginButton}>
             로그인
-          </Link>
+          </button>
         </div>
       </nav>
 
