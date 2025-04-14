@@ -6,7 +6,8 @@ import styles from "./page.module.css";
 
 export default function Home() {
   const handleGoogleLogin = () => {
-    window.location.href = "https://localhost:3573/oauth2/authorization/google";
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+    window.location.href = `${backendUrl}/oauth2/authorization/google`;
   };
 
   return (
