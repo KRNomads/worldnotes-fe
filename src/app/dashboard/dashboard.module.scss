@@ -1,0 +1,262 @@
+// 브레이크포인트 믹스인
+@mixin mobile {
+  @media (max-width: 767px) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: 768px) and (max-width: 1023px) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: 1024px) {
+    @content;
+  }
+}
+
+// 전체 레이아웃
+.container {
+  display: flex;
+  height: 100vh;
+
+  @include mobile {
+    flex-direction: column;
+  }
+}
+
+// 사이드바 스타일
+.sidebar {
+  width: 283px;
+  height: 100%;
+  background-color: #1f2945;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 10px;
+  gap: 8px;
+
+  @include mobile {
+    width: 100%;
+    height: auto;
+    padding: 15px 10px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    overflow-x: auto;
+  }
+
+  @include tablet {
+    width: 220px;
+  }
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 24px;
+  color: #ffffff;
+  margin-bottom: 16px;
+
+  @include mobile {
+    margin-bottom: 0;
+    font-size: 20px;
+    margin-right: 10px;
+    white-space: nowrap;
+  }
+
+  @include tablet {
+    font-size: 22px;
+  }
+}
+
+.navItem {
+  width: 240px;
+  height: 48px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px 16px;
+  gap: 12px;
+  border-radius: 4px;
+  color: #ccd6e0;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #2e3854;
+  }
+
+  @include mobile {
+    width: auto;
+    height: 40px;
+    padding: 8px 12px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  @include tablet {
+    width: 200px;
+  }
+}
+
+.navItemActive {
+  background-color: #2e3854;
+  border: 1px solid #38425e;
+  color: #ffffff;
+}
+
+// 메뉴 컨테이너 (모바일용)
+.menuContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  @include mobile {
+    flex-direction: row;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+  }
+}
+
+// 메인 영역 스타일
+.mainArea {
+  flex: 1;
+  height: 100%;
+  background-color: #f5f7fa;
+  padding: 40px 40px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+
+  @include mobile {
+    height: calc(100vh - 70px); // 사이드바 높이 빼기
+    padding: 20px 20px 10px;
+  }
+
+  @include tablet {
+    padding: 30px 30px 10px;
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+}
+
+.welcomeMessage {
+  font-weight: 600;
+  font-size: 24px;
+  color: #333333;
+
+  @include mobile {
+    font-size: 20px;
+  }
+
+  @include tablet {
+    font-size: 22px;
+  }
+}
+
+.newProjectButton {
+  width: 110px;
+  height: 40px;
+  background-color: #1f2945;
+  color: #ffffff;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border: none;
+
+  &:hover {
+    background-color: #2e3854;
+  }
+
+  @include mobile {
+    width: 100%;
+  }
+}
+
+.sectionTitle {
+  font-weight: 600;
+  font-size: 18px;
+  color: #333333;
+  margin-top: 10px;
+
+  @include mobile {
+    font-size: 16px;
+  }
+}
+
+.projectsContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  padding: 10px;
+  overflow-x: auto;
+
+  @include mobile {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  @include tablet {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+}
+
+.projectCard {
+  width: 360px;
+  height: 180px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 20px 20px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  @include mobile {
+    width: 100%;
+    height: 160px;
+  }
+
+  @include tablet {
+    width: calc(50% - 15px);
+    flex-shrink: 0;
+  }
+}
+
+.projectTitle {
+  font-weight: 600;
+  font-size: 16px;
+  color: #333333;
+}
+
+.lastModified {
+  font-weight: 400;
+  font-size: 14px;
+  color: #808080;
+  margin-top: auto;
+}
