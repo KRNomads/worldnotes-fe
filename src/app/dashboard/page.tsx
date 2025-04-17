@@ -2,10 +2,13 @@
 
 import React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import styles from "./dashboard.module.scss";
 import { Project } from "@/types/project";
 
 export default function Dashboard() {
+  const router = useRouter();
+
   // 예시 프로젝트 데이터
   const recentProjects: Project[] = [
     {
@@ -22,12 +25,13 @@ export default function Dashboard() {
 
   const handleNewProject = () => {
     console.log("새 작품 만들기 버튼 클릭");
-    // 새 프로젝트 생성 로직 구현
+    // 테스트를 위해 고정 경로로 이동
+    router.push("/project/basicinfo");
   };
 
   const handleProjectClick = (projectId: string) => {
-    console.log(`프로젝트 ${projectId} 클릭됨`);
-    // 프로젝트 클릭 처리 로직 구현
+    // 테스트를 위해 고정 경로로 이동
+    router.push("/project/basicinfo");
   };
 
   return (
