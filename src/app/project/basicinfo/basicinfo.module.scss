@@ -1,0 +1,317 @@
+// 브레이크포인트 믹스인
+@mixin mobile {
+  @media (max-width: 767px) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: 768px) and (max-width: 1023px) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: 1024px) {
+    @content;
+  }
+}
+
+// 전체 레이아웃
+.container {
+  display: flex;
+  height: 100vh;
+  background-color: #fafafa;
+
+  @include mobile {
+    flex-direction: column;
+  }
+}
+
+// 사이드바 스타일
+.sidebar {
+  width: 280px;
+  height: 100%;
+  background-color: #1f2945;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 10px;
+  gap: 8px;
+
+  @include mobile {
+    width: 100%;
+    height: auto;
+    padding: 15px 10px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    overflow-x: auto;
+  }
+
+  @include tablet {
+    width: 240px;
+  }
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 24px;
+  color: #ffffff;
+  margin-bottom: 16px;
+
+  @include mobile {
+    margin-bottom: 0;
+    font-size: 20px;
+    margin-right: 10px;
+    white-space: nowrap;
+  }
+
+  @include tablet {
+    font-size: 22px;
+  }
+}
+
+.menuContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+
+  @include mobile {
+    flex-direction: row;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+  }
+}
+
+.navItem {
+  width: 240px;
+  height: 48px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px 16px;
+  gap: 12px;
+  border-radius: 4px;
+  color: #ccd6e0;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #2e3854;
+  }
+
+  @include mobile {
+    width: auto;
+    height: 40px;
+    padding: 8px 12px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  @include tablet {
+    width: 200px;
+  }
+}
+
+.navItemActive {
+  background-color: #2e3854;
+  border: 1px solid #38425e;
+  color: #ffffff;
+}
+
+// 메인 컨텐츠 영역
+.mainContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #f5f7fa;
+  height: 100%;
+  overflow-y: auto;
+
+  @include mobile {
+    height: calc(100vh - 70px);
+  }
+}
+
+// 헤더
+.header {
+  width: 100%;
+  height: 80px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5ebf0;
+  display: flex;
+  align-items: center;
+  padding: 10px 40px;
+
+  @include mobile {
+    padding: 10px 20px;
+    height: 60px;
+  }
+
+  @include tablet {
+    padding: 10px 30px;
+  }
+}
+
+.headerTitle {
+  font-weight: 700;
+  font-size: 24px;
+  color: #1f2945;
+
+  @include mobile {
+    font-size: 20px;
+  }
+
+  @include tablet {
+    font-size: 22px;
+  }
+}
+
+// 폼 영역
+.formContainer {
+  width: 1080px;
+  margin: 0 auto;
+  padding: 40px;
+  background-color: #ffffff;
+  border: 1px solid #e5ebf0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+
+  @include mobile {
+    width: 90%;
+    padding: 20px;
+  }
+
+  @include tablet {
+    width: 90%;
+    padding: 30px;
+  }
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  width: 100%;
+
+  @include mobile {
+    padding: 5px;
+  }
+}
+
+.fieldLabel {
+  font-weight: 600;
+  font-size: 16px;
+  color: #1f2945;
+
+  @include mobile {
+    font-size: 14px;
+  }
+}
+
+.inputContainer {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  width: 100%;
+  height: 48px;
+  background-color: #fafafa;
+  border: 1px solid #e5ebf0;
+  border-radius: 4px;
+
+  @include mobile {
+    height: 42px;
+  }
+}
+
+.inputField {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background-color: transparent;
+  font-size: 16px;
+  color: #1f2945;
+
+  &::placeholder {
+    color: #99a6b2;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  @include mobile {
+    font-size: 14px;
+  }
+}
+
+.textAreaContainer {
+  width: 100%;
+  background-color: #fafafa;
+  border: 1px solid #e5ebf0;
+  border-radius: 4px;
+  min-height: 120px;
+
+  @include mobile {
+    min-height: 100px;
+  }
+}
+
+.textAreaField {
+  width: 100%;
+  min-height: 120px;
+  border: none;
+  background-color: transparent;
+  font-size: 16px;
+  color: #1f2945;
+  padding: 10px 16px;
+  resize: vertical;
+
+  &::placeholder {
+    color: #99a6b2;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  @include mobile {
+    font-size: 14px;
+    min-height: 100px;
+  }
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.saveButton {
+  background-color: #1f2945;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 24px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #2e3854;
+  }
+
+  @include mobile {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+}
