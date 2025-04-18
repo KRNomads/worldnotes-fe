@@ -1,0 +1,517 @@
+// 브레이크포인트 믹스인
+@mixin mobile {
+  @media (max-width: 767px) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: 768px) and (max-width: 1023px) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: 1024px) {
+    @content;
+  }
+}
+
+// 전체 레이아웃
+.container {
+  display: flex;
+  height: 100vh;
+  background-color: #fafafa;
+
+  @include mobile {
+    flex-direction: column;
+  }
+}
+
+// 사이드바 스타일
+.sidebar {
+  width: 280px;
+  height: 100%;
+  background-color: #1f2945;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 10px;
+  gap: 8px;
+
+  @include mobile {
+    width: 100%;
+    height: auto;
+    padding: 15px 10px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    overflow-x: auto;
+  }
+}
+
+.logo {
+  font-family: "Inter", sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  color: #ffffff;
+  margin-bottom: 16px;
+
+  @include mobile {
+    margin-bottom: 0;
+    font-size: 20px;
+    margin-right: 12px;
+    white-space: nowrap;
+  }
+}
+
+.navContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 8px;
+
+  @include mobile {
+    flex-direction: row;
+    overflow-x: auto;
+    margin-left: 8px;
+  }
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  width: 240px;
+  height: 48px;
+  padding: 10px 16px;
+  border-radius: 4px;
+  color: #ccd6e0;
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  @include mobile {
+    width: auto;
+    min-width: 120px;
+    white-space: nowrap;
+    padding: 8px 12px;
+    height: 40px;
+    font-size: 14px;
+  }
+}
+
+.navItemActive {
+  background-color: #2e3853;
+  color: #ffffff;
+}
+
+// 메인 컨텐츠 영역
+.mainContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: 100vh;
+
+  @include mobile {
+    max-height: none;
+  }
+}
+
+// 헤더
+.header {
+  width: 100%;
+  height: 60px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+
+  @include mobile {
+    height: auto;
+    padding: 12px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+
+.headerTitle {
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: #1f2945;
+}
+
+.addCharacterBtn {
+  background-color: #1f2945;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #2e3853;
+  }
+
+  @include mobile {
+    width: 100%;
+  }
+}
+
+// 컨텐츠 컨테이너
+.contentContainer {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+
+  @include mobile {
+    flex-direction: column;
+    overflow: auto;
+  }
+}
+
+// 캐릭터 목록 패널
+.charactersPanel {
+  width: 250px;
+  background-color: #ffffff;
+  border-right: 1px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  @include mobile {
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid #f0f0f0;
+  }
+}
+
+.charactersPanelTitle {
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: #1f2945;
+  padding: 16px;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background-color: #f0f0f0;
+}
+
+.charactersList {
+  flex: 1;
+  padding: 8px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  @include mobile {
+    max-height: 200px;
+  }
+}
+
+.characterItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #fafafa;
+  }
+}
+
+.characterItemActive {
+  background-color: #fafafa;
+}
+
+.characterAvatar {
+  width: 30px;
+  height: 30px;
+  background-color: #f0f0f0;
+  border-radius: 15px;
+  flex-shrink: 0;
+}
+
+.characterName {
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: #666666;
+}
+
+// 캐릭터 정보 패널
+.characterInfoPanel {
+  flex: 1;
+  background-color: #ffffff;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+
+  @include mobile {
+    padding: 16px;
+  }
+}
+
+.characterInfoHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.characterInfoTitle {
+  font-family: "Inter", sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  color: #1f2945;
+}
+
+.deleteBtn {
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: #cc4d4d;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// 캐릭터 정보 상단
+.characterInfoTop {
+  display: flex;
+  gap: 20px;
+
+  @include mobile {
+    flex-direction: column;
+  }
+}
+
+.characterImageArea {
+  width: 200px;
+  height: 220px;
+  background-color: #e0e0e0;
+  border: 1px solid #cccccc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+
+  @include mobile {
+    width: 100%;
+    height: 250px;
+  }
+}
+
+.characterImagePlaceholder {
+  font-size: 42px;
+  color: #999999;
+}
+
+.characterDescArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.characterDescTitle {
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: #1f2945;
+}
+
+.characterDescInputContainer {
+  flex: 1;
+  border: 1px solid #e6e6e6;
+  background-color: #fafafa;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.characterDescInput {
+  width: 100%;
+  height: 100%;
+  min-height: 180px;
+  padding: 12px;
+  border: none;
+  background-color: transparent;
+  resize: vertical;
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: #333333;
+
+  &::placeholder {
+    color: #b3b3b3;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+// 캐릭터 프로필
+.characterProfile {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.profileTitle {
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: #334d66;
+}
+
+.profileItems {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  border: 1px solid #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.profileRow {
+  display: flex;
+  min-height: 50px;
+  height: auto;
+  border-bottom: 1px solid #ffffff;
+  background-color: #ffffff;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.profileLabel {
+  width: 120px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  background-color: #ffffff;
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: #405973;
+
+  @include mobile {
+    width: 100px;
+    font-size: 14px;
+    padding: 0 10px;
+  }
+}
+
+.profileLabelInput {
+  width: 100%;
+  background: transparent;
+  text-align: center;
+  border: none;
+  resize: none;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 0;
+  overflow: hidden;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.profileOptions {
+  margin-left: 10px;
+  padding-right: 10px;
+}
+
+.optionsIcon {
+  color: #999999;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.profileInputContainer {
+  flex: 1;
+  padding: 8px;
+  background-color: #fafafa;
+  display: flex;
+  align-items: flex-start;
+}
+
+.profileInput {
+  flex: 1;
+  width: 100%;
+  min-height: 30px;
+  border: none;
+  background-color: transparent;
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: #333333;
+  resize: vertical;
+  overflow: hidden;
+  padding: 6px 0;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.addProfileBtnContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.addProfileBtn {
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: #5980a6;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  @include mobile {
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+    background-color: #fafafa;
+    border: 1px solid #e6e6e6;
+    border-radius: 4px;
+  }
+}
