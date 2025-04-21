@@ -30,7 +30,7 @@ export default function Dashboard() {
   };
 
   const handleProjectClick = (projectId: string) => {
-    router.push("/project/basicinfo");
+    router.push(`/project/${projectId}/basicinfo`);
   };
 
   return (
