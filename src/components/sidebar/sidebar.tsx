@@ -82,8 +82,8 @@ export default function Sidebar({
           style={{
             background: "none",
             border: "none",
-            cursor: "pointer",
             textAlign: "left",
+            justifyContent: "center",
           }}
         >
           로그아웃
