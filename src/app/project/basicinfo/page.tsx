@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
 import styles from "./basicinfo.module.scss";
+import Sidebar from "../../../components/sidebar/sidebar";
 
 export default function BasicInfo() {
   // 폼 상태 관리
@@ -35,26 +35,7 @@ export default function BasicInfo() {
   return (
     <div className={styles.container}>
       {/* 사이드바 */}
-      <div className={styles.sidebar}>
-        <h1 className={styles.logo}>World Note</h1>
-
-        <div className={styles.menuContainer}>
-          <Link
-            href="/project/basicinfo"
-            className={`${styles.navItem} ${styles.navItemActive}`}
-          >
-            기본정보
-          </Link>
-
-          <Link href="/project/characters" className={styles.navItem}>
-            캐릭터 정보
-          </Link>
-
-          <Link href="/project/worldbuilding" className={styles.navItem}>
-            세계관 정보
-          </Link>
-        </div>
-      </div>
+      <Sidebar activeItem="basicinfo" isProjectSidebar={true} />
 
       {/* 메인 콘텐츠 */}
       <div className={styles.mainContent}>
@@ -99,61 +80,6 @@ export default function BasicInfo() {
               />
             </div>
           </div>
-
-          {/* <div className={styles.formField}>
-            <label htmlFor="period" className={styles.fieldLabel}>
-              시대 배경
-            </label>
-            <div className={styles.inputContainer}>
-              <input
-                type="text"
-                id="period"
-                name="period"
-                value={formData.period}
-                onChange={handleInputChange}
-                placeholder="시대 배경을 입력하세요 (현대, 중세, 미래 등)"
-                className={styles.inputField}
-              />
-            </div>
-          </div>
-          
-          <div className={styles.formField}>
-            <label htmlFor="background" className={styles.fieldLabel}>
-              작품 배경
-            </label>
-            <div className={styles.textAreaContainer}>
-              <textarea
-                id="background"
-                name="background"
-                value={formData.background}
-                onChange={handleInputChange}
-                placeholder="작품의 배경을 자세히 설명해주세요"
-                className={styles.textAreaField}
-              />
-            </div>
-          </div>
-          
-          <div className={styles.formField}>
-            <label htmlFor="summary" className={styles.fieldLabel}>
-              줄거리
-            </label>
-            <div className={styles.textAreaContainer}>
-              <textarea
-                id="summary"
-                name="summary"
-                value={formData.summary}
-                onChange={handleInputChange}
-                placeholder="줄거리를 입력하세요"
-                className={styles.textAreaField}
-              />
-            </div>
-          </div>
-          
-          <div className={styles.buttonContainer}>
-            <button type="submit" className={styles.saveButton}>
-              저장하기
-            </button>
-          </div> */}
         </form>
       </div>
     </div>

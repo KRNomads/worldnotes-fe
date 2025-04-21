@@ -1,33 +1,14 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import styles from "../basicinfo/basicinfo.module.scss";
+import Sidebar from "../../../components/sidebar/sidebar";
 
 export default function Worldbuilding() {
   return (
     <div className={styles.container}>
       {/* 사이드바 */}
-      <div className={styles.sidebar}>
-        <h1 className={styles.logo}>World Note</h1>
-
-        <div className={styles.menuContainer}>
-          <Link href="/project/basicinfo" className={styles.navItem}>
-            기본정보
-          </Link>
-
-          <Link href="/project/characters" className={styles.navItem}>
-            캐릭터 정보
-          </Link>
-
-          <Link
-            href="/project/worldbuilding"
-            className={`${styles.navItem} ${styles.navItemActive}`}
-          >
-            세계관 정보
-          </Link>
-        </div>
-      </div>
+      <Sidebar activeItem="worldbuilding" isProjectSidebar={true} />
 
       {/* 메인 콘텐츠 */}
       <div className={styles.mainContent}>

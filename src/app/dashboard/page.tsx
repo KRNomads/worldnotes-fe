@@ -1,10 +1,11 @@
+// src/app/dashboard/page.tsx
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import styles from "./dashboard.module.scss";
 import { Project } from "@/types/project";
+import Sidebar from "../../components/sidebar/sidebar";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -25,34 +26,17 @@ export default function Dashboard() {
 
   const handleNewProject = () => {
     console.log("새 작품 만들기 버튼 클릭");
-    // 테스트를 위해 고정 경로로 이동
     router.push("/project/basicinfo");
   };
 
   const handleProjectClick = (projectId: string) => {
-    // 테스트를 위해 고정 경로로 이동
     router.push("/project/basicinfo");
   };
 
   return (
     <div className={styles.container}>
-      {/* 사이드바 */}
-      <div className={styles.sidebar}>
-        <h1 className={styles.logo}>World Note</h1>
-
-        <div className={styles.menuContainer}>
-          <Link
-            href="/dashboard"
-            className={`${styles.navItem} ${styles.navItemActive}`}
-          >
-            홈
-          </Link>
-
-          <Link href="/my-projects" className={styles.navItem}>
-            내 프로젝트
-          </Link>
-        </div>
-      </div>
+      {/* 사이드바 컴포넌트 사용 */}
+      <Sidebar activeItem="home" isProjectSidebar={false} />
 
       {/* 메인 영역 */}
       <div className={styles.mainArea}>

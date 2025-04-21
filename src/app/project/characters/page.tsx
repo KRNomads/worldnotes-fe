@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
 import styles from "./characters.module.scss";
+import Sidebar from "../../../components/sidebar/sidebar";
 
 // 프로필 항목의 타입 정의
 interface ProfileItem {
@@ -62,28 +62,8 @@ export default function Characters() {
 
   return (
     <div className={styles.container}>
-      {/* 왼쪽 사이드바 */}
-      <div className={styles.sidebar}>
-        {/* 사이드바 내용은 그대로 유지 */}
-        <h1 className={styles.logo}>World Note</h1>
-
-        <div className={styles.navContainer}>
-          <Link href="/project/basicinfo" className={styles.navItem}>
-            기본정보
-          </Link>
-
-          <Link
-            href="/project/characters"
-            className={`${styles.navItem} ${styles.navItemActive}`}
-          >
-            캐릭터 정보
-          </Link>
-
-          <Link href="/project/worldbuilding" className={styles.navItem}>
-            세계관 정보
-          </Link>
-        </div>
-      </div>
+      {/* 사이드바 */}
+      <Sidebar activeItem="characters" isProjectSidebar={true} />
 
       {/* 메인 콘텐츠 영역 */}
       <div className={styles.mainContent}>
