@@ -12,6 +12,7 @@
     "check": "biome check --apply ./src"
   },
   "dependencies": {
+    "@svgr/webpack": "^8.1.0",
     "axios": "^1.8.4",
     "next": "15.3.0",
     "next-auth": "^4.24.11",
