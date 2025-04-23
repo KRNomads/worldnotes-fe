@@ -1,0 +1,55 @@
+/* components/LoadingSpinner.module.scss */
+
+// --- 변수 정의 ---
+$default-size: 36px; // 기본 크기
+$default-thickness: 4px; // 기본 두께
+$track-color: rgba(0, 0, 0, 0.1); // 스피너 배경 트랙 색상 (연한 회색)
+$default-spinner-color: #0070f3; // 기본 스피너 색상 (props로 전달된 값으로 덮어쓰여짐)
+$animation-duration: 0.8s; // 애니메이션 속도
+
+// --- 스타일 정의 ---
+.spinnerContainer {
+  display: inline-flex; // 다른 요소와 인라인으로 배치
+  justify-content: center;
+  align-items: center;
+}
+
+.spinner {
+  // 변수 사용
+  border-width: $default-thickness;
+  border-style: solid;
+  border-color: $track-color; // 배경 트랙 색상 설정
+  border-radius: 50%; // 원형
+  width: $default-size; // 기본 너비 (인라인 스타일로 덮어쓰여짐)
+  height: $default-size; // 기본 높이 (인라인 스타일로 덮어쓰여짐)
+
+  // border-left-color는 인라인 스타일(props.color)로 설정됨
+  // 기본값을 여기서 설정할 수도 있지만, 인라인 스타일 방식이 우선됨
+  // border-left-color: $default-spinner-color;
+
+  // 애니메이션 적용
+  animation: spin $animation-duration linear infinite;
+}
+
+// 회전 애니메이션 키프레임 (SCSS 내에서도 동일하게 사용)
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+// 스크린 리더 전용 텍스트 숨김 (이전과 동일)
+.visuallyHidden {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+  white-space: nowrap;
+}
