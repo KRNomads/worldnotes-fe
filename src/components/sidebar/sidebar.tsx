@@ -1,18 +1,81 @@
-// src/components/Sidebar.tsx
+// src/components/sidebar/sidebar.tsx
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
 import styles from "./sidebar.module.scss";
+import settingIcon from "../../../public/settingIcon.svg";
+
+// 모달 컴포넌트를 사이드바 파일 내에 정의
+function SettingsModal({ onClose }: { onClose: () => void }) {
+  const modalRef = React.useRef<HTMLDivElement>(null);
+
+  // ESC 키로 모달 닫기
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
+    // 모달 외부 클릭 시 닫기
+    const handleClickOutside = (e: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("mousedown", handleClickOutside);
+
+    // 모달이 열릴 때 스크롤 방지
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("mousedown", handleClickOutside);
+
+      // 모달이 닫힐 때 스크롤 복원
+      document.body.style.overflow = "auto";
+    };
+  }, [onClose]);
+
+  return (
+    <div className={styles.modalOverlay}>
+      <div className={styles.modalContainer} ref={modalRef}>
+        <div className={styles.modalHeader}>
+          <h2 className={styles.modalTitle}>설정</h2>
+          <button
+            className={styles.closeButton}
+            onClick={onClose}
+            aria-label="닫기"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div className={styles.modalContent}>
+          <div className={styles.settingsSection}>
+            <h3 className={styles.sectionTitle}>API 발급</h3>
+            <div className={styles.settingItem}></div>
+          </div>
+        </div>
+
+        <div className={styles.modalFooter}>
+          <button className={styles.cancelButton} onClick={onClose}>
+            취소
+          </button>
+          <button className={styles.saveButton}>확인</button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 interface SidebarProps {
-  activeItem?:
-    | "home"
-    | "projects"
-    | "basicinfo"
-    | "characters"
-    | "worldbuilding";
+  activeItem?: "home" | "basicinfo" | "characters" | "worldbuilding";
   isProjectSidebar?: boolean;
 }
 
@@ -21,6 +84,7 @@ export default function Sidebar({
   isProjectSidebar = false,
 }: SidebarProps) {
   const { logout } = useAuth();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -28,7 +92,16 @@ export default function Sidebar({
 
   return (
     <div className={styles.sidebar}>
-      <h1 className={styles.logo}>World Note</h1>
+      <div className={styles.sidebarTop}>
+        <h1 className={styles.logo}>World Note</h1>
+        <button
+          className={styles.settingsButton}
+          onClick={() => setIsModalOpen(true)}
+          aria-label="설정"
+        >
+          <Image src={settingIcon} alt="설정" width={30} height={30} />
+        </button>
+      </div>
 
       <div className={styles.menuContainer}>
         {isProjectSidebar ? (
@@ -89,6 +162,9 @@ export default function Sidebar({
           로그아웃
         </button>
       </div>
+
+      {/* 모달 렌더링 */}
+      {isModalOpen && <SettingsModal onClose={() => setIsModalOpen(false)} />}
     </div>
   );
 }
