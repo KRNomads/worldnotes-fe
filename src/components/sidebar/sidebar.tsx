@@ -77,11 +77,13 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
 interface SidebarProps {
   activeItem?: "home" | "basicinfo" | "characters" | "worldbuilding";
   isProjectSidebar?: boolean;
+  projectId?: string; // 프로젝트 ID 추가
 }
 
 export default function Sidebar({
   activeItem = "home",
   isProjectSidebar = false,
+  projectId = "", // 기본값 설정
 }: SidebarProps) {
   const { logout } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -105,10 +107,10 @@ export default function Sidebar({
 
       <div className={styles.menuContainer}>
         {isProjectSidebar ? (
-          // 프로젝트 관련 사이드바 메뉴
+          // 프로젝트 관련 사이드바 메뉴 (동적 라우팅 적용)
           <>
             <Link
-              href="/project/basicinfo"
+              href={`/project/${projectId}/basicinfo`}
               className={`${styles.navItem} ${
                 activeItem === "basicinfo" ? styles.navItemActive : ""
               }`}
@@ -117,7 +119,7 @@ export default function Sidebar({
             </Link>
 
             <Link
-              href="/project/characters"
+              href={`/project/${projectId}/characters`}
               className={`${styles.navItem} ${
                 activeItem === "characters" ? styles.navItemActive : ""
               }`}
@@ -126,7 +128,7 @@ export default function Sidebar({
             </Link>
 
             <Link
-              href="/project/worldbuilding"
+              href={`/project/${projectId}/worldbuilding`}
               className={`${styles.navItem} ${
                 activeItem === "worldbuilding" ? styles.navItemActive : ""
               }`}

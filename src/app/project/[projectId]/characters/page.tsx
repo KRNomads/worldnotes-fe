@@ -1,8 +1,11 @@
+// src/app/project/[projectId]/characters/page.tsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import styles from "./characters.module.scss";
-import Sidebar from "../../../components/sidebar/sidebar";
+import Sidebar from "@/components/sidebar/sidebar";
+import { useProjectStore } from "@/store/projectStore";
 
 // 프로필 항목의 타입 정의
 interface ProfileItem {
@@ -12,6 +15,10 @@ interface ProfileItem {
 }
 
 export default function Characters() {
+  const params = useParams();
+  const projectId = params.projectId as string;
+  const { error, fetchProject } = useProjectStore();
+
   // 선택된 캐릭터 상태 관리
   const [selectedCharacter, setSelectedCharacter] = useState<string | null>(
     "character1"
@@ -21,6 +28,13 @@ export default function Characters() {
   const [profileItems, setProfileItems] = useState<ProfileItem[]>([
     { id: "profile-1", label: "이름", value: "" },
   ]);
+
+  // 컴포넌트 마운트 시 프로젝트 데이터 로드
+  useEffect(() => {
+    if (projectId) {
+      fetchProject(projectId);
+    }
+  }, [projectId, fetchProject]);
 
   // 캐릭터 데이터 (예시)
   const charactersList = [
@@ -60,10 +74,28 @@ export default function Characters() {
     );
   };
 
+  if (error) {
+    return (
+      <div className={styles.errorContainer}>
+        <p>{error}</p>
+        <button
+          onClick={() => fetchProject(projectId)}
+          className={styles.retryButton}
+        >
+          다시 시도
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
       {/* 사이드바 */}
-      <Sidebar activeItem="characters" isProjectSidebar={true} />
+      <Sidebar
+        activeItem="characters"
+        isProjectSidebar={true}
+        projectId={projectId}
+      />
 
       {/* 메인 콘텐츠 영역 */}
       <div className={styles.mainContent}>

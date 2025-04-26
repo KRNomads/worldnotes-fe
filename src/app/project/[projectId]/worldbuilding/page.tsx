@@ -2,7 +2,7 @@
 
 import React from "react";
 import styles from "../basicinfo/basicinfo.module.scss";
-import Sidebar from "../../../components/sidebar/sidebar";
+import Sidebar from "@/components/sidebar/sidebar";
 
 export default function Worldbuilding() {
   return (
