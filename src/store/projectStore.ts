@@ -17,15 +17,6 @@ interface CreateProjectResponse {
   description?: string;
 }
 
-// 프로젝트 상세 조회 응답 타입
-interface ProjectDetailResponse {
-  projectId: string;
-  userId: string;
-  title: string;
-  description?: string;
-  // 다른 필드들이 있다면 추가
-}
-
 interface ProjectState {
   projects: Project[];
   currentProject: Project | null;
@@ -40,6 +31,14 @@ interface ProjectState {
     title: string;
     description?: string;
   }) => Promise<Project>;
+  updateProject: (
+    projectId: string,
+    updateData: {
+      title?: string;
+      description?: string;
+    }
+  ) => Promise<Project>;
+  deleteProject: (projectId: string) => Promise<void>;
 }
 
 export const useProjectStore = create<ProjectState>((set, get) => ({
@@ -48,15 +47,12 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   isLoading: false,
   error: null,
 
-  // src/store/projectStore.ts - 수정된 fetchUserProjects 함수
-
   fetchUserProjects: async () => {
     set({ isLoading: true, error: null });
     try {
       // API에서 프로젝트 목록 가져오기
       const response = await api.get("/api/v1/projects");
 
-      // --- *** 여기가 수정된 부분입니다 *** ---
       // API 응답 데이터를 Project[] 타입으로 변환 (id 필드 매핑)
       const fetchedProjects: Project[] = response.data.map(
         (projectData: any) => ({
@@ -66,11 +62,9 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
           lastModified: projectData.lastModified || new Date().toISOString(),
           // 백엔드 응답에 다른 필드(description, genre 등)가 있다면 여기에 추가합니다.
           description: projectData.description,
-          genre: projectData.genre,
           userId: projectData.userId,
         })
       );
-      // --- *** 수정 끝 *** ---
 
       // 매핑된 데이터로 상태 업데이트
       set({ projects: fetchedProjects, isLoading: false });
@@ -82,6 +76,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       });
     }
   },
+
   fetchProject: async (projectId) => {
     // 프로젝트 ID가 유효한지 확인
     if (!projectId || projectId === "undefined") {
@@ -169,6 +164,89 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       }
       set({
         error: "프로젝트 생성에 실패했습니다",
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  updateProject: async (projectId, updateData) => {
+    set({ isLoading: true, error: null });
+    try {
+      // 백엔드 API가 요구하는 형식으로 변환
+      const requestData = {
+        name: updateData.title, // title -> name으로 변환
+        description: updateData.description,
+      };
+
+      console.log(`프로젝트 업데이트 요청 데이터:`, requestData);
+
+      const response = await api.put(
+        `/api/v1/projects/${projectId}`,
+        requestData
+      );
+      console.log("프로젝트 업데이트 응답:", response.data);
+
+      // 응답에서 받은 데이터를 Project 타입에 맞게 변환
+      const updatedProject: Project = {
+        id: response.data.projectId,
+        title: response.data.title,
+        lastModified: new Date().toISOString(), // 현재 시간으로 업데이트
+        description: response.data.description,
+        userId: response.data.userId,
+      };
+
+      // 프로젝트 목록과 현재 프로젝트 상태 업데이트
+      set((state) => ({
+        projects: state.projects.map((project) =>
+          project.id === projectId ? updatedProject : project
+        ),
+        currentProject:
+          state.currentProject?.id === projectId
+            ? updatedProject
+            : state.currentProject,
+        isLoading: false,
+      }));
+
+      return updatedProject;
+    } catch (error) {
+      console.error(`프로젝트 ID ${projectId} 업데이트 실패:`, error);
+      // 에러 응답 내용 확인
+      if (error.response) {
+        console.error("에러 응답 데이터:", error.response.data);
+      }
+      set({
+        error: "프로젝트 업데이트에 실패했습니다",
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  // 새로 추가된 deleteProject 함수
+  deleteProject: async (projectId) => {
+    set({ isLoading: true, error: null });
+    try {
+      console.log(`프로젝트 삭제 요청: /api/v1/projects/${projectId}`);
+
+      await api.delete(`/api/v1/projects/${projectId}`);
+      console.log(`프로젝트 ID ${projectId} 삭제 성공`);
+
+      // 삭제된 프로젝트를 상태에서 제거
+      set((state) => ({
+        projects: state.projects.filter((project) => project.id !== projectId),
+        currentProject:
+          state.currentProject?.id === projectId ? null : state.currentProject,
+        isLoading: false,
+      }));
+    } catch (error) {
+      console.error(`프로젝트 ID ${projectId} 삭제 실패:`, error);
+      // 에러 응답 내용 확인
+      if (error.response) {
+        console.error("에러 응답 데이터:", error.response.data);
+      }
+      set({
+        error: "프로젝트 삭제에 실패했습니다",
         isLoading: false,
       });
       throw error;
