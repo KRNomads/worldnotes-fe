@@ -95,7 +95,9 @@ export default function Sidebar({
   return (
     <div className={styles.sidebar}>
       <div className={styles.sidebarTop}>
-        <h1 className={styles.logo}>World Note</h1>
+        <Link href={`/dashboard`} className={styles.logo}>
+          World Note
+        </Link>
         <button
           className={styles.settingsButton}
           onClick={() => setIsModalOpen(true)}

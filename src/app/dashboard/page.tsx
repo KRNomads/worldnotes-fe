@@ -44,7 +44,7 @@ export default function Dashboard() {
 
       // 생성된 프로젝트의 기본정보 페이지로 이동
       if (newProject && newProject.id) {
-        router.push(`/project/${newProject.id}/basicinfo`);
+        router.push(`/project/${newProject.id}`);
       } else {
         console.error("프로젝트 ID가 없습니다:", newProject);
       }
@@ -59,7 +59,7 @@ export default function Dashboard() {
     if (editingProjectId === projectId) {
       return;
     }
-    router.push(`/project/${projectId}/basicinfo`);
+    router.push(`/project/${projectId}`);
   };
 
   // 수정 버튼 클릭 핸들러
