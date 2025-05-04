@@ -1,39 +1,15 @@
 // src/store/noteStore.ts
 import { create } from "zustand";
 import axios, { AxiosError, AxiosResponse } from "axios";
-
-interface Note {
-  id: string;
-  projectId: string;
-  title: string;
-  type: string;
-  position: number; //이건 노트순서
-  lastModified?: string;
-}
+import {
+  Note,
+  NoteResponse,
+  NoteCreateRequest,
+  NoteUpdateRequest,
+} from "@/types/note";
 
 // API 기본 URL 설정
 const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-
-// API 응답 타입 정의
-interface NoteResponse {
-  noteId: string;
-  projectId: string;
-  title: string;
-  type: string;
-  position: number;
-}
-
-// 노트 생성 요청 타입
-interface NoteCreateRequest {
-  projectId: string;
-  title: string;
-  type: string; // "BASIC_INFO" | "CHARACTER" | "DETAILS"
-}
-
-// 노트 업데이트 요청 타입
-interface NoteUpdateRequest {
-  title: string;
-}
 
 interface NoteState {
   // 상태 관리
@@ -308,7 +284,7 @@ export const useNoteStore = create<NoteState>((set, get) => ({
       // 삭제된 노트를 상태에서 제거
       set((state) => ({
         notes: state.notes.filter((note) => note.id !== noteId),
-        currentNote:
+        currentBlock:
           state.currentNote?.id === noteId ? null : state.currentNote,
         isLoading: false,
       }));
