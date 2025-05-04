@@ -2,14 +2,13 @@
 import { create } from "zustand";
 import axios, { AxiosError, AxiosResponse } from "axios";
 
-// API 명세서를 기반으로 프론트엔드에서 사용할 Note 타입 정의
 interface Note {
-  id: string; // 노트 ID (서버에서는 noteId)
-  projectId: string; // 프로젝트 ID
-  title: string; // 노트 제목
-  type: string; // 노트 타입 (BASIC_INFO, CHARACTER, DETAILS)
-  position: number; // 노트 순서
-  lastModified?: string; // 마지막 수정 시간 (프론트에서 추가)
+  id: string;
+  projectId: string;
+  title: string;
+  type: string;
+  position: number; //이건 노트순서
+  lastModified?: string;
 }
 
 // API 기본 URL 설정
