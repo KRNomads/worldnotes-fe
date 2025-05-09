@@ -29,7 +29,6 @@ interface BlockState {
   deleteBlock: (blockId: number) => Promise<void>;
 }
 
-// axios 인스턴스 생성
 const api = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
