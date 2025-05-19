@@ -1,15 +1,44 @@
 // src/app/project/[projectId]/basicinfo/page.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams } from "next/navigation";
 import styles from "./basicinfo.module.scss";
 import Sidebar from "@/components/sidebar/sidebar";
 import { useProjectStore } from "@/store/projectStore";
-// Note 타입은 필요하다면 @/types/note에서 직접 가져옵니다.
-// import { Note } from "@/types/note";
-import { useNoteStore } from "@/store/noteStore"; // 수정된 스토어 사용
+import { useNoteStore } from "@/store/noteStore";
 import { useBlockStore } from "@/store/blockStore";
+import type {
+  Block,
+  BlockCreateRequest,
+  BlockUpdateRequest,
+  TextBlockProperties,
+} from "@/types/block";
+import axios from "axios"; // AxiosError 타입 명시적 임포트
+
+// 디바운스 훅 (제네릭 타입 개선 시도)
+function useDebounce<TCallback extends (...args: any[]) => void>( // eslint-disable-line @typescript-eslint/no-explicit-any
+  callback: TCallback,
+  delay: number
+): (...args: Parameters<TCallback>) => void {
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const debouncedCallback = useCallback(
+    (...args: Parameters<TCallback>) => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => callback(...args), delay);
+    },
+    [callback, delay]
+  );
+  useEffect(
+    () => () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    },
+    []
+  );
+  return debouncedCallback;
+}
+
+const EMPTY_ARRAY: Block[] = [];
 
 export default function BasicInfoPage() {
   const params = useParams();
@@ -18,135 +47,372 @@ export default function BasicInfoPage() {
   const {
     currentProject,
     fetchProject,
+    updateProject,
+    isLoading: isLoadingProject,
     error: projectError,
   } = useProjectStore();
 
-  // noteStore에서 BASIC_INFO 노트 전용 상태와 액션을 가져옵니다.
   const {
-    activeProjectBasicInfoNote, // 전용 상태 사용
-    ensureActiveProjectBasicInfoNote, // 전용 액션 사용
-    isLoadingActiveProjectBasicInfoNote, // 전용 로딩 상태 사용
-    errorActiveProjectBasicInfoNote, // 전용 에러 상태 사용
+    activeProjectBasicInfoNote,
+    ensureActiveProjectBasicInfoNote,
+    createNote,
+    isLoadingActiveProjectBasicInfoNote,
+    errorActiveProjectBasicInfoNote,
   } = useNoteStore();
 
   const {
-    blocks,
     fetchBlocksByNote,
-    isLoading: blocksLoading, // 블록 스토어의 로딩 상태
-    error: blocksError, // 블록 스토어의 에러 상태
+    createBlock,
+    updateBlock,
+    isLoading: isLoadingBlocksGlobal,
+    error: errorBlocksGlobal,
   } = useBlockStore();
 
-  // 로컬 basicInfoNote 상태는 이제 필요 없습니다. activeProjectBasicInfoNote를 직접 사용합니다.
-  // const [basicInfoNote, setBasicInfoNote] = useState<Note | null>(null);
-
-  const [formData, setFormData] = useState({
-    projectTitle: "",
-    genre: "",
+  const [formData, setFormData] = useState({ projectTitle: "", genre: "" });
+  const [isSaving, setIsSaving] = useState<"projectTitle" | "genre" | null>(
+    null
+  );
+  const [lastSaveError, setLastSaveError] = useState<string | null>(null);
+  const initialLoadTracker = useRef({
+    project: false,
+    note: false,
+    blocksInitialFetchDone: false,
   });
 
-  // 1. 프로젝트 정보 가져오기 (변경 없음)
+  const basicInfoNoteId = activeProjectBasicInfoNote?.id;
+  const currentNoteBlocks = useBlockStore((state) =>
+    basicInfoNoteId
+      ? state.blocksByNoteId[basicInfoNoteId] || EMPTY_ARRAY
+      : EMPTY_ARRAY
+  );
+
+  // --- 데이터 로딩 useEffects (이전과 동일) ---
   useEffect(() => {
     if (projectId) {
-      fetchProject(projectId);
+      fetchProject(projectId)
+        .then(() => {
+          initialLoadTracker.current.project = true;
+        })
+        .catch((e) => {
+          console.error("Failed to fetch project", e);
+          initialLoadTracker.current.project = true;
+        });
     }
   }, [projectId, fetchProject]);
 
-  // 2. BASIC_INFO 노트 메타데이터 로드 (ensure... 액션 사용으로 변경)
   useEffect(() => {
     if (projectId) {
-      ensureActiveProjectBasicInfoNote(projectId);
+      ensureActiveProjectBasicInfoNote(projectId).catch((e) =>
+        console.error("Failed to ensure basic info note", e)
+      );
     }
   }, [projectId, ensureActiveProjectBasicInfoNote]);
 
-  // 3. BASIC_INFO 노트(스토어의 activeProjectBasicInfoNote)가 식별되면 해당 노트의 블록 가져오기
   useEffect(() => {
-    if (activeProjectBasicInfoNote && activeProjectBasicInfoNote.id) {
-      fetchBlocksByNote(activeProjectBasicInfoNote.id);
+    if (activeProjectBasicInfoNote !== undefined) {
+      initialLoadTracker.current.note = true;
     }
-    // 만약 activeProjectBasicInfoNote가 null이 되면 (예: 프로젝트 변경 또는 노트 삭제 시)
-    // blocks 상태를 초기화하는 로직을 blockStore에 추가하거나 여기서 처리할 수 있습니다.
-    // 예: else if (!activeProjectBasicInfoNote && blocks.length > 0) { get().clearBlocks(); } (blockStore에 clearBlocks가 있다면)
-  }, [activeProjectBasicInfoNote, fetchBlocksByNote]);
+  }, [activeProjectBasicInfoNote]);
 
-  // 4. currentProject와 (스토어의) activeProjectBasicInfoNote, 그리고 blocks 데이터로 폼 상태 업데이트
   useEffect(() => {
-    if (currentProject) {
+    if (basicInfoNoteId) {
+      fetchBlocksByNote(basicInfoNoteId)
+        .then(() => {
+          initialLoadTracker.current.blocksInitialFetchDone = true;
+        })
+        .catch((e) => {
+          console.error("Failed to fetch blocks for note:", basicInfoNoteId, e);
+          initialLoadTracker.current.blocksInitialFetchDone = true;
+        });
+    } else if (
+      activeProjectBasicInfoNote === null &&
+      !isLoadingActiveProjectBasicInfoNote
+    ) {
+      initialLoadTracker.current.blocksInitialFetchDone = true;
+    }
+  }, [
+    basicInfoNoteId,
+    fetchBlocksByNote,
+    activeProjectBasicInfoNote,
+    isLoadingActiveProjectBasicInfoNote,
+  ]);
+
+  // --- 폼 데이터 초기화 (fieldKey 우선으로 장르 블록 식별) ---
+  useEffect(() => {
+    if (initialLoadTracker.current.project && currentProject) {
       setFormData((prev) => ({
         ...prev,
         projectTitle: currentProject.title || "",
       }));
     }
+  }, [currentProject]);
 
-    if (activeProjectBasicInfoNote && blocks.length > 0) {
-      const genreBlock = blocks.find(
-        (b) => b.title === "genre" /* 또는 b.fieldKey === 'genre' */
-      );
-      setFormData((prev) => ({
-        ...prev,
-        genre: genreBlock?.properties?.text || "",
-      }));
-    } else if (
-      activeProjectBasicInfoNote &&
-      blocks.length === 0 &&
-      !blocksLoading
+  useEffect(() => {
+    if (
+      initialLoadTracker.current.note &&
+      initialLoadTracker.current.blocksInitialFetchDone
     ) {
-      // 노트는 있지만 블록이 로딩 중이 아니면서 비어있을 때 (예: 새 노트)
-      setFormData((prev) => ({ ...prev, genre: "" }));
-    } else if (!activeProjectBasicInfoNote) {
-      // 노트 자체가 없을 때 (예: 아직 생성 전)
-      setFormData((prev) => ({ ...prev, genre: "" }));
+      if (basicInfoNoteId && currentNoteBlocks.length > 0) {
+        const genreBlock =
+          currentNoteBlocks.find(
+            (b: Block) => b.fieldKey === "genre" && b.type === "TEXT"
+          ) ||
+          currentNoteBlocks.find(
+            (b: Block) => b.title === "genre" && b.type === "TEXT"
+          ); // fallback
+
+        const genreText =
+          (genreBlock?.properties as TextBlockProperties)?.value || "";
+        setFormData((prev) => ({ ...prev, genre: genreText }));
+      } else {
+        setFormData((prev) => ({ ...prev, genre: "" }));
+      }
     }
-  }, [currentProject, activeProjectBasicInfoNote, blocks, blocksLoading]);
+  }, [basicInfoNoteId, currentNoteBlocks]);
+
+  const isInitialLoadComplete = () => {
+    return (
+      initialLoadTracker.current.project &&
+      initialLoadTracker.current.note &&
+      initialLoadTracker.current.blocksInitialFetchDone
+    );
+  };
+
+  // --- 자동 저장 로직 (작품 제목 - 이전과 동일) ---
+  const autoSaveProjectTitle = useCallback(
+    async (newTitle: string) => {
+      if (!isInitialLoadComplete() || !projectId || !updateProject) return;
+      if (newTitle === (currentProject?.title || "")) return;
+
+      setIsSaving("projectTitle");
+      setLastSaveError(null);
+      try {
+        await updateProject(projectId, { title: newTitle });
+        console.log("작품 제목 자동 저장 완료:", newTitle);
+      } catch (error: unknown) {
+        const message =
+          error instanceof Error ? error.message : "알 수 없는 오류";
+        console.error("작품 제목 자동 저장 실패:", error);
+        setLastSaveError(`작품 제목 저장 실패: ${message}`);
+      } finally {
+        setIsSaving(null);
+      }
+    },
+    [projectId, updateProject, currentProject]
+  );
+
+  const debouncedAutoSaveProjectTitle = useDebounce(autoSaveProjectTitle, 1000);
+
+  useEffect(() => {
+    if (isInitialLoadComplete()) {
+      debouncedAutoSaveProjectTitle(formData.projectTitle);
+    }
+  }, [formData.projectTitle, debouncedAutoSaveProjectTitle]);
+
+  // --- 자동 저장 로직 (장르 - fieldKey: "genre"로 생성) ---
+  const autoSaveGenreBlock = useCallback(
+    async (newGenreText: string) => {
+      if (!isInitialLoadComplete() || !projectId) return;
+
+      const genreBlockFromState = basicInfoNoteId
+        ? currentNoteBlocks.find(
+            (b: Block) =>
+              (b.fieldKey === "genre" && b.type === "TEXT") ||
+              (b.title === "genre" && b.type === "TEXT")
+          )
+        : undefined;
+      if (
+        newGenreText ===
+        ((genreBlockFromState?.properties as TextBlockProperties)?.value || "")
+      )
+        return;
+
+      setIsSaving("genre");
+      setLastSaveError(null);
+      let noteIdToUse = basicInfoNoteId;
+
+      try {
+        if (!noteIdToUse) {
+          if (!createNote)
+            throw new Error("createNote 함수가 정의되지 않았습니다.");
+          console.log("BASIC_INFO 노트 생성 시도");
+          const newNote = await createNote({
+            projectId,
+            title: "기본 정보",
+            type: "BASIC_INFO",
+          });
+          if (newNote?.id) {
+            noteIdToUse = newNote.id;
+            console.log("BASIC_INFO 노트 생성됨, ID:", noteIdToUse);
+          } else {
+            throw new Error("기본 정보 노트 생성에 실패했습니다.");
+          }
+        }
+
+        if (noteIdToUse) {
+          const genreBlock = currentNoteBlocks.find(
+            (b: Block) =>
+              ((b.fieldKey === "genre" && b.type === "TEXT") ||
+                (b.title === "genre" && b.type === "TEXT")) &&
+              b.noteId === noteIdToUse
+          );
+
+          const newTextProperties: TextBlockProperties = {
+            type: "TEXT",
+            value: newGenreText,
+          };
+
+          if (genreBlock) {
+            if (!updateBlock)
+              throw new Error("updateBlock 함수가 정의되지 않았습니다.");
+            const payloadForUpdate: BlockUpdateRequest = {
+              type: genreBlock.type, // "TEXT"
+              properties: newTextProperties,
+              title: genreBlock.title, // 기존 title 유지 (또는 "genre"로 고정)
+              // fieldKey는 BlockUpdateRequest 타입에 포함되지 않으므로 보내지 않음 (API 명세에 따름)
+            };
+
+            console.log(
+              "[BasicInfoPage] 장르 업데이트 전송 직전 payload:",
+              JSON.parse(JSON.stringify(payloadForUpdate))
+            );
+            // ... (JSON.stringify 로깅)
+
+            await updateBlock(
+              genreBlock.blockId,
+              noteIdToUse,
+              payloadForUpdate
+            );
+            console.log(
+              `장르 블록(ID:${genreBlock.blockId}) 자동 업데이트 완료:`,
+              newGenreText
+            );
+          } else {
+            if (!createBlock)
+              throw new Error("createBlock 함수가 정의되지 않았습니다.");
+
+            // BlockCreateRequest의 fieldKey 타입이 string | null | undefined 를 허용하므로 "genre" 전달
+            const newBlockData: BlockCreateRequest = {
+              noteId: noteIdToUse,
+              title: "genre", // 새 "genre" 블록의 title
+              type: "TEXT",
+              properties: newTextProperties,
+              fieldKey: "genre", // 명시적으로 "genre" fieldKey로 생성
+            };
+
+            const createdBlock = await createBlock(newBlockData);
+            if (!createdBlock)
+              throw new Error("장르 블록 생성 API 호출 실패 (반환값 없음).");
+            console.log(
+              `장르 블록 자동 생성 완료 (ID:${createdBlock.blockId}):`,
+              newGenreText
+            );
+          }
+        }
+      } catch (error: unknown) {
+        // any 대신 unknown 사용
+        const message =
+          error instanceof Error ? error.message : "알 수 없는 오류";
+        console.error("장르 정보 자동 저장 실패:", error);
+        let serverResponseMessage = "";
+        if (axios.isAxiosError(error) && error.response?.data) {
+          const responseData = error.response.data;
+          // 서버 응답 데이터가 객체이고 특정 속성을 가지고 있는지 더 안전하게 확인
+          if (responseData && typeof responseData === "object") {
+            if (
+              "message" in responseData &&
+              typeof responseData.message === "string"
+            ) {
+              serverResponseMessage = responseData.message;
+            } else if (
+              "error" in responseData &&
+              typeof responseData.error === "string"
+            ) {
+              serverResponseMessage = responseData.error;
+            }
+          }
+          if (!serverResponseMessage && responseData) {
+            try {
+              // JSON.stringify도 실패할 수 있으므로 try-catch
+              serverResponseMessage = JSON.stringify(responseData);
+            } catch (err) {
+              serverResponseMessage =
+                "서버 응답을 문자열로 변환하는데 실패했습니다.";
+            }
+          }
+        }
+        setLastSaveError(
+          `장르 정보 저장 실패: ${serverResponseMessage || message}`
+        );
+      } finally {
+        setIsSaving(null);
+      }
+    },
+    [
+      projectId,
+      basicInfoNoteId,
+      currentNoteBlocks,
+      createNote,
+      updateBlock,
+      createBlock,
+    ]
+  );
+
+  const debouncedAutoSaveGenreBlock = useDebounce(autoSaveGenreBlock, 1000);
+
+  useEffect(() => {
+    if (isInitialLoadComplete()) {
+      debouncedAutoSaveGenreBlock(formData.genre);
+    }
+  }, [formData.genre, debouncedAutoSaveGenreBlock]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("저장될 데이터:", {
-      projectId: projectId,
-      projectTitle: formData.projectTitle,
-      basicInfoNoteId: activeProjectBasicInfoNote?.id, // 스토어의 노트 ID 사용
-      genre: formData.genre,
-    });
-    // 여기에 프로젝트 제목 저장 로직 (projectStore.updateProject(...))
-    // 그리고 'genre' 블록 저장 로직 (blockStore.updateBlock 또는 createBlock) 구현
-  };
+  const isPageStillInitializing = !(
+    initialLoadTracker.current.project &&
+    initialLoadTracker.current.note &&
+    initialLoadTracker.current.blocksInitialFetchDone
+  );
+  const pageDataLoadingError =
+    projectError || errorActiveProjectBasicInfoNote || errorBlocksGlobal;
+  const displayError = pageDataLoadingError || lastSaveError;
 
-  // 로딩 및 에러 UI (전용 상태 사용)
-  if (projectError || errorActiveProjectBasicInfoNote || blocksError) {
+  if (
+    isPageStillInitializing &&
+    (isLoadingProject ||
+      isLoadingActiveProjectBasicInfoNote ||
+      (basicInfoNoteId &&
+        isLoadingBlocksGlobal &&
+        !initialLoadTracker.current.blocksInitialFetchDone))
+  ) {
     return (
-      <div className={styles.errorContainer}>
-        <p>데이터 로드 중 오류 발생:</p>
-        {projectError && <p>- 프로젝트 오류: {projectError}</p>}
-        {errorActiveProjectBasicInfoNote && (
-          <p>- 기본 정보 노트 오류: {errorActiveProjectBasicInfoNote}</p>
-        )}
-        {blocksError && <p>- 세부 내용(블록) 오류: {blocksError}</p>}
+      <div className={styles.loadingContainer}>
+        <p>기본 정보를 불러오는 중입니다...</p>
       </div>
     );
   }
 
-  // 기본 정보 노트 메타데이터 로딩 중이거나, 노트는 있지만 블록이 로딩 중일 때
-  if (
-    isLoadingActiveProjectBasicInfoNote ||
-    (activeProjectBasicInfoNote && blocksLoading)
-  ) {
-    return <p>기본 정보를 불러오는 중입니다...</p>;
-  }
-
-  // 로딩이 끝났고, 에러도 없는데 activeProjectBasicInfoNote가 없는 경우 (예: 아직 생성되지 않음)
-  if (
-    !isLoadingActiveProjectBasicInfoNote &&
-    !activeProjectBasicInfoNote &&
-    !errorActiveProjectBasicInfoNote
-  ) {
-    // 이 UI는 필요에 따라 다르게 구성할 수 있습니다. (예: "기본 정보 노트를 생성하세요" 버튼 표시)
-    // 현재는 폼이 비어있는 상태로 렌더링됩니다.
+  if (displayError && !isSaving) {
+    return (
+      <div className={styles.errorContainer}>
+        <p>오류가 발생했습니다:</p>
+        {projectError && <p>- 프로젝트 정보 로드: {projectError}</p>}
+        {errorActiveProjectBasicInfoNote && (
+          <p>- 기본 노트 정보 로드: {errorActiveProjectBasicInfoNote}</p>
+        )}
+        {errorBlocksGlobal && !lastSaveError && (
+          <p>- 세부 항목 로드: {errorBlocksGlobal}</p>
+        )}
+        {lastSaveError && (
+          <p className={styles.saveErrorFeedback}>{lastSaveError}</p>
+        )}
+      </div>
+    );
   }
 
   return (
@@ -159,11 +425,19 @@ export default function BasicInfoPage() {
       <div className={styles.mainContent}>
         <div className={styles.header}>
           <h1 className={styles.headerTitle}>기본정보</h1>
-          {/* activeProjectBasicInfoNote가 있다면 그 제목을 부가적으로 표시할 수 있습니다. */}
-          {/* <h2>{activeProjectBasicInfoNote?.title}</h2> */}
+          <div className={styles.saveStatus}>
+            {isSaving && (
+              <span className={styles.savingIndicator}>
+                {isSaving === "projectTitle" ? "제목" : "장르"} 저장 중...
+              </span>
+            )}
+          </div>
         </div>
 
-        <form className={styles.formContainer} onSubmit={handleSubmit}>
+        <form
+          className={styles.formContainer}
+          onSubmit={(e) => e.preventDefault()}
+        >
           <div className={styles.formField}>
             <label htmlFor="projectTitle" className={styles.fieldLabel}>
               작품 제목
@@ -177,6 +451,7 @@ export default function BasicInfoPage() {
                 onChange={handleInputChange}
                 placeholder="작품 제목을 입력하세요"
                 className={styles.inputField}
+                disabled={isSaving === "projectTitle"}
               />
             </div>
           </div>
@@ -194,14 +469,9 @@ export default function BasicInfoPage() {
                 onChange={handleInputChange}
                 placeholder="장르를 입력하세요 (판타지, SF, 로맨스 등)"
                 className={styles.inputField}
+                disabled={isSaving === "genre"}
               />
             </div>
-          </div>
-
-          <div className={styles.buttonContainer}>
-            <button type="submit" className={styles.saveButton}>
-              저장
-            </button>
           </div>
         </form>
       </div>

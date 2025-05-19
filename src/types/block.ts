@@ -1,37 +1,62 @@
 // src/types/block.ts
 
+// 기본 블록 속성 (discriminator를 위해 모든 properties 객체에 포함될 수 있음)
+export interface BaseBlockProperties {
+  type: "TEXT" | "TAGS" | "IMAGE"; // 블록 타입에 따른 구분자
+}
+
+// TEXT 타입 블록의 properties
+export interface TextBlockProperties extends BaseBlockProperties {
+  type: "TEXT";
+  value: string;
+}
+
+// IMAGE 타입 블록의 properties
+export interface ImageBlockProperties extends BaseBlockProperties {
+  type: "IMAGE";
+  url: string;
+  caption?: string;
+}
+
+// TAGS 타입 블록의 properties
+export interface TagBlockProperties extends BaseBlockProperties {
+  type: "TAGS";
+  tags: string[];
+}
+
+// BlockDto.properties는 이들 중 하나가 될 수 있음
+export type BlockPropertiesUnion =
+  | TextBlockProperties
+  | ImageBlockProperties
+  | TagBlockProperties;
+
 /**
- * API 명세의 BlockDto 및 제공된 Java BlockDto 기반 타입
- * - `title`은 API 응답에 따라 nullable 할 수 있습니다.
- * - `fieldKey`는 API 생성 요청에는 있으나, DTO 명세에는 명시적으로 없습니다.
- * 응답에 포함된다면 유용할 수 있어 옵셔널로 추가합니다. (백엔드 확인 필요)
- * - `isDefault`도 생성 시에 주로 사용될 수 있어 옵셔널로 처리합니다.
+ * API 명세의 BlockDto 기반 타입
+ * - isDefault 필드 제거
+ * - position 필드는 서버 응답에 있으므로 유지
  */
 export interface Block {
-  blockId: number; // API: blockId (int64), Java: blockId (Long)
-  projectId: string; // API: projectId (uuid), Java: projectId (UUID)
-  noteId: string; // API: noteId (uuid), Java: noteId (UUID)
-  title: string | null; // API: title (string), Java: title (String)
-  isDefault?: boolean; // API: isDefault (boolean), Java: isDefault (boolean)
-  fieldKey?: string | null; // Java DTO에는 없으나, 생성 요청에는 존재. 응답 DTO에 포함 여부 확인 필요.
-  type: "TEXT" | "TAGS" | "IMAGE"; // API: type (enum), Java: BlockType (enum)
-  properties: Record<string, any>; // API: BlockProperties (object), Java: BlockProperties
-  position: number; // API: position (int32), Java: position (Integer)
+  blockId: number;
+  // projectId는 API 명세의 BlockDto에 명시적으로 없으므로 제거된 상태 유지.
+  noteId: string; // UUID
+  title: string | null;
+  fieldKey?: string | null; // API 명세 BlockDto에 추가됨.
+  type: "TEXT" | "TAGS" | "IMAGE";
+  properties: BlockPropertiesUnion;
+  position: number; // 서버 응답에 포함되므로 유지
 }
 
 /**
  * API 명세 기반 Block 생성 요청 타입 (POST /api/v1/blocks/block)
- * - `position`은 API 명세에는 없으나, 생성 시 위치 지정이 필요할 수 있습니다.
- * 백엔드에서 자동 관리한다면 불필요합니다.
+ * - isDefault 필드 제거
+ * - position 필드 제거 (API 명세에 없음)
  */
 export interface BlockCreateRequest {
   noteId: string; // uuid
   title: string;
-  isDefault?: boolean;
-  fieldKey?: string;
+  fieldKey?: string | null;
   type: "TEXT" | "TAGS" | "IMAGE";
-  properties: Record<string, any>;
-  position?: number;
+  properties: BlockPropertiesUnion;
 }
 
 /**
@@ -41,10 +66,17 @@ export interface BlocksCreateRequest {
   blocks: BlockCreateRequest[];
 }
 
-export type BlockUpdateRequest = Partial<
-  Omit<Block, "blockId" | "projectId" | "noteId">
->;
-// 예시: { title?: string; type?: "TEXT" | "TAGS" | "IMAGE"; properties?: Record<string, any>; position?: number; isDefault?: boolean; fieldKey?: string | null; }
+/**
+ * 블록 업데이트 API (PUT /api/v1/blocks/{blockId})의 요청 본문 타입.
+ * API 명세의 BlockUpdateRequest 스키마를 따름.
+ * - isDefault 필드 제거
+ * - position 필드 제거 (API 명세에 없음)
+ */
+export interface BlockUpdateRequest {
+  title?: string | null;
+  type?: "TEXT" | "TAGS" | "IMAGE";
+  properties?: BlockPropertiesUnion;
+}
 
-// API 응답에서 BlockDto가 실제 Block 타입과 동일하다고 가정합니다.
+// API 응답은 대부분 Block 타입 객체 또는 그 배열일 것으로 예상
 export type BlockResponse = Block;
