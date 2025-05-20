@@ -1,18 +1,19 @@
-// 브레이크포인트 믹스인
+// 브레이크포인트 믹스인 수정
 @mixin mobile {
-  @media (max-width: 767px) {
-    @content;
-  }
-}
-
-@mixin tablet {
-  @media (min-width: 768px) and (max-width: 1023px) {
+  @media (max-width: 1024px) {
     @content;
   }
 }
 
 @mixin desktop {
-  @media (min-width: 1024px) {
+  @media (min-width: 1025px) {
+    @content;
+  }
+}
+
+// 작은 모바일 화면용 믹스인 추가
+@mixin small-mobile {
+  @media (max-width: 500px) {
     @content;
   }
 }
@@ -20,7 +21,8 @@
 // 전체 레이아웃
 .container {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
+  background-color: #f5f7fa;
 
   @include mobile {
     flex-direction: column;
@@ -35,30 +37,36 @@
 
   @include mobile {
     flex-direction: row;
-    gap: 10px;
+    gap: 6px;
     overflow-x: auto;
     padding-bottom: 5px;
+    -ms-overflow-style: none; // IE 스크롤바 숨김
+    scrollbar-width: none; // Firefox 스크롤바 숨김
+
+    &::-webkit-scrollbar {
+      display: none; // Chrome, Safari 스크롤바 숨김
+    }
   }
 }
 
 // 메인 영역 스타일
 .mainArea {
+  margin-left: 280px;
   flex: 1;
   height: 100%;
   background-color: #f5f7fa;
-  padding: 40px 40px 10px;
+  padding: 40px 40px 20px;
   display: flex;
   flex-direction: column;
   gap: 20px;
   overflow-y: auto;
 
   @include mobile {
-    height: calc(100vh - 70px); // 사이드바 높이 빼기
-    padding: 20px 20px 10px;
-  }
-
-  @include tablet {
-    padding: 30px 30px 10px;
+    margin-left: 0;
+    margin-top: 120px; // 사이드바 높이에 맞게 조정
+    height: auto;
+    min-height: calc(100vh - 120px);
+    padding: 20px 16px;
   }
 }
 
@@ -66,11 +74,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 10px;
 
   @include mobile {
     flex-direction: column;
     align-items: flex-start;
     gap: 15px;
+    width: 100%;
   }
 }
 
@@ -81,10 +91,6 @@
 
   @include mobile {
     font-size: 20px;
-  }
-
-  @include tablet {
-    font-size: 22px;
   }
 }
 
@@ -109,6 +115,7 @@
 
   @include mobile {
     width: 100%;
+    height: 44px;
   }
 }
 
@@ -117,6 +124,7 @@
   font-size: 18px;
   color: #333333;
   margin-top: 10px;
+  margin-bottom: 10px;
 
   @include mobile {
     font-size: 16px;
@@ -124,47 +132,41 @@
 }
 
 .projectsContainer {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
   gap: 20px;
-  padding: 10px;
-  overflow-x: auto;
+  width: 100%;
 
-  @include mobile {
-    flex-direction: column;
-    gap: 15px;
+  @include desktop {
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
   }
 
-  @include tablet {
-    flex-wrap: wrap;
-    justify-content: flex-start;
+  @include mobile {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
 }
 
 .projectCard {
-  width: 360px;
-  height: 180px;
   background-color: #ffffff;
   border-radius: 8px;
-  padding: 20px 20px 10px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 15px;
   cursor: pointer;
-  transition: box-shadow 0.2s ease;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  height: 180px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 
   &:hover {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
   }
 
   @include mobile {
-    width: 100%;
     height: 160px;
-  }
-
-  @include tablet {
-    width: calc(50% - 15px);
-    flex-shrink: 0;
+    width: 100%;
   }
 }
 
@@ -172,6 +174,9 @@
   font-weight: 600;
   font-size: 16px;
   color: #333333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .lastModified {
@@ -187,6 +192,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
+  width: 100%;
 }
 
 // 수정 버튼
@@ -199,6 +205,7 @@
   font-size: 12px;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  flex-shrink: 0;
 
   &:hover {
     background-color: #f0f0f0;
@@ -264,6 +271,7 @@
   justify-content: space-between;
   align-items: center;
   margin-top: auto;
+  width: 100%;
 }
 
 // 삭제 버튼
@@ -276,6 +284,7 @@
   font-size: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
+  flex-shrink: 0;
 
   &:hover {
     background-color: #e74c3c;
@@ -295,6 +304,7 @@
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  padding: 20px;
 }
 
 // 모달 창
@@ -302,7 +312,8 @@
   background-color: #ffffff;
   border-radius: 8px;
   padding: 24px;
-  width: 400px;
+  width: 100%;
+  max-width: 400px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
   h3 {
@@ -315,6 +326,10 @@
   p {
     margin-bottom: 16px;
     color: #555555;
+  }
+
+  @include mobile {
+    padding: 20px;
   }
 }
 
@@ -330,6 +345,11 @@
   justify-content: flex-end;
   gap: 12px;
   margin-top: 24px;
+
+  @include mobile {
+    flex-direction: column;
+    gap: 8px;
+  }
 }
 
 // 삭제 취소 버튼
@@ -346,6 +366,10 @@
   &:hover {
     background-color: #e0e0e0;
   }
+
+  @include mobile {
+    order: 2;
+  }
 }
 
 // 삭제 확인 버튼
@@ -361,5 +385,21 @@
 
   &:hover {
     background-color: #c0392b;
+  }
+
+  @include mobile {
+    order: 1;
+  }
+}
+
+// 프로젝트가 없을 때 표시할 메시지
+.emptyProjectsMessage {
+  text-align: center;
+  padding: 40px 0;
+  color: #808080;
+  font-size: 16px;
+
+  @include mobile {
+    padding: 30px 0;
   }
 }
