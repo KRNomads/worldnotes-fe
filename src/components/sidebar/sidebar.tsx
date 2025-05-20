@@ -4,9 +4,9 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useAuth } from "@/hooks/useAuth";
 import styles from "./sidebar.module.scss";
 import settingIcon from "../../../public/settingIcon.svg";
+import { useAuthStore } from "@/store/authStore";
 
 // 모달 컴포넌트를 사이드바 파일 내에 정의
 function SettingsModal({ onClose }: { onClose: () => void }) {
@@ -85,7 +85,7 @@ export default function Sidebar({
   isProjectSidebar = false,
   projectId = "", // 기본값 설정
 }: SidebarProps) {
-  const { logout } = useAuth();
+  const { logout } = useAuthStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleLogout = () => {
