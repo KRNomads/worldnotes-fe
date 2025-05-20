@@ -1,3 +1,26 @@
+// 변수 정의
+$primary-color: #4f46e5;
+$primary-light: #818cf8;
+$primary-dark: #3730a3;
+$secondary-color: #f97316;
+$text-primary: #1e293b;
+$text-secondary: #64748b;
+$text-muted: #94a3b8;
+$bg-primary: #ffffff;
+$bg-secondary: #f8fafc;
+$bg-tertiary: #f1f5f9;
+$border-color: #e2e8f0;
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+  0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$transition-fast: 150ms ease;
+$transition-normal: 250ms ease;
+$font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+  Helvetica, Arial, sans-serif;
+
 // 브레이크포인트 믹스인
 @mixin mobile {
   @media (max-width: 767px) {
@@ -17,501 +40,678 @@
   }
 }
 
-// 전체 레이아웃
-.container {
+// 애니메이션 키프레임
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+// 페이지 레이아웃
+.pageContainer {
   display: flex;
-  height: 100vh;
-  background-color: #fafafa;
+  min-height: 100vh;
+  background-color: $bg-secondary;
+  font-family: $font-sans;
+  color: $text-primary;
+  position: relative;
 
   @include mobile {
     flex-direction: column;
   }
 }
 
-// 사이드바 스타일
-.sidebar {
-  width: 280px;
-  height: 100%;
-  background-color: #1f2945;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 24px 10px;
-  gap: 8px;
-
-  @include mobile {
-    width: 100%;
-    height: auto;
-    padding: 15px 10px;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    overflow-x: auto;
-  }
-}
-
-.logo {
-  font-family: "Inter", sans-serif;
-  font-weight: 700;
-  font-size: 24px;
-  color: #ffffff;
-  margin-bottom: 16px;
-
-  @include mobile {
-    margin-bottom: 0;
-    font-size: 20px;
-    margin-right: 12px;
-    white-space: nowrap;
-  }
-}
-
-.navContainer {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  gap: 8px;
-
-  @include mobile {
-    flex-direction: row;
-    overflow-x: auto;
-    margin-left: 8px;
-  }
-}
-
-.navItem {
-  display: flex;
-  align-items: center;
-  width: 240px;
-  height: 48px;
-  padding: 10px 16px;
-  border-radius: 4px;
-  color: #ccd6e0;
-  font-family: "Inter", sans-serif;
-  font-weight: 500;
-  font-size: 16px;
-  text-decoration: none;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-
-  @include mobile {
-    width: auto;
-    min-width: 120px;
-    white-space: nowrap;
-    padding: 8px 12px;
-    height: 40px;
-    font-size: 14px;
-  }
-}
-
-.navItemActive {
-  background-color: #2e3853;
-  color: #ffffff;
-}
-
-// 메인 컨텐츠 영역
 .mainContent {
+  margin-left: 280px;
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  max-height: 100vh;
+  padding: 24px;
+  overflow-y: auto; // 사이드바 너비만큼 여백 추가
 
   @include mobile {
-    max-height: none;
-  }
-}
-
-// 헤더
-.header {
-  width: 100%;
-  height: 60px;
-  background-color: #ffffff;
-  border-bottom: 1px solid #f0f0f0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-
-  @include mobile {
-    height: auto;
-    padding: 12px 16px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-}
-
-.headerTitle {
-  font-family: "Inter", sans-serif;
-  font-weight: 600;
-  font-size: 18px;
-  color: #1f2945;
-}
-
-.addCharacterBtn {
-  background-color: #1f2945;
-  color: #ffffff;
-  border: none;
-  border-radius: 4px;
-  padding: 8px 12px;
-  font-family: "Inter", sans-serif;
-  font-weight: 500;
-  font-size: 12px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: #2e3853;
-  }
-
-  @include mobile {
-    width: 100%;
-  }
-}
-
-// 컨텐츠 컨테이너
-.contentContainer {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-
-  @include mobile {
-    flex-direction: column;
-    overflow: auto;
-  }
-}
-
-// 캐릭터 목록 패널
-.charactersPanel {
-  width: 250px;
-  background-color: #ffffff;
-  border-right: 1px solid #f0f0f0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-
-  @include mobile {
-    width: 100%;
-    height: auto;
-    border-right: none;
-    border-bottom: 1px solid #f0f0f0;
-  }
-}
-
-.charactersPanelTitle {
-  font-family: "Inter", sans-serif;
-  font-weight: 600;
-  font-size: 16px;
-  color: #1f2945;
-  padding: 16px;
-}
-
-.divider {
-  width: 100%;
-  height: 1px;
-  background-color: #f0f0f0;
-}
-
-.charactersList {
-  flex: 1;
-  padding: 8px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-
-  @include mobile {
-    max-height: 200px;
-  }
-}
-
-.characterItem {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: #fafafa;
-  }
-}
-
-.characterItemActive {
-  background-color: #fafafa;
-}
-
-.characterAvatar {
-  width: 30px;
-  height: 30px;
-  background-color: #f0f0f0;
-  border-radius: 15px;
-  flex-shrink: 0;
-}
-
-.characterName {
-  font-family: "Inter", sans-serif;
-  font-weight: 500;
-  font-size: 14px;
-  color: #666666;
-}
-
-// 캐릭터 정보 패널
-.characterInfoPanel {
-  flex: 1;
-  background-color: #ffffff;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  overflow-y: auto;
-
-  @include mobile {
+    margin-left: 0;
     padding: 16px;
+    margin-top: 60px; // 모바일 사이드바 높이만큼 여백
+  }
+
+  @include tablet {
+    margin-left: 240px; // 태블릿에서 사이드바 너비만큼 여백 추가
   }
 }
 
-.characterInfoHeader {
+.contentWrapper {
+  margin: 0 auto;
+}
+
+.characterPageLayout {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.characterInfoTitle {
-  font-family: "Inter", sans-serif;
-  font-weight: 700;
-  font-size: 24px;
-  color: #1f2945;
-}
-
-.deleteBtn {
-  font-family: "Inter", sans-serif;
-  font-weight: 500;
-  font-size: 14px;
-  color: #cc4d4d;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
-// 캐릭터 정보 상단
-.characterInfoTop {
-  display: flex;
-  gap: 20px;
+  gap: 24px;
 
   @include mobile {
     flex-direction: column;
+    gap: 16px;
+  }
+
+  @include tablet {
+    gap: 20px;
   }
 }
 
-.characterImageArea {
-  width: 200px;
-  height: 220px;
-  background-color: #e0e0e0;
-  border: 1px solid #cccccc;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-shrink: 0;
+// 노트 목록 스타일
+.noteListContainer {
+  width: 280px;
+  background-color: $bg-primary;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+  overflow: hidden;
 
   @include mobile {
     width: 100%;
-    height: 250px;
+    margin-bottom: 20px;
+  }
+
+  @include tablet {
+    width: 240px;
   }
 }
 
-.characterImagePlaceholder {
-  font-size: 42px;
-  color: #999999;
-}
-
-.characterDescArea {
-  flex: 1;
+.noteListHeader {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid $border-color;
+  background-color: $bg-primary;
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: $text-primary;
+  }
 }
 
-.characterDescTitle {
-  font-family: "Inter", sans-serif;
-  font-weight: 600;
-  font-size: 16px;
-  color: #1f2945;
-}
-
-.characterDescInputContainer {
-  flex: 1;
-  border: 1px solid #e6e6e6;
-  background-color: #fafafa;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.characterDescInput {
-  width: 100%;
-  height: 100%;
-  min-height: 180px;
-  padding: 12px;
+.addNoteButton {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: $primary-color;
+  color: white;
   border: none;
-  background-color: transparent;
-  resize: vertical;
-  font-family: "Inter", sans-serif;
-  font-weight: 400;
-  font-size: 14px;
-  color: #333333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  transition: background-color $transition-fast;
 
-  &::placeholder {
-    color: #b3b3b3;
-  }
-
-  &:focus {
-    outline: none;
+  &:hover {
+    background-color: $primary-dark;
   }
 }
 
-// 캐릭터 프로필
-.characterProfile {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.noteList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+
+  @include mobile {
+    max-height: 300px;
+  }
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $bg-tertiary;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: $text-muted;
+    border-radius: 10px;
+  }
 }
 
-.profileTitle {
-  font-family: "Inter", sans-serif;
-  font-weight: 600;
-  font-size: 18px;
-  color: #334d66;
-}
+.noteItem {
+  padding: 14px 20px;
+  border-bottom: 1px solid $border-color;
+  cursor: pointer;
+  transition: background-color $transition-fast;
 
-.profileItems {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  border: 1px solid #f0f0f0;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.profileRow {
-  display: flex;
-  min-height: 50px;
-  height: auto;
-  border-bottom: 1px solid #ffffff;
-  background-color: #ffffff;
+  &:hover {
+    background-color: $bg-tertiary;
+  }
 
   &:last-child {
     border-bottom: none;
   }
 }
 
-.profileLabel {
-  width: 120px;
+.selectedNote {
+  background-color: rgba($primary-color, 0.08);
+  border-left: 3px solid $primary-color;
+}
+
+.noteTitleContainer {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  padding: 0 16px;
-  background-color: #ffffff;
-  font-family: "Inter", sans-serif;
-  font-weight: 400;
-  font-size: 16px;
-  color: #405973;
-
-  @include mobile {
-    width: 100px;
-    font-size: 14px;
-    padding: 0 10px;
-  }
 }
 
-.profileLabelInput {
-  width: 100%;
-  background: transparent;
-  text-align: center;
-  border: none;
-  resize: none;
-  font-weight: 600;
-  font-size: 14px;
-  padding: 0;
-  overflow: hidden;
-
-  &:focus {
-    outline: none;
-  }
-}
-
-.profileOptions {
-  margin-left: 10px;
-  padding-right: 10px;
-}
-
-.optionsIcon {
-  color: #999999;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.profileInputContainer {
-  flex: 1;
-  padding: 8px;
-  background-color: #fafafa;
-  display: flex;
-  align-items: flex-start;
-}
-
-.profileInput {
-  flex: 1;
-  width: 100%;
-  min-height: 30px;
-  border: none;
-  background-color: transparent;
-  font-family: "Inter", sans-serif;
-  font-weight: 400;
-  font-size: 14px;
-  color: #333333;
-  resize: vertical;
-  overflow: hidden;
-  padding: 6px 0;
-
-  &:focus {
-    outline: none;
-  }
-}
-
-.addProfileBtnContainer {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.addProfileBtn {
-  font-family: "Inter", sans-serif;
+.noteTitle {
   font-weight: 500;
-  font-size: 14px;
-  color: #5980a6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: $text-primary;
+}
+
+.noteActions {
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity $transition-fast;
+
+  .noteItem:hover & {
+    opacity: 1;
+  }
+}
+
+.editButton,
+.deleteButton {
   background: none;
   border: none;
+  font-size: 16px;
   cursor: pointer;
-  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: $radius-md;
+  transition: background-color $transition-fast;
 
   &:hover {
-    text-decoration: underline;
+    background-color: rgba($text-primary, 0.05);
+  }
+}
+
+.editButton {
+  color: $text-secondary;
+
+  &:hover {
+    color: $primary-color;
+  }
+}
+
+.deleteButton {
+  color: $text-secondary;
+
+  &:hover {
+    color: #e53935;
+  }
+}
+
+.editTitleInput {
+  width: 100%;
+  padding: 8px 12px;
+  border: 2px solid $primary-color;
+  border-radius: $radius-md;
+  font-size: 14px;
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.2);
+  }
+}
+
+.emptyNote {
+  padding: 20px;
+  text-align: center;
+  color: $text-muted;
+  font-style: italic;
+}
+
+// 캐릭터 에디터 스타일
+.editorContainer {
+  flex: 1;
+  background-color: $bg-primary;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+  overflow: hidden;
+}
+
+.editorWrapper {
+  padding: 24px;
+  min-height: 600px;
+
+  @include mobile {
+    padding: 16px;
+    min-height: auto;
+  }
+}
+
+// 구조화된 캐릭터 정보 입력 폼
+.characterForm {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  @include mobile {
+    gap: 20px;
+  }
+}
+
+.formSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: fadeIn $transition-normal forwards;
+}
+
+.sectionTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: $text-primary;
+  margin: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid $border-color;
+}
+
+.titleInput {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  font-size: 16px;
+  font-weight: 500;
+  transition: border-color $transition-fast, box-shadow $transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+  }
+}
+
+.appearanceSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.imageUploadContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.imagePreviewArea {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background-color: $bg-tertiary;
+  border: 2px dashed $border-color;
+  border-radius: $radius-md;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: $text-muted;
+  font-size: 14px;
+  overflow: hidden;
+  position: relative;
+  transition: border-color $transition-fast, background-color $transition-fast;
+
+  &:hover {
+    border-color: $primary-color;
+    background-color: rgba($primary-color, 0.03);
+  }
+
+  &.dragOver {
+    border-color: $primary-color;
+    background-color: rgba($primary-color, 0.05);
+  }
+}
+
+.imagePreview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.uploadIcon {
+  font-size: 32px;
+  margin-bottom: 8px;
+  color: $text-secondary;
+}
+
+.uploadText {
+  text-align: center;
+  margin: 8px 0;
+}
+
+.uploadInput {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.uploadButton {
+  margin-top: 8px;
+  padding: 8px 16px;
+  background-color: $primary-color;
+  color: white;
+  border: none;
+  border-radius: $radius-md;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+
+  &:hover {
+    background-color: $primary-dark;
+  }
+}
+
+.uploadProgress {
+  width: 100%;
+  height: 4px;
+  background-color: $bg-tertiary;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 8px;
+
+  .progressBar {
+    height: 100%;
+    background-color: $primary-color;
+    transition: width 0.3s ease;
+  }
+}
+
+.uploadStatus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  margin-top: 8px;
+
+  &.success {
+    color: #10b981;
+  }
+
+  &.error {
+    color: #ef4444;
+  }
+
+  &.loading {
+    color: $primary-color;
+  }
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba($primary-color, 0.3);
+  border-radius: 50%;
+  border-top-color: $primary-color;
+  animation: spin 1s linear infinite;
+}
+
+.imageUrlInput {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  font-size: 14px;
+  transition: border-color $transition-fast, box-shadow $transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+  }
+}
+
+.descriptionContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.descriptionTextarea {
+  width: 100%;
+  height: 100%;
+  min-height: 200px;
+  padding: 12px 16px;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  font-family: $font-sans;
+  font-size: 14px;
+  resize: vertical;
+  transition: border-color $transition-fast, box-shadow $transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
   }
 
   @include mobile {
-    width: 100%;
-    text-align: center;
-    padding: 10px;
-    background-color: #fafafa;
-    border: 1px solid #e6e6e6;
-    border-radius: 4px;
+    min-height: 150px;
+  }
+}
+
+.textSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.infoTextarea {
+  width: 100%;
+  min-height: 150px;
+  padding: 12px 16px;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  font-family: $font-sans;
+  font-size: 14px;
+  resize: vertical;
+  transition: border-color $transition-fast, box-shadow $transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+  }
+
+  @include mobile {
+    min-height: 120px;
+  }
+}
+
+.addBlockButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background-color: $bg-tertiary;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  color: $text-secondary;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+  margin: 0 auto;
+
+  &:hover {
+    background-color: $bg-secondary;
+    color: $primary-color;
+  }
+}
+
+.addBlockIcon {
+  font-size: 18px;
+}
+
+// 로딩 및 에러 상태
+.loadingContainer,
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  text-align: center;
+  padding: 32px;
+
+  @include mobile {
+    min-height: 200px;
+    padding: 24px;
+  }
+}
+
+.retryButton {
+  margin-top: 16px;
+  padding: 10px 20px;
+  background-color: $primary-color;
+  color: white;
+  border: none;
+  border-radius: $radius-md;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+
+  &:hover {
+    background-color: $primary-dark;
+  }
+}
+
+// 블록 추가 메뉴
+.blockMenuOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.blockMenu {
+  background-color: $bg-primary;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+  width: 280px;
+  overflow: hidden;
+
+  @include mobile {
+    width: 90%;
+    max-width: 280px;
+  }
+}
+
+.blockMenuItem {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 16px 20px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+
+  &:hover {
+    background-color: $bg-tertiary;
+  }
+
+  &:not(:last-child) {
+    border-bottom: 1px solid $border-color;
+  }
+}
+
+.blockMenuItemIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-right: 16px;
+  background-color: rgba($primary-color, 0.1);
+  color: $primary-color;
+  border-radius: $radius-md;
+  font-size: 16px;
+}
+
+.blockMenuItemText {
+  font-size: 15px;
+  font-weight: 500;
+  color: $text-primary;
+}
+
+// 반응형 노트 선택 없음 상태
+.noNoteSelected {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  text-align: center;
+  padding: 32px;
+
+  @include mobile {
+    min-height: 200px;
+    padding: 24px;
+  }
+
+  p {
+    margin-bottom: 16px;
+    color: $text-secondary;
+  }
+}
+
+.createButton {
+  padding: 10px 20px;
+  background-color: $primary-color;
+  color: white;
+  border: none;
+  border-radius: $radius-md;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+
+  &:hover {
+    background-color: $primary-dark;
   }
 }

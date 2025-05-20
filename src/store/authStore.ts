@@ -34,7 +34,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: async () => {
     set({ loading: true });
     try {
-      await api.post("/logout", {
+      await api.post("/api/v1/auth/logout", {
         withCredentials: true,
       });
       set({ user: null, isAuthenticated: false, loading: false });
