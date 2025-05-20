@@ -103,7 +103,12 @@ export default function Sidebar({
           onClick={() => setIsModalOpen(true)}
           aria-label="설정"
         >
-          <Image src={settingIcon} alt="설정" width={30} height={30} />
+          <Image
+            src={settingIcon || "/placeholder.svg"}
+            alt="설정"
+            width={30}
+            height={30}
+          />
         </button>
       </div>
 
@@ -159,8 +164,9 @@ export default function Sidebar({
           style={{
             background: "none",
             border: "none",
-            textAlign: "left",
-            justifyContent: "center",
+            color: "red",
+            textAlign: "center",
+            cursor: "pointer",
           }}
         >
           로그아웃

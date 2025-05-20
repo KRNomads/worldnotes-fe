@@ -461,15 +461,6 @@ export default function StructuredCharacterEditor({
               )}
 
               {renderUploadStatus()}
-
-              <input
-                type="text"
-                className={styles.imageUrlInput}
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                onBlur={handleImageUrlChange}
-                placeholder="또는 이미지 URL을 직접 입력하세요"
-              />
             </div>
 
             {/* 외모 설명 영역 */}
@@ -506,7 +497,6 @@ export default function StructuredCharacterEditor({
           onClick={() => setShowBlockMenu(true)}
         >
           <span className={styles.addBlockIcon}>+</span>
-          블록 추가
         </button>
       </form>
 

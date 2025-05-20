@@ -21,21 +21,22 @@ $transition-normal: 250ms ease;
 $font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
   Helvetica, Arial, sans-serif;
 
-// 브레이크포인트 믹스인
+// 브레이크포인트 믹스인 수정
 @mixin mobile {
-  @media (max-width: 767px) {
-    @content;
-  }
-}
-
-@mixin tablet {
-  @media (min-width: 768px) and (max-width: 1023px) {
+  @media (max-width: 1024px) {
     @content;
   }
 }
 
 @mixin desktop {
-  @media (min-width: 1024px) {
+  @media (min-width: 1025px) {
+    @content;
+  }
+}
+
+// 작은 모바일 화면용 믹스인 추가
+@mixin small-mobile {
+  @media (max-width: 500px) {
     @content;
   }
 }
@@ -79,21 +80,18 @@ $font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
   margin-left: 280px;
   flex: 1;
   padding: 24px;
-  overflow-y: auto; // 사이드바 너비만큼 여백 추가
+  overflow-y: auto;
 
   @include mobile {
     margin-left: 0;
     padding: 16px;
-    margin-top: 60px; // 모바일 사이드바 높이만큼 여백
-  }
-
-  @include tablet {
-    margin-left: 240px; // 태블릿에서 사이드바 너비만큼 여백 추가
+    margin-top: 120px; // 모바일 사이드바 높이만큼 여백 증가
   }
 }
 
 .contentWrapper {
   margin: 0 auto;
+  // 최대 너비 설정
 }
 
 .characterPageLayout {
@@ -102,11 +100,7 @@ $font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
 
   @include mobile {
     flex-direction: column;
-    gap: 16px;
-  }
-
-  @include tablet {
-    gap: 20px;
+    gap: 28px;
   }
 }
 
@@ -121,10 +115,6 @@ $font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
   @include mobile {
     width: 100%;
     margin-bottom: 20px;
-  }
-
-  @include tablet {
-    width: 240px;
   }
 }
 
@@ -295,6 +285,10 @@ $font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
   border-radius: $radius-lg;
   box-shadow: $shadow-md;
   overflow: hidden;
+
+  @include mobile {
+    min-width: 0; // 컨텐츠 크기 이하로 축소 가능하도록 설정
+  }
 }
 
 .editorWrapper {
@@ -352,12 +346,20 @@ $font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
 
 .appearanceSection {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr; // 데스크탑: 2열 그리드
   gap: 20px;
+  max-width: 1400px; // 최대 너비 설정
+  margin-left: auto; // ✨ 변경점: appearanceSection 블록 자체를 가운데 정렬
+  margin-right: auto; // ✨ 변경점: appearanceSection 블록 자체를 가운데 정렬
+  width: 100%; // ✨ 추가: max-width와 함께 사용하여 반응형으로 너비 조절
 
   @include mobile {
-    grid-template-columns: 1fr;
+    // max-width: 1024px (수정된 믹스인 기준)
+    grid-template-columns: 1fr; // 모바일(태블릿 포함): 1열 그리드
     gap: 16px;
+    // margin-left: auto; margin-right: auto; 는 상속받으므로,
+    // 부모 컨테이너가 이 섹션의 내용보다 넓다면 여전히 가운데 정렬 효과가 있을 수 있습니다.
+    // 보통 모바일에서는 100% 너비를 사용하므로 눈에 띄지 않을 수 있습니다.
   }
 }
 
@@ -369,6 +371,7 @@ $font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
 
 .imagePreviewArea {
   width: 100%;
+  max-width: 500px;
   aspect-ratio: 1 / 1;
   background-color: $bg-tertiary;
   border: 2px dashed $border-color;
@@ -382,6 +385,12 @@ $font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
   overflow: hidden;
   position: relative;
   transition: border-color $transition-fast, background-color $transition-fast;
+  margin: 0 auto; // 중앙 정렬
+
+  @include mobile {
+    max-width: 100%;
+    max-width: 500px; // 모바일에서는 100%로 제한
+  }
 
   &:hover {
     border-color: $primary-color;
@@ -490,6 +499,12 @@ $font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
   border-radius: $radius-md;
   font-size: 14px;
   transition: border-color $transition-fast, box-shadow $transition-fast;
+  max-width: 400px; // 최대 너비 제한
+  margin: 0 auto; // 중앙 정렬
+
+  @include mobile {
+    max-width: 100%; // 모바일에서는 100%로 제한
+  }
 
   &:focus {
     outline: none;
@@ -502,9 +517,11 @@ $font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
   display: flex;
   flex-direction: column;
   gap: 12px;
+  align-items: center;
 }
 
 .descriptionTextarea {
+  max-width: 500px;
   width: 100%;
   height: 100%;
   min-height: 200px;
@@ -523,6 +540,8 @@ $font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
   }
 
   @include mobile {
+    max-width: 100%;
+    max-width: 500px;
     min-height: 150px;
   }
 }
@@ -561,24 +580,45 @@ $font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
   justify-content: center;
   gap: 8px;
   padding: 10px 16px;
-  background-color: $bg-tertiary;
-  border: 1px solid $border-color;
-  border-radius: $radius-md;
-  color: $text-secondary;
+  background: none;
+  border: none;
+  color: $primary-color;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color $transition-fast;
+  transition: all 0.2s ease;
   margin: 0 auto;
 
+  &::before {
+    display: none;
+  }
+
   &:hover {
-    background-color: $bg-secondary;
-    color: $primary-color;
+    background: none;
+    border: none;
+    box-shadow: none;
+    transform: scale(1.05);
+    color: $primary-dark;
+  }
+
+  &:active {
+    transform: scale(0.95);
   }
 }
 
 .addBlockIcon {
-  font-size: 18px;
+  font-size: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  margin-right: 4px;
+  transition: all 0.2s ease;
+
+  .addBlockButton:hover & {
+    background: none;
+    transform: rotate(90deg);
+  }
 }
 
 // 로딩 및 에러 상태
@@ -703,6 +743,127 @@ $font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
 
 .createButton {
   padding: 10px 20px;
+  background-color: $primary-color;
+  color: white;
+  border: none;
+  border-radius: $radius-md;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+
+  &:hover {
+    background-color: $primary-dark;
+  }
+}
+
+// 블록 컴포넌트 스타일
+.blockContainer {
+  margin-bottom: 16px;
+  padding: 16px;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  background-color: $bg-primary;
+  position: relative;
+  transition: border-color $transition-fast, box-shadow $transition-fast;
+
+  &:hover {
+    border-color: rgba($primary-color, 0.3);
+  }
+
+  &.editing {
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+  }
+}
+
+.blockTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: 12px;
+}
+
+.blockContent {
+  width: 100%;
+}
+
+.blockOptions {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.blockOptionButton {
+  width: 28px;
+  height: 28px;
+  border-radius: $radius-md;
+  background: none;
+  border: none;
+  color: $text-secondary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color $transition-fast, color $transition-fast;
+
+  &:hover {
+    background-color: $bg-tertiary;
+    color: $text-primary;
+  }
+}
+
+.blockWrapper {
+  position: relative;
+  margin-bottom: 8px;
+
+  .addBlockButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    height: auto;
+    background: none;
+    border: none;
+    color: $primary-color;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 8px auto;
+    padding: 4px;
+    box-shadow: none;
+
+    &:hover {
+      background: none;
+      border: none;
+      box-shadow: none;
+      transform: scale(1.2);
+      color: $primary-dark;
+    }
+
+    &:active {
+      transform: scale(0.9);
+    }
+  }
+}
+
+.emptyBlocksMessage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  text-align: center;
+  color: $text-secondary;
+
+  p {
+    margin-bottom: 16px;
+  }
+}
+
+.addFirstBlockButton {
+  padding: 10px 16px;
   background-color: $primary-color;
   color: white;
   border: none;
