@@ -1,5 +1,4 @@
 // src/store/blockStore.ts
-
 import { create } from "zustand";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import {
@@ -39,6 +38,21 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+// BlockResponse (Block DTO)를 클라이언트 Block 타입으로 변환.
+// block.ts에서 BlockResponse = Block 이므로, 이 함수는 DTO가 Block 타입임을 보장.
+const mapBlockResponseToBlock = (dto: BlockResponse): Block => {
+  // dto는 이미 block.ts의 Block 타입과 호환되는 구조여야 합니다.
+  return {
+    blockId: dto.blockId,
+    noteId: dto.noteId,
+    title: dto.title, // string | null
+    fieldKey: dto.fieldKey, // string | null | undefined
+    type: dto.type,
+    properties: dto.properties, // BlockPropertiesUnion
+    position: dto.position,
+  };
+};
+
 const sortBlocksByPosition = (blocks: Block[]): Block[] => {
   return [...blocks].sort((a, b) => a.position - b.position);
 };
@@ -54,6 +68,10 @@ export const useBlockStore = create<BlockState>((set, get) => ({
         "[BlockStore] fetchBlocksByNote: 유효하지 않은 노트 ID:",
         noteId
       );
+      set((state) => ({
+        blocksByNoteId: { ...state.blocksByNoteId, [noteId]: [] },
+        isLoading: false,
+      }));
       return;
     }
     set({ isLoading: true, error: null });
@@ -61,7 +79,7 @@ export const useBlockStore = create<BlockState>((set, get) => ({
       const response: AxiosResponse<BlockResponse[]> = await api.get(
         `/api/v1/blocks/note/${noteId}`
       );
-      const fetchedBlocks: Block[] = response.data;
+      const fetchedBlocks: Block[] = response.data.map(mapBlockResponseToBlock);
       set((state) => ({
         blocksByNoteId: {
           ...state.blocksByNoteId,
@@ -82,14 +100,16 @@ export const useBlockStore = create<BlockState>((set, get) => ({
     }
   },
 
-  createBlock: async (blockData) => {
+  createBlock: async (blockData: BlockCreateRequest) => {
     set({ isLoading: true, error: null });
     try {
+      // blockData는 BlockCreateRequest 타입이므로, API가 요구하는 필드만 포함합니다.
+      // (block.ts의 BlockCreateRequest에 position 필드가 없음)
       const response: AxiosResponse<BlockResponse> = await api.post(
         "/api/v1/blocks/block",
         blockData
       );
-      const newBlock: Block = response.data;
+      const newBlock = mapBlockResponseToBlock(response.data);
       set((state) => {
         const currentBlocks = state.blocksByNoteId[blockData.noteId] || [];
         return {
@@ -110,11 +130,8 @@ export const useBlockStore = create<BlockState>((set, get) => ({
       if (axios.isAxiosError(error) && error.response?.data) {
         const serverMessage =
           (error.response.data as any)?.message ||
-          (error.response.data as any)?.error ||
           JSON.stringify(error.response.data);
-        if (serverMessage) errorMessage += ` 서버 응답: ${serverMessage}`;
-      } else if (error.message) {
-        errorMessage += ` (${error.message})`;
+        errorMessage += ` 서버 응답: ${serverMessage}`;
       }
       console.error("[BlockStore] 블록 생성 실패:", error);
       set({ error: errorMessage, isLoading: false });
@@ -122,16 +139,17 @@ export const useBlockStore = create<BlockState>((set, get) => ({
     }
   },
 
-  createBlocks: async (blocksData) => {
+  createBlocks: async (blocksData: BlocksCreateRequest) => {
     if (!blocksData.blocks || blocksData.blocks.length === 0) return [];
     set({ isLoading: true, error: null });
     const noteId = blocksData.blocks[0].noteId;
     try {
+      // blocksData는 BlocksCreateRequest 타입이므로, API가 요구하는 필드만 포함합니다.
       const response: AxiosResponse<BlockResponse[]> = await api.post(
         "/api/v1/blocks/blocks",
         blocksData
       );
-      const newBlocks: Block[] = response.data;
+      const newBlocks: Block[] = response.data.map(mapBlockResponseToBlock);
       set((state) => {
         const currentBlocks = state.blocksByNoteId[noteId] || [];
         return {
@@ -149,11 +167,8 @@ export const useBlockStore = create<BlockState>((set, get) => ({
       if (axios.isAxiosError(error) && error.response?.data) {
         const serverMessage =
           (error.response.data as any)?.message ||
-          (error.response.data as any)?.error ||
           JSON.stringify(error.response.data);
-        if (serverMessage) errorMessage += ` 서버 응답: ${serverMessage}`;
-      } else if (error.message) {
-        errorMessage += ` (${error.message})`;
+        errorMessage += ` 서버 응답: ${serverMessage}`;
       }
       console.error(
         `[BlockStore] 노트 (${noteId}) 여러 블록 생성 실패:`,
@@ -164,14 +179,19 @@ export const useBlockStore = create<BlockState>((set, get) => ({
     }
   },
 
-  updateBlock: async (blockId, noteId, updateData) => {
+  updateBlock: async (
+    blockId: number,
+    noteId: string,
+    updateData: BlockUpdateRequest
+  ) => {
     set({ isLoading: true, error: null });
     try {
+      // updateData는 BlockUpdateRequest 타입이므로, API가 요구하는 필드만 포함합니다.
       const response: AxiosResponse<BlockResponse> = await api.put(
         `/api/v1/blocks/${blockId}`,
         updateData
       );
-      const updatedBlock: Block = response.data;
+      const updatedBlock = mapBlockResponseToBlock(response.data);
       set((state) => {
         const currentBlocks = state.blocksByNoteId[noteId] || [];
         const newBlocks = currentBlocks.map((block) =>
@@ -192,21 +212,16 @@ export const useBlockStore = create<BlockState>((set, get) => ({
       if (axios.isAxiosError(error) && error.response?.data) {
         const serverMessage =
           (error.response.data as any)?.message ||
-          (error.response.data as any)?.error ||
           JSON.stringify(error.response.data);
-        if (serverMessage) errorMessage += ` 서버 응답: ${serverMessage}`;
-      } else if (error.message) {
-        errorMessage += ` (${error.message})`;
-      } else {
-        errorMessage += ` (알 수 없는 오류)`;
+        errorMessage += ` 서버 응답: ${serverMessage}`;
       }
-      console.error(`[BlockStore] 블록 (ID: ${blockId}) 업데이트 실패:`, error); // 전체 에러 객체 로깅
+      console.error(`[BlockStore] 블록 (ID: ${blockId}) 업데이트 실패:`, error);
       set({ error: errorMessage, isLoading: false });
       return null;
     }
   },
 
-  deleteBlock: async (blockId, noteId) => {
+  deleteBlock: async (blockId: number, noteId: string) => {
     set({ isLoading: true, error: null });
     try {
       await api.delete(`/api/v1/blocks/${blockId}`);
@@ -259,10 +274,6 @@ export const useBlockStore = create<BlockState>((set, get) => ({
   },
 
   clearAllBlocks: () => {
-    set({
-      blocksByNoteId: {},
-      isLoading: false,
-      error: null,
-    });
+    set({ blocksByNoteId: {}, isLoading: false, error: null });
   },
 }));

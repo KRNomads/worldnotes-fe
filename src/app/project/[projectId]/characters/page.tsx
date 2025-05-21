@@ -22,7 +22,6 @@ export default function CharactersPage() {
 
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
 
-  // 프로젝트의 캐릭터 노트 가져오기
   const characterNotes = getNotesByType("CHARACTER", projectId as string);
 
   useEffect(() => {
@@ -32,20 +31,23 @@ export default function CharactersPage() {
   }, [projectId, fetchNotesByProject]);
 
   useEffect(() => {
-    // 노트가 로드되면 첫 번째 노트를 선택
+    // 노트가 로드되고, 아직 선택된 노트가 없으며, 캐릭터 노트가 존재할 경우 첫번째 노트를 선택
     if (characterNotes.length > 0 && !selectedNoteId) {
       setSelectedNoteId(characterNotes[0].id);
+    } else if (characterNotes.length === 0 && selectedNoteId) {
+      // 만약 캐릭터 노트가 모두 삭제되어 비어있게 되면 선택된 ID도 초기화
+      setSelectedNoteId(null);
     }
   }, [characterNotes, selectedNoteId]);
 
   const handleCreateCharacter = async () => {
     if (!projectId) return;
 
+    // NoteCreateRequest의 title은 string 타입이므로 "새 캐릭터"는 유효합니다.
     const newNote = await createNote({
       projectId: projectId as string,
-      title: "새 캐릭터",
+      title: "새 캐릭터", // NoteCreateRequest.title은 string
       type: "CHARACTER",
-      position: characterNotes.length,
     });
 
     if (newNote) {
@@ -53,6 +55,7 @@ export default function CharactersPage() {
     }
   };
 
+  // JSX 구조 및 클래스명은 원본과 동일하게 유지
   return (
     <div className={styles.pageContainer}>
       <Sidebar

@@ -1,12 +1,12 @@
 // src/store/noteStore.ts
 import { create } from "zustand";
-import axios from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import {
   Note,
   NoteCreateRequest,
   NoteUpdateRequest,
-  NoteResponse,
-} from "@/types/note";
+  NoteResponse, // from "@/types/note"
+} from "@/types/note"; // 실제 타입 파일 경로를 정확히 확인해주세요.
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -33,6 +33,16 @@ interface NoteState {
   clearNotes: () => void;
 }
 
+// NoteResponse (API의 NoteDto)를 클라이언트 Note 타입으로 변환
+const mapNoteResponseToNote = (dto: NoteResponse): Note => ({
+  id: dto.noteId,
+  projectId: dto.projectId,
+  title: dto.title, // API 명세상 title은 항상 존재 (null 아님)
+  type: dto.type,
+  position: dto.position,
+  lastModified: new Date().toISOString(), // 클라이언트에서 관리
+});
+
 export const useNoteStore = create<NoteState>((set, get) => ({
   notes: [],
   currentNote: null,
@@ -40,98 +50,116 @@ export const useNoteStore = create<NoteState>((set, get) => ({
   error: null,
 
   fetchNotesByProject: async (projectId) => {
-    if (!projectId) return;
-
+    if (!projectId) {
+      console.warn(
+        "[NoteStore] fetchNotesByProject: 유효하지 않은 프로젝트 ID:",
+        projectId
+      );
+      set({ notes: [], isLoading: false });
+      return;
+    }
     set({ isLoading: true, error: null });
     try {
-      const { data } = await api.get<NoteResponse[]>(
+      const response: AxiosResponse<NoteResponse[]> = await api.get(
         `/api/v1/notes/project/${projectId}`
       );
-      const notes: Note[] = data.map((n) => ({
-        id: n.noteId,
-        projectId: n.projectId,
-        title: n.title || "제목 없음",
-        type: n.type,
-        position: n.position,
-        lastModified: new Date().toISOString(),
-      }));
-      set({ notes, isLoading: false });
-    } catch (error) {
-      set({ error: "노트를 불러오는데 실패했습니다", isLoading: false });
+      const fetchedNotes: Note[] = response.data.map(mapNoteResponseToNote);
+      set({ notes: fetchedNotes, isLoading: false });
+    } catch (err) {
+      const error = err as Error | AxiosError;
+      console.error(
+        `[NoteStore] 프로젝트 (${projectId}) 노트 목록 가져오기 실패:`,
+        error.message
+      );
+      set({ error: "노트를 불러오는데 실패했습니다.", isLoading: false });
     }
   },
 
   fetchNote: async (noteId) => {
-    if (!noteId) return;
+    if (!noteId) {
+      console.warn("[NoteStore] fetchNote: 유효하지 않은 노트 ID:", noteId);
+      return;
+    }
     set({ isLoading: true, error: null });
     try {
-      const { data } = await api.get<NoteResponse>(`/api/v1/notes/${noteId}`);
-      const note: Note = {
-        id: data.noteId,
-        projectId: data.projectId,
-        title: data.title || "제목 없음",
-        type: data.type,
-        position: data.position,
-        lastModified: new Date().toISOString(),
-      };
+      const response: AxiosResponse<NoteResponse> = await api.get(
+        `/api/v1/notes/${noteId}`
+      );
+      const note = mapNoteResponseToNote(response.data);
       set((state) => ({
         notes: state.notes.map((n) => (n.id === noteId ? note : n)),
         currentNote: note,
         isLoading: false,
       }));
-    } catch (error) {
-      set({ error: "노트 정보를 불러오는데 실패했습니다", isLoading: false });
+    } catch (err) {
+      const error = err as Error | AxiosError;
+      console.error(
+        `[NoteStore] 노트 (${noteId}) 정보 가져오기 실패:`,
+        error.message
+      );
+      set({ error: "노트 정보를 불러오는데 실패했습니다.", isLoading: false });
     }
   },
 
-  createNote: async (noteData) => {
+  createNote: async (noteData: NoteCreateRequest) => {
     set({ isLoading: true, error: null });
     try {
-      const { data } = await api.post<NoteResponse>("/api/v1/notes", noteData);
-      const newNote: Note = {
-        id: data.noteId,
-        projectId: data.projectId,
-        title: data.title,
-        type: data.type,
-        position: data.position,
-        lastModified: new Date().toISOString(),
-      };
+      const response: AxiosResponse<NoteResponse> = await api.post(
+        "/api/v1/notes",
+        noteData
+      );
+      const newNote = mapNoteResponseToNote(response.data);
       set((state) => ({
-        notes: [...state.notes, newNote],
+        notes: [...state.notes, newNote].sort(
+          (a, b) => a.position - b.position
+        ),
         currentNote: newNote,
         isLoading: false,
       }));
       return newNote;
-    } catch {
-      set({ error: "노트 생성 실패", isLoading: false });
+    } catch (err) {
+      const error = err as Error | AxiosError;
+      let errorMessage = "노트 생성에 실패했습니다.";
+      if (axios.isAxiosError(error) && error.response?.data) {
+        const serverMessage =
+          (error.response.data as any)?.message ||
+          JSON.stringify(error.response.data);
+        errorMessage += ` 서버 응답: ${serverMessage}`;
+      }
+      console.error("[NoteStore] 노트 생성 실패:", error);
+      set({ error: errorMessage, isLoading: false });
       return null;
     }
   },
 
-  updateNote: async (noteId, updateData) => {
+  updateNote: async (noteId, updateData: NoteUpdateRequest) => {
     set({ isLoading: true, error: null });
     try {
-      const { data } = await api.put<NoteResponse>(
+      const response: AxiosResponse<NoteResponse> = await api.put(
         `/api/v1/notes/${noteId}`,
         updateData
       );
-      const updatedNote: Note = {
-        id: data.noteId,
-        projectId: data.projectId,
-        title: data.title,
-        type: data.type,
-        position: data.position,
-        lastModified: new Date().toISOString(),
-      };
+      const updatedNote = mapNoteResponseToNote(response.data);
       set((state) => ({
-        notes: state.notes.map((n) => (n.id === noteId ? updatedNote : n)),
+        notes: state.notes
+          .map((n) => (n.id === noteId ? updatedNote : n))
+          .sort((a, b) => a.position - b.position),
         currentNote:
           state.currentNote?.id === noteId ? updatedNote : state.currentNote,
         isLoading: false,
       }));
       return updatedNote;
-    } catch {
-      set({ error: "노트 업데이트 실패", isLoading: false });
+    } catch (err) {
+      const error = err as Error | AxiosError;
+      let errorMessage = `노트 (ID: ${noteId}) 업데이트에 실패했습니다.`;
+      if (axios.isAxiosError(error) && error.response?.data) {
+        const serverMessage =
+          (error.response.data as any)?.message ||
+          JSON.stringify(error.response.data);
+        errorMessage += ` 서버 응답: ${serverMessage}`;
+      }
+      console.error(`[NoteStore] 노트 (ID: ${noteId}) 업데이트 실패:`, error);
+      set({ error: errorMessage, isLoading: false });
       return null;
     }
   },
@@ -147,8 +175,16 @@ export const useNoteStore = create<NoteState>((set, get) => ({
         isLoading: false,
       }));
       return true;
-    } catch {
-      set({ error: "노트 삭제 실패", isLoading: false });
+    } catch (err) {
+      const error = err as Error | AxiosError;
+      console.error(
+        `[NoteStore] 노트 (ID: ${noteId}) 삭제 실패:`,
+        error.message
+      );
+      set({
+        error: `노트 (ID: ${noteId}) 삭제에 실패했습니다.`,
+        isLoading: false,
+      });
       return false;
     }
   },

@@ -1,31 +1,36 @@
-"use client"
+"use client";
 
-import { useRef, useEffect } from "react"
-import styles from "../characters.module.scss"
+import { useRef, useEffect } from "react";
+import styles from "../characters.module.scss";
 
 interface AddBlockMenuProps {
-  onAddBlock: (type: "TEXT" | "TAGS" | "IMAGE") => void
-  onClose: () => void
+  onAddBlock: (type: "TEXT" | "TAGS" | "IMAGE") => void;
+  onClose: () => void;
 }
 
-export default function AddBlockMenu({ onAddBlock, onClose }: AddBlockMenuProps) {
-  const menuRef = useRef<HTMLDivElement>(null)
+export default function AddBlockMenu({
+  onAddBlock,
+  onClose,
+}: AddBlockMenuProps) {
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        onClose()
+        onClose();
       }
-    }
+    };
 
-    document.addEventListener("mousedown", handleClickOutside)
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [onClose])
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [onClose]);
 
+  // JSX 구조 및 클래스명은 원본과 동일하게 유지
   return (
     <div className={styles.addBlockMenuOverlay}>
+      {" "}
       <div className={styles.addBlockMenu} ref={menuRef}>
         <button className={styles.menuItem} onClick={() => onAddBlock("TEXT")}>
           <span className={styles.menuItemIcon}>T</span>
@@ -41,5 +46,5 @@ export default function AddBlockMenu({ onAddBlock, onClose }: AddBlockMenuProps)
         </button>
       </div>
     </div>
-  )
+  );
 }
