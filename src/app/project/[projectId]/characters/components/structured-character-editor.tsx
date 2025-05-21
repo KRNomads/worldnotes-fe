@@ -394,8 +394,7 @@ export default function StructuredCharacterEditor({
     <div className={styles.editorWrapper}>
       <form className={styles.characterForm}>
         {/* 제목 섹션 */}
-        <div className={styles.formSection}>
-          <h2 className={styles.sectionTitle}>제목</h2>
+        <div className={styles.TitleformSection}>
           <input
             type="text"
             className={styles.titleInput}
@@ -404,6 +403,7 @@ export default function StructuredCharacterEditor({
             onBlur={handleTitleChange}
             placeholder="캐릭터 이름"
           />
+          <div className={styles.gradientline}></div>
         </div>
 
         {/* 외모 섹션 */}
