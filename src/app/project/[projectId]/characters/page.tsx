@@ -8,6 +8,7 @@ import CharacterNoteList from "./components/character-note-list";
 import StructuredCharacterEditor from "./components/structured-character-editor";
 import LoadingSpinner from "@/components/LoadingSpinner/LoadingSpinner";
 import styles from "./characters.module.scss";
+import NotionEditor from "./fix/notion-editor";
 
 export default function CharactersPage() {
   const { projectId } = useParams();
@@ -92,10 +93,7 @@ export default function CharactersPage() {
 
               <div className={styles.editorContainer}>
                 {selectedNoteId ? (
-                  <StructuredCharacterEditor
-                    noteId={selectedNoteId}
-                    projectId={projectId as string}
-                  />
+                  <NotionEditor noteId={selectedNoteId} />
                 ) : (
                   <div className={styles.noNoteSelected}>
                     <p>캐릭터를 선택하거나 새로운 캐릭터를 생성해주세요.</p>

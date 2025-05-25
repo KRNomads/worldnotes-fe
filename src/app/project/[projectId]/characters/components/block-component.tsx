@@ -11,9 +11,9 @@ import type {
   BlockPropertiesUnion,
 } from "@/types/block";
 import { useBlockStore } from "@/store/blockStore";
-import TextBlock from "./blocks/text-block"; // 자식 컴포넌트 경로 확인
-import TagsBlock from "./blocks/tags-block"; // 자식 컴포넌트 경로 확인
-import ImageBlock from "./blocks/image-block"; // 자식 컴포넌트 경로 확인
+import TextBlock from "../../../../../components/blocks/text-block"; // 자식 컴포넌트 경로 확인
+import TagsBlock from "../../../../../components/blocks/tags-block"; // 자식 컴포넌트 경로 확인
+import ImageBlock from "../../../../../components/blocks/image-block"; // 자식 컴포넌트 경로 확인
 import styles from "../characters.module.scss";
 
 const DEBOUNCE_DELAY = 1000; // 1초

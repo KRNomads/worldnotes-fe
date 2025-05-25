@@ -1,9 +1,18 @@
 // src/types/block.ts
 
+// 블록 타입
+export type BlockType = "TEXT" | "IMAGE" | "TAGS";
+
 // 기본 블록 속성 (discriminator를 위해 모든 properties 객체에 포함될 수 있음)
 export interface BaseBlockProperties {
-  type: "TEXT" | "TAGS" | "IMAGE"; // 블록 타입에 따른 구분자
+  type: BlockType; // 블록 타입에 따른 구분자
 }
+
+// BlockDto.properties는 이들 중 하나가 될 수 있음
+export type BlockPropertiesUnion =
+  | TextBlockProperties
+  | ImageBlockProperties
+  | TagsBlockProperties;
 
 // TEXT 타입 블록의 properties
 export interface TextBlockProperties extends BaseBlockProperties {
@@ -19,16 +28,10 @@ export interface ImageBlockProperties extends BaseBlockProperties {
 }
 
 // TAGS 타입 블록의 properties
-export interface TagBlockProperties extends BaseBlockProperties {
+export interface TagsBlockProperties extends BaseBlockProperties {
   type: "TAGS";
   tags: string[];
 }
-
-// BlockDto.properties는 이들 중 하나가 될 수 있음
-export type BlockPropertiesUnion =
-  | TextBlockProperties
-  | ImageBlockProperties
-  | TagBlockProperties;
 
 /**
  * API 명세의 BlockDto 기반 타입
@@ -41,9 +44,10 @@ export interface Block {
   noteId: string; // UUID
   title: string | null;
   fieldKey?: string | null; // API 명세 BlockDto에 추가됨.
-  type: "TEXT" | "TAGS" | "IMAGE";
+  type: BlockType;
   properties: BlockPropertiesUnion;
   position: number; // 서버 응답에 포함되므로 유지
+  isCollapsed?: boolean;
 }
 
 /**
@@ -55,8 +59,8 @@ export interface BlockCreateRequest {
   noteId: string; // uuid
   title: string;
   fieldKey?: string | null;
-  type: "TEXT" | "TAGS" | "IMAGE";
-  properties: BlockPropertiesUnion;
+  type: BlockType;
+  properties: BlockPropertiesUnion | null;
 }
 
 /**
@@ -74,7 +78,7 @@ export interface BlocksCreateRequest {
  */
 export interface BlockUpdateRequest {
   title?: string | null;
-  type?: "TEXT" | "TAGS" | "IMAGE";
+  type?: BlockType;
   properties?: BlockPropertiesUnion;
 }
 

@@ -7,6 +7,8 @@ import {
   BlocksCreateRequest,
   BlockUpdateRequest,
   BlockResponse,
+  BlockType,
+  BlockPropertiesUnion,
 } from "@/types/block";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -17,17 +19,37 @@ interface BlockState {
   error: string | null;
 
   fetchBlocksByNote: (noteId: string) => Promise<void>;
+
+  hasBlocksForNote: (noteId: string) => boolean;
+
   createBlock: (blockData: BlockCreateRequest) => Promise<Block | null>;
   createBlocks: (blocksData: BlocksCreateRequest) => Promise<Block[] | null>;
+
   updateBlock: (
     blockId: number,
     noteId: string,
     updateData: BlockUpdateRequest
   ) => Promise<Block | null>;
+  updateBlockTitle: (
+    blockId: number,
+    noteId: string,
+    title: string
+  ) => Promise<Block | null>;
+  updateBlockProperties: (
+    blockId: number,
+    noteId: string,
+    type: BlockType,
+    properties: BlockPropertiesUnion
+  ) => Promise<Block | null>;
+
   deleteBlock: (blockId: number, noteId: string) => Promise<boolean>;
 
   getBlocksForNote: (noteId: string) => Block[];
   getBlockById: (noteId: string, blockId: number) => Block | undefined;
+
+  getDefaultBlocks: (noteId: string) => Block[];
+  getCustomBlocks: (noteId: string) => Block[];
+
   clearBlocksForNote: (noteId: string) => void;
   clearAllBlocks: () => void;
 }
@@ -98,6 +120,11 @@ export const useBlockStore = create<BlockState>((set, get) => ({
         isLoading: false,
       });
     }
+  },
+
+  hasBlocksForNote: (noteId: string) => {
+    const blocks = get().blocksByNoteId[noteId];
+    return Array.isArray(blocks) && blocks.length > 0;
   },
 
   createBlock: async (blockData: BlockCreateRequest) => {
@@ -182,15 +209,16 @@ export const useBlockStore = create<BlockState>((set, get) => ({
   updateBlock: async (
     blockId: number,
     noteId: string,
-    updateData: BlockUpdateRequest
-  ) => {
+    updateData: Partial<BlockUpdateRequest>
+  ): Promise<Block | null> => {
     set({ isLoading: true, error: null });
     try {
-      // updateData는 BlockUpdateRequest 타입이므로, API가 요구하는 필드만 포함합니다.
-      const response: AxiosResponse<BlockResponse> = await api.put(
-        `/api/v1/blocks/${blockId}`,
-        updateData
-      );
+      const response = await api.put(`/api/v1/blocks/${blockId}`, {
+        title: updateData.title ?? null,
+        type: updateData.type ?? null,
+        properties: updateData.properties ?? null,
+      });
+
       const updatedBlock = mapBlockResponseToBlock(response.data);
       set((state) => {
         const currentBlocks = state.blocksByNoteId[noteId] || [];
@@ -207,18 +235,27 @@ export const useBlockStore = create<BlockState>((set, get) => ({
       });
       return updatedBlock;
     } catch (err) {
-      const error = err as Error | AxiosError;
-      let errorMessage = `블록 (ID: ${blockId}) 업데이트에 실패했습니다.`;
-      if (axios.isAxiosError(error) && error.response?.data) {
-        const serverMessage =
-          (error.response.data as any)?.message ||
-          JSON.stringify(error.response.data);
-        errorMessage += ` 서버 응답: ${serverMessage}`;
-      }
-      console.error(`[BlockStore] 블록 (ID: ${blockId}) 업데이트 실패:`, error);
-      set({ error: errorMessage, isLoading: false });
+      const error = err as AxiosError;
+      set({ error: "블록 업데이트 실패", isLoading: false });
       return null;
     }
+  },
+
+  updateBlockTitle: async (
+    blockId: number,
+    noteId: string,
+    title: string
+  ): Promise<Block | null> => {
+    return await get().updateBlock(blockId, noteId, { title });
+  },
+
+  updateBlockProperties: async (
+    blockId: number,
+    noteId: string,
+    type: BlockType,
+    properties: BlockPropertiesUnion
+  ): Promise<Block | null> => {
+    return await get().updateBlock(blockId, noteId, { type, properties });
   },
 
   deleteBlock: async (blockId: number, noteId: string) => {
@@ -262,6 +299,14 @@ export const useBlockStore = create<BlockState>((set, get) => ({
     const blocksForNote = get().blocksByNoteId[noteId] || [];
     return blocksForNote.find((block) => block.blockId === blockId);
   },
+
+  getDefaultBlocks: (noteId: string) =>
+    get().blocksByNoteId[noteId].filter((b) => b.fieldKey !== null),
+
+  getCustomBlocks: (noteId: string) =>
+    get()
+      .blocksByNoteId[noteId].filter((b) => b.fieldKey === null)
+      .sort((a, b) => a.position - b.position),
 
   clearBlocksForNote: (noteId: string) => {
     set((state) => {
