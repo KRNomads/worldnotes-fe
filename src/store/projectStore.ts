@@ -1,24 +1,13 @@
 // src/store/projectStore.ts
 import { create } from "zustand";
-import { Project } from "@/types/project";
-import axios, { AxiosError, AxiosResponse } from "axios"; // axios로 직접 변경
-
-// API 기본 URL 설정
-const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL; // 또는 환경 변수 등에서 불러오는 URL
-
-// API 요청 타입 정의
-interface CreateProjectRequest {
-  name: string;
-  description?: string;
-}
-
-// API 응답 타입 정의
-interface CreateProjectResponse {
-  projectId: string;
-  userId: string;
-  title: string;
-  description?: string;
-}
+import {
+  CreateProjectRequest,
+  CreateProjectResponse,
+  Project,
+} from "@/types/project";
+import { AxiosResponse } from "axios";
+import api from "@/lib/api";
+import { mapProjectResponseToProject } from "@/utils/mappers";
 
 interface ProjectState {
   projects: Project[];
@@ -43,15 +32,6 @@ interface ProjectState {
   deleteProject: (projectId: string) => Promise<void>;
 }
 
-// axios 인스턴스 생성
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  withCredentials: true,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
 export const useProjectStore = create<ProjectState>((set, get) => ({
   projects: [],
   currentProject: null,
@@ -61,25 +41,12 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   fetchUserProjects: async () => {
     set({ isLoading: true, error: null });
     try {
-      // API에서 프로젝트 목록 가져오기
-      const response: AxiosResponse = await api.get("/api/v1/projects");
-
-      // API 응답 데이터를 Project[] 타입으로 변환 (id 필드 매핑)
+      const response = await api.get("/api/v1/projects");
       const fetchedProjects: Project[] = response.data.map(
-        (projectData: Record<string, unknown>) => ({
-          id: projectData.projectId as string,
-          title: (projectData.title as string) || "제목 없음",
-          lastModified:
-            (projectData.lastModified as string) || new Date().toISOString(),
-          description: projectData.description as string | undefined,
-          userId: projectData.userId as string,
-        })
+        mapProjectResponseToProject
       );
-
-      // 매핑된 데이터로 상태 업데이트
       set({ projects: fetchedProjects, isLoading: false });
     } catch (err) {
-      const error = err as Error | AxiosError;
       set({
         error: "프로젝트를 불러오는데 실패했습니다",
         isLoading: false,
@@ -88,28 +55,10 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   },
 
   fetchProject: async (projectId) => {
-    // 프로젝트 ID가 유효한지 확인
-    if (!projectId || projectId === "undefined") {
-      set({
-        error: "유효하지 않은 프로젝트 ID입니다",
-        isLoading: false,
-      });
-      return;
-    }
-
     set({ isLoading: true, error: null });
     try {
-      const response: AxiosResponse = await api.get(
-        `/api/v1/projects/${projectId}`
-      );
-
-      // API 응답 데이터를 프론트엔드 모델로 변환
-      const project: Project = {
-        id: response.data.projectId,
-        title: response.data.title || "제목 없음", // 기본값 제공
-        lastModified: new Date().toISOString(), // 현재 시간으로 초기화
-      };
-
+      const response = await api.get(`/api/v1/projects/${projectId}`);
+      const project: Project = mapProjectResponseToProject(response.data);
       set({ currentProject: project, isLoading: false });
     } catch (err) {
       set({
@@ -165,30 +114,20 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   updateProject: async (projectId, updateData) => {
     set({ isLoading: true, error: null });
     try {
-      // 백엔드 API가 요구하는 형식으로 변환
       const requestData = {
-        name: updateData.title, // title -> name으로 변환
+        name: updateData.title,
         description: updateData.description,
       };
-
       const response = await api.put(
         `/api/v1/projects/${projectId}`,
         requestData
       );
-
-      // 응답에서 받은 데이터를 Project 타입에 맞게 변환
-      const updatedProject: Project = {
-        id: response.data.projectId,
-        title: response.data.title,
-        lastModified: new Date().toISOString(),
-        description: response.data.description,
-        userId: response.data.userId,
-      };
-
-      // 프로젝트 목록과 현재 프로젝트 상태 업데이트
+      const updatedProject: Project = mapProjectResponseToProject(
+        response.data
+      );
       set((state) => ({
-        projects: state.projects.map((project) =>
-          project.id === projectId ? updatedProject : project
+        projects: state.projects.map((p) =>
+          p.id === projectId ? updatedProject : p
         ),
         currentProject:
           state.currentProject?.id === projectId
@@ -196,7 +135,6 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
             : state.currentProject,
         isLoading: false,
       }));
-
       return updatedProject;
     } catch (err) {
       set({
