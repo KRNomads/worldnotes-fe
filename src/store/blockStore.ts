@@ -9,7 +9,7 @@ import {
   BlockResponse,
   BlockType,
   BlockPropertiesUnion,
-} from "@/types/block";
+} from "@/types/block"; // 실제 타입 경로 확인
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -17,18 +17,14 @@ interface BlockState {
   blocksByNoteId: Record<string, Block[]>;
   isLoading: boolean;
   error: string | null;
-
   fetchBlocksByNote: (noteId: string) => Promise<void>;
-
   hasBlocksForNote: (noteId: string) => boolean;
-
   createBlock: (blockData: BlockCreateRequest) => Promise<Block | null>;
   createBlocks: (blocksData: BlocksCreateRequest) => Promise<Block[] | null>;
-
   updateBlock: (
     blockId: number,
     noteId: string,
-    updateData: BlockUpdateRequest
+    updateData: Partial<BlockUpdateRequest>
   ) => Promise<Block | null>;
   updateBlockTitle: (
     blockId: number,
@@ -41,15 +37,11 @@ interface BlockState {
     type: BlockType,
     properties: BlockPropertiesUnion
   ) => Promise<Block | null>;
-
   deleteBlock: (blockId: number, noteId: string) => Promise<boolean>;
-
   getBlocksForNote: (noteId: string) => Block[];
   getBlockById: (noteId: string, blockId: number) => Block | undefined;
-
   getDefaultBlocks: (noteId: string) => Block[];
   getCustomBlocks: (noteId: string) => Block[];
-
   clearBlocksForNote: (noteId: string) => void;
   clearAllBlocks: () => void;
 }
@@ -60,22 +52,20 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-// BlockResponse (Block DTO)를 클라이언트 Block 타입으로 변환.
-// block.ts에서 BlockResponse = Block 이므로, 이 함수는 DTO가 Block 타입임을 보장.
 const mapBlockResponseToBlock = (dto: BlockResponse): Block => {
-  // dto는 이미 block.ts의 Block 타입과 호환되는 구조여야 합니다.
   return {
     blockId: dto.blockId,
     noteId: dto.noteId,
-    title: dto.title, // string | null
-    fieldKey: dto.fieldKey, // string | null | undefined
+    title: dto.title,
+    fieldKey: dto.fieldKey,
     type: dto.type,
-    properties: dto.properties, // BlockPropertiesUnion
+    properties: dto.properties,
     position: dto.position,
   };
 };
 
 const sortBlocksByPosition = (blocks: Block[]): Block[] => {
+  if (!Array.isArray(blocks)) return [];
   return [...blocks].sort((a, b) => a.position - b.position);
 };
 
@@ -86,13 +76,10 @@ export const useBlockStore = create<BlockState>((set, get) => ({
 
   fetchBlocksByNote: async (noteId) => {
     if (!noteId || noteId === "undefined") {
-      console.warn(
-        "[BlockStore] fetchBlocksByNote: 유효하지 않은 노트 ID:",
-        noteId
-      );
       set((state) => ({
         blocksByNoteId: { ...state.blocksByNoteId, [noteId]: [] },
         isLoading: false,
+        error: "유효하지 않은 노트 ID로 블록 조회 시도",
       }));
       return;
     }
@@ -112,11 +99,11 @@ export const useBlockStore = create<BlockState>((set, get) => ({
     } catch (err) {
       const error = err as Error | AxiosError;
       console.error(
-        `[BlockStore] 노트 (${noteId}) 블록 목록 가져오기 실패:`,
+        `[BlockStore] fetchBlocksByNote FAILED for noteId (${noteId}):`,
         error.message
-      );
+      ); // 에러 로그 유지
       set({
-        error: `노트 (${noteId})의 블록 목록을 불러오는데 실패했습니다.`,
+        error: `노트 (${noteId})의 블록 목록 로딩 실패.`,
         isLoading: false,
       });
     }
@@ -130,8 +117,6 @@ export const useBlockStore = create<BlockState>((set, get) => ({
   createBlock: async (blockData: BlockCreateRequest) => {
     set({ isLoading: true, error: null });
     try {
-      // blockData는 BlockCreateRequest 타입이므로, API가 요구하는 필드만 포함합니다.
-      // (block.ts의 BlockCreateRequest에 position 필드가 없음)
       const response: AxiosResponse<BlockResponse> = await api.post(
         "/api/v1/blocks/block",
         blockData
@@ -139,13 +124,14 @@ export const useBlockStore = create<BlockState>((set, get) => ({
       const newBlock = mapBlockResponseToBlock(response.data);
       set((state) => {
         const currentBlocks = state.blocksByNoteId[blockData.noteId] || [];
+        const updatedBlocks = sortBlocksByPosition([
+          ...currentBlocks,
+          newBlock,
+        ]);
         return {
           blocksByNoteId: {
             ...state.blocksByNoteId,
-            [blockData.noteId]: sortBlocksByPosition([
-              ...currentBlocks,
-              newBlock,
-            ]),
+            [blockData.noteId]: updatedBlocks,
           },
           isLoading: false,
         };
@@ -153,25 +139,24 @@ export const useBlockStore = create<BlockState>((set, get) => ({
       return newBlock;
     } catch (err) {
       const error = err as Error | AxiosError;
-      let errorMessage = "블록 생성에 실패했습니다.";
+      let errorMessage = "블록 생성 실패.";
       if (axios.isAxiosError(error) && error.response?.data) {
-        const serverMessage =
+        errorMessage += ` 서버: ${
           (error.response.data as any)?.message ||
-          JSON.stringify(error.response.data);
-        errorMessage += ` 서버 응답: ${serverMessage}`;
+          JSON.stringify(error.response.data)
+        }`;
       }
-      console.error("[BlockStore] 블록 생성 실패:", error);
+      console.error("[BlockStore] createBlock FAILED:", errorMessage, error); // 에러 로그 유지
       set({ error: errorMessage, isLoading: false });
       return null;
     }
   },
 
   createBlocks: async (blocksData: BlocksCreateRequest) => {
-    if (!blocksData.blocks || blocksData.blocks.length === 0) return [];
-    set({ isLoading: true, error: null });
+    if (!blocksData.blocks || blocksData.blocks.length === 0) return null;
     const noteId = blocksData.blocks[0].noteId;
+    set({ isLoading: true, error: null });
     try {
-      // blocksData는 BlocksCreateRequest 타입이므로, API가 요구하는 필드만 포함합니다.
       const response: AxiosResponse<BlockResponse[]> = await api.post(
         "/api/v1/blocks/blocks",
         blocksData
@@ -179,28 +164,30 @@ export const useBlockStore = create<BlockState>((set, get) => ({
       const newBlocks: Block[] = response.data.map(mapBlockResponseToBlock);
       set((state) => {
         const currentBlocks = state.blocksByNoteId[noteId] || [];
+        const updatedBlocks = sortBlocksByPosition([
+          ...currentBlocks,
+          ...newBlocks,
+        ]);
         return {
-          blocksByNoteId: {
-            ...state.blocksByNoteId,
-            [noteId]: sortBlocksByPosition([...currentBlocks, ...newBlocks]),
-          },
+          blocksByNoteId: { ...state.blocksByNoteId, [noteId]: updatedBlocks },
           isLoading: false,
         };
       });
       return newBlocks;
     } catch (err) {
       const error = err as Error | AxiosError;
-      let errorMessage = `노트 (${noteId})에 여러 블록을 생성하는데 실패했습니다.`;
+      let errorMessage = `노트 (${noteId}) 여러 블록 생성 실패.`;
       if (axios.isAxiosError(error) && error.response?.data) {
-        const serverMessage =
+        errorMessage += ` 서버: ${
           (error.response.data as any)?.message ||
-          JSON.stringify(error.response.data);
-        errorMessage += ` 서버 응답: ${serverMessage}`;
+          JSON.stringify(error.response.data)
+        }`;
       }
       console.error(
-        `[BlockStore] 노트 (${noteId}) 여러 블록 생성 실패:`,
+        `[BlockStore] createBlocks FAILED for noteId (${noteId}):`,
+        errorMessage,
         error
-      );
+      ); // 에러 로그 유지
       set({ error: errorMessage, isLoading: false });
       return null;
     }
@@ -211,14 +198,13 @@ export const useBlockStore = create<BlockState>((set, get) => ({
     noteId: string,
     updateData: Partial<BlockUpdateRequest>
   ): Promise<Block | null> => {
+    if (Object.keys(updateData).length === 0) {
+      const currentBlock = get().getBlockById(noteId, blockId);
+      return currentBlock || null;
+    }
     set({ isLoading: true, error: null });
     try {
-      const response = await api.put(`/api/v1/blocks/${blockId}`, {
-        title: updateData.title ?? null,
-        type: updateData.type ?? null,
-        properties: updateData.properties ?? null,
-      });
-
+      const response = await api.put(`/api/v1/blocks/${blockId}`, updateData);
       const updatedBlock = mapBlockResponseToBlock(response.data);
       set((state) => {
         const currentBlocks = state.blocksByNoteId[noteId] || [];
@@ -236,7 +222,18 @@ export const useBlockStore = create<BlockState>((set, get) => ({
       return updatedBlock;
     } catch (err) {
       const error = err as AxiosError;
-      set({ error: "블록 업데이트 실패", isLoading: false });
+      console.error(
+        `[BlockStore updateBlock] FAILED for blockId: ${blockId}. Error:`,
+        error.message,
+        "Server response:",
+        error.response?.data
+      ); // 에러 로그 유지
+      set({
+        error:
+          "블록 업데이트 실패: " +
+          ((error.response?.data as any)?.message || error.message),
+        isLoading: false,
+      });
       return null;
     }
   },
@@ -246,7 +243,7 @@ export const useBlockStore = create<BlockState>((set, get) => ({
     noteId: string,
     title: string
   ): Promise<Block | null> => {
-    return await get().updateBlock(blockId, noteId, { title });
+    return get().updateBlock(blockId, noteId, { title });
   },
 
   updateBlockProperties: async (
@@ -255,7 +252,7 @@ export const useBlockStore = create<BlockState>((set, get) => ({
     type: BlockType,
     properties: BlockPropertiesUnion
   ): Promise<Block | null> => {
-    return await get().updateBlock(blockId, noteId, { type, properties });
+    return get().updateBlock(blockId, noteId, { properties, type });
   },
 
   deleteBlock: async (blockId: number, noteId: string) => {
@@ -279,20 +276,16 @@ export const useBlockStore = create<BlockState>((set, get) => ({
     } catch (err) {
       const error = err as Error | AxiosError;
       console.error(
-        `[BlockStore] 블록 (ID: ${blockId}) 삭제 실패:`,
+        `[BlockStore] deleteBlock FAILED for blockId (${blockId}):`,
         error.message
-      );
-      set({
-        error: `블록 (ID: ${blockId}) 삭제에 실패했습니다.`,
-        isLoading: false,
-      });
+      ); // 에러 로그 유지
+      set({ error: `블록 (ID: ${blockId}) 삭제 실패.`, isLoading: false });
       return false;
     }
   },
 
   getBlocksForNote: (noteId: string) => {
-    const state = get();
-    return state.blocksByNoteId[noteId] || [];
+    return get().blocksByNoteId[noteId] || [];
   },
 
   getBlockById: (noteId: string, blockId: number) => {
@@ -300,13 +293,21 @@ export const useBlockStore = create<BlockState>((set, get) => ({
     return blocksForNote.find((block) => block.blockId === blockId);
   },
 
-  getDefaultBlocks: (noteId: string) =>
-    get().blocksByNoteId[noteId].filter((b) => b.fieldKey !== null),
+  getDefaultBlocks: (noteId: string) => {
+    const blocks = get().blocksByNoteId[noteId];
+    if (!blocks) return [];
+    return blocks.filter(
+      (b) => b.fieldKey !== null && b.fieldKey !== undefined
+    );
+  },
 
-  getCustomBlocks: (noteId: string) =>
-    get()
-      .blocksByNoteId[noteId].filter((b) => b.fieldKey === null)
-      .sort((a, b) => a.position - b.position),
+  getCustomBlocks: (noteId: string) => {
+    const blocks = get().blocksByNoteId[noteId];
+    if (!blocks) return [];
+    return blocks
+      .filter((b) => b.fieldKey === null || b.fieldKey === undefined)
+      .sort((a, b) => a.position - b.position);
+  },
 
   clearBlocksForNote: (noteId: string) => {
     set((state) => {

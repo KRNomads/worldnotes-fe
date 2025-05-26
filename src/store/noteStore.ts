@@ -5,8 +5,8 @@ import {
   Note,
   NoteCreateRequest,
   NoteUpdateRequest,
-  NoteResponse, // from "@/types/note"
-} from "@/types/note"; // 실제 타입 파일 경로를 정확히 확인해주세요.
+  NoteResponse,
+} from "@/types/note"; // 실제 타입 경로 확인
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -33,14 +33,13 @@ interface NoteState {
   clearNotes: () => void;
 }
 
-// NoteResponse (API의 NoteDto)를 클라이언트 Note 타입으로 변환
 const mapNoteResponseToNote = (dto: NoteResponse): Note => ({
   id: dto.noteId,
   projectId: dto.projectId,
-  title: dto.title, // API 명세상 title은 항상 존재 (null 아님)
+  title: dto.title,
   type: dto.type,
   position: dto.position,
-  lastModified: new Date().toISOString(), // 클라이언트에서 관리
+  lastModified: new Date().toISOString(),
 });
 
 export const useNoteStore = create<NoteState>((set, get) => ({
@@ -51,11 +50,11 @@ export const useNoteStore = create<NoteState>((set, get) => ({
 
   fetchNotesByProject: async (projectId) => {
     if (!projectId) {
-      console.warn(
-        "[NoteStore] fetchNotesByProject: 유효하지 않은 프로젝트 ID:",
-        projectId
-      );
-      set({ notes: [], isLoading: false });
+      set({
+        notes: [],
+        isLoading: false,
+        error: "프로젝트 ID가 유효하지 않습니다.",
+      });
       return;
     }
     set({ isLoading: true, error: null });
@@ -68,7 +67,8 @@ export const useNoteStore = create<NoteState>((set, get) => ({
     } catch (err) {
       const error = err as Error | AxiosError;
       console.error(
-        `[NoteStore] 프로젝트 (${projectId}) 노트 목록 가져오기 실패:`,
+        // 에러 로그 유지
+        `[NoteStore] fetchNotesByProject FAILED for projectId: ${projectId}:`,
         error.message
       );
       set({ error: "노트를 불러오는데 실패했습니다.", isLoading: false });
@@ -77,7 +77,6 @@ export const useNoteStore = create<NoteState>((set, get) => ({
 
   fetchNote: async (noteId) => {
     if (!noteId) {
-      console.warn("[NoteStore] fetchNote: 유효하지 않은 노트 ID:", noteId);
       return;
     }
     set({ isLoading: true, error: null });
@@ -88,13 +87,15 @@ export const useNoteStore = create<NoteState>((set, get) => ({
       const note = mapNoteResponseToNote(response.data);
       set((state) => ({
         notes: state.notes.map((n) => (n.id === noteId ? note : n)),
-        currentNote: note,
+        currentNote:
+          state.currentNote?.id === noteId ? note : state.currentNote,
         isLoading: false,
       }));
     } catch (err) {
       const error = err as Error | AxiosError;
       console.error(
-        `[NoteStore] 노트 (${noteId}) 정보 가져오기 실패:`,
+        // 에러 로그 유지
+        `[NoteStore] fetchNote FAILED for noteId: ${noteId}:`,
         error.message
       );
       set({ error: "노트 정보를 불러오는데 실패했습니다.", isLoading: false });
@@ -121,12 +122,12 @@ export const useNoteStore = create<NoteState>((set, get) => ({
       const error = err as Error | AxiosError;
       let errorMessage = "노트 생성에 실패했습니다.";
       if (axios.isAxiosError(error) && error.response?.data) {
-        const serverMessage =
+        errorMessage += ` 서버 응답: ${
           (error.response.data as any)?.message ||
-          JSON.stringify(error.response.data);
-        errorMessage += ` 서버 응답: ${serverMessage}`;
+          JSON.stringify(error.response.data)
+        }`;
       }
-      console.error("[NoteStore] 노트 생성 실패:", error);
+      console.error("[NoteStore] createNote FAILED:", errorMessage, error); // 에러 로그 유지
       set({ error: errorMessage, isLoading: false });
       return null;
     }
@@ -153,12 +154,16 @@ export const useNoteStore = create<NoteState>((set, get) => ({
       const error = err as Error | AxiosError;
       let errorMessage = `노트 (ID: ${noteId}) 업데이트에 실패했습니다.`;
       if (axios.isAxiosError(error) && error.response?.data) {
-        const serverMessage =
+        errorMessage += ` 서버 응답: ${
           (error.response.data as any)?.message ||
-          JSON.stringify(error.response.data);
-        errorMessage += ` 서버 응답: ${serverMessage}`;
+          JSON.stringify(error.response.data)
+        }`;
       }
-      console.error(`[NoteStore] 노트 (ID: ${noteId}) 업데이트 실패:`, error);
+      console.error(
+        `[NoteStore] updateNote FAILED for noteId: ${noteId}`,
+        errorMessage,
+        error
+      ); // 에러 로그 유지
       set({ error: errorMessage, isLoading: false });
       return null;
     }
@@ -178,7 +183,7 @@ export const useNoteStore = create<NoteState>((set, get) => ({
     } catch (err) {
       const error = err as Error | AxiosError;
       console.error(
-        `[NoteStore] 노트 (ID: ${noteId}) 삭제 실패:`,
+        `[NoteStore] deleteNote FAILED for noteId: ${noteId}:`,
         error.message
       );
       set({
@@ -190,6 +195,10 @@ export const useNoteStore = create<NoteState>((set, get) => ({
   },
 
   setCurrentNote: (noteId) => {
+    if (noteId === undefined) {
+      set({ currentNote: null });
+      return;
+    }
     const note = get().notes.find((n) => n.id === noteId) || null;
     set({ currentNote: note });
   },

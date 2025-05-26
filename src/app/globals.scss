@@ -1,3 +1,9 @@
+// src/app/globals.scss (또는 사용하는 경로)
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 * {
   box-sizing: border-box;
   padding: 0;

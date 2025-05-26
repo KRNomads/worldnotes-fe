@@ -1,8 +1,6 @@
-// 변수 정의
+// 사용되는 변수 정의
 $primary-color: #4f46e5;
-$primary-light: #818cf8;
 $primary-dark: #3730a3;
-$secondary-color: #f97316;
 $text-primary: #1e293b;
 $text-secondary: #64748b;
 $text-muted: #94a3b8;
@@ -10,55 +8,18 @@ $bg-primary: #ffffff;
 $bg-secondary: #f8fafc;
 $bg-tertiary: #f1f5f9;
 $border-color: #e2e8f0;
-$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
 $shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
   0 2px 4px -1px rgba(0, 0, 0, 0.06);
-$radius-sm: 4px;
 $radius-md: 8px;
 $radius-lg: 12px;
 $transition-fast: 150ms ease;
-$transition-normal: 250ms ease;
 $font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
   Helvetica, Arial, sans-serif;
 
-// 브레이크포인트 믹스인 수정
+// 사용되는 브레이크포인트 믹스인
 @mixin mobile {
   @media (max-width: 1024px) {
     @content;
-  }
-}
-
-@mixin desktop {
-  @media (min-width: 1025px) {
-    @content;
-  }
-}
-
-// 작은 모바일 화면용 믹스인 추가
-@mixin small-mobile {
-  @media (max-width: 500px) {
-    @content;
-  }
-}
-
-// 애니메이션 키프레임
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
   }
 }
 
@@ -85,13 +46,12 @@ $font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
   @include mobile {
     margin-left: 0;
     padding: 16px;
-    margin-top: 120px; // 모바일 사이드바 높이만큼 여백 증가
+    margin-top: 120px;
   }
 }
 
 .contentWrapper {
   margin: 0 auto;
-  // 최대 너비 설정
 }
 
 .characterPageLayout {
@@ -104,7 +64,7 @@ $font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
   }
 }
 
-// 노트 목록 스타일
+// 노트 목록 스타일 (CharacterNoteList.tsx)
 .noteListContainer {
   width: 280px;
   background-color: $bg-primary;
@@ -157,7 +117,7 @@ $font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
   list-style: none;
   padding: 0;
   margin: 0;
-  max-height: calc(100vh - 200px);
+  max-height: calc(100vh - 200px); // TODO: 이 값은 상황에 따라 조절될 수 있음
   overflow-y: auto;
 
   @include mobile {
@@ -244,7 +204,6 @@ $font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
 
 .editButton {
   color: $text-secondary;
-
   &:hover {
     color: $primary-color;
   }
@@ -252,13 +211,13 @@ $font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
 
 .deleteButton {
   color: $text-secondary;
-
   &:hover {
-    color: #e53935;
+    color: #e53935; // 원본 SCSS의 하드코딩된 값 유지
   }
 }
 
 .editTitleInput {
+  // CharacterNoteList.tsx 에서 사용
   width: 100%;
   padding: 8px 12px;
   border: 2px solid $primary-color;
@@ -278,7 +237,7 @@ $font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
   font-style: italic;
 }
 
-// 캐릭터 에디터 스타일
+// 에디터 컨테이너 (CharactersPage.tsx 에서 사용)
 .editorContainer {
   flex: 1;
   background-color: $bg-primary;
@@ -287,47 +246,11 @@ $font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
   overflow: hidden;
 
   @include mobile {
-    min-width: 0; // 컨텐츠 크기 이하로 축소 가능하도록 설정
+    min-width: 0;
   }
 }
 
-.editorWrapper {
-  padding: 24px;
-  min-height: 600px;
-
-  @include mobile {
-    padding: 16px;
-    min-height: auto;
-  }
-}
-
-// 구조화된 캐릭터 정보 입력 폼
-.characterForm {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-
-  @include mobile {
-    gap: 20px;
-  }
-}
-
-.formSection {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  animation: fadeIn $transition-normal forwards;
-}
-
-.sectionTitle {
-  color: $text-primary;
-  margin: 0;
-  padding-bottom: 8px;
-  border-bottom: 1px solid $border-color;
-  font-size: 16px;
-  font-weight: 600;
-}
-
+// 노트 Title 입력 (NotionEditor.tsx 에서 사용)
 .titleInput {
   width: 100%;
   font-size: 24px;
@@ -339,340 +262,22 @@ $font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
 
   &:focus {
     outline: none;
-    border-color: $primary-color;
-    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+    border-color: $primary-color; // 이 부분은 실제 적용 시 $primary-color 가 정의되어 있어야 함
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.1); // 이 부분도 마찬가지
   }
 }
+
 .gradientline {
+  // NotionEditor.tsx 에서 사용
   height: 0.25rem;
   width: 10rem;
-  margin-left: 13px;
-  background: linear-gradient(to right, #8b5cf6, #3b82f6);
+  margin-left: 13px; // 원본 값 유지
+  background: linear-gradient(to right, #8b5cf6, #3b82f6); // 원본 값 유지
   border-radius: 9999px;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.5rem; // 원본 값 유지
 }
 
-.appearanceSection {
-  display: grid;
-  grid-template-columns: 1fr 1fr; // 데스크탑: 2열 그리드
-  gap: 20px;
-  max-width: 1400px; // 최대 너비 설정
-  margin-left: auto; // ✨ 변경점: appearanceSection 블록 자체를 가운데 정렬
-  margin-right: auto; // ✨ 변경점: appearanceSection 블록 자체를 가운데 정렬
-  width: 100%; // ✨ 추가: max-width와 함께 사용하여 반응형으로 너비 조절
-
-  @include mobile {
-    // max-width: 1024px (수정된 믹스인 기준)
-    grid-template-columns: 1fr; // 모바일(태블릿 포함): 1열 그리드
-    gap: 16px;
-    // margin-left: auto; margin-right: auto; 는 상속받으므로,
-    // 부모 컨테이너가 이 섹션의 내용보다 넓다면 여전히 가운데 정렬 효과가 있을 수 있습니다.
-    // 보통 모바일에서는 100% 너비를 사용하므로 눈에 띄지 않을 수 있습니다.
-  }
-}
-
-.imageUploadContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.imagePreviewArea {
-  width: 100%;
-  max-width: 500px;
-  aspect-ratio: 1 / 1;
-  background-color: $bg-tertiary;
-  border: 2px dashed $border-color;
-  border-radius: $radius-md;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: $text-muted;
-  font-size: 14px;
-  overflow: hidden;
-  position: relative;
-  transition: border-color $transition-fast, background-color $transition-fast;
-  margin: 0 auto; // 중앙 정렬
-
-  @include mobile {
-    max-width: 100%;
-    max-width: 500px; // 모바일에서는 100%로 제한
-  }
-
-  &:hover {
-    border-color: $primary-color;
-    background-color: rgba($primary-color, 0.03);
-  }
-
-  &.dragOver {
-    border-color: $primary-color;
-    background-color: rgba($primary-color, 0.05);
-  }
-}
-
-.imagePreview {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.uploadIcon {
-  font-size: 32px;
-  margin-bottom: 8px;
-  color: $text-secondary;
-}
-
-.uploadText {
-  text-align: center;
-  margin: 8px 0;
-}
-
-.uploadInput {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  cursor: pointer;
-}
-
-.uploadButton {
-  margin-top: 8px;
-  padding: 8px 16px;
-  background-color: $primary-color;
-  color: white;
-  border: none;
-  border-radius: $radius-md;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color $transition-fast;
-
-  &:hover {
-    background-color: $primary-dark;
-  }
-}
-
-.uploadProgress {
-  width: 100%;
-  height: 4px;
-  background-color: $bg-tertiary;
-  border-radius: 2px;
-  overflow: hidden;
-  margin-top: 8px;
-
-  .progressBar {
-    height: 100%;
-    background-color: $primary-color;
-    transition: width 0.3s ease;
-  }
-}
-
-.uploadStatus {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  margin-top: 8px;
-
-  &.success {
-    color: #10b981;
-  }
-
-  &.error {
-    color: #ef4444;
-  }
-
-  &.loading {
-    color: $primary-color;
-  }
-}
-
-.spinner {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba($primary-color, 0.3);
-  border-radius: 50%;
-  border-top-color: $primary-color;
-  animation: spin 1s linear infinite;
-}
-
-.imageUrlInput {
-  width: 100%;
-  padding: 10px 14px;
-  border: 1px solid $border-color;
-  border-radius: $radius-md;
-  font-size: 14px;
-  transition: border-color $transition-fast, box-shadow $transition-fast;
-  max-width: 400px; // 최대 너비 제한
-  margin: 0 auto; // 중앙 정렬
-
-  @include mobile {
-    max-width: 100%; // 모바일에서는 100%로 제한
-  }
-
-  &:focus {
-    outline: none;
-    border-color: $primary-color;
-    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
-  }
-}
-
-.descriptionContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  align-items: center;
-}
-
-.descriptionTextarea {
-  max-width: 500px;
-  width: 100%;
-  height: 100%;
-  min-height: 200px;
-  padding: 12px 16px;
-  border: 1px solid $border-color;
-  border-radius: $radius-md;
-  font-family: $font-sans;
-  font-size: 14px;
-  resize: vertical;
-  transition: border-color $transition-fast, box-shadow $transition-fast;
-
-  &:focus {
-    outline: none;
-    border-color: $primary-color;
-    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
-  }
-
-  @include mobile {
-    max-width: 100%;
-    max-width: 500px;
-    min-height: 150px;
-  }
-}
-
-.textSection {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.textBlockContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  animation: fadeIn $transition-normal forwards;
-}
-
-.textBlockHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.textBlockTitle {
-  font-size: 15px;
-  font-weight: 600;
-  color: $text-primary;
-  margin: 0;
-  padding: 4px 8px;
-  border-radius: $radius-sm;
-  cursor: pointer;
-  transition: background-color $transition-fast;
-
-  &:hover {
-    background-color: rgba($primary-color, 0.05);
-  }
-}
-
-.textBlockTitleInput {
-  font-size: 15px;
-  font-weight: 600;
-  color: $text-primary;
-  padding: 4px 8px;
-  border: 1px solid $primary-color;
-  border-radius: $radius-sm;
-  width: 200px;
-
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px rgba($primary-color, 0.1);
-  }
-}
-
-.infoTextarea {
-  width: 100%;
-  min-height: 150px;
-  padding: 12px 16px;
-  border: 1px solid $border-color;
-  border-radius: $radius-md;
-  font-family: $font-sans;
-  font-size: 14px;
-  resize: vertical;
-  transition: border-color $transition-fast, box-shadow $transition-fast;
-
-  &:focus {
-    outline: none;
-    border-color: $primary-color;
-    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
-  }
-
-  @include mobile {
-    min-height: 120px;
-  }
-}
-
-.addBlockButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px 16px;
-  background: none;
-  border: none;
-  color: $primary-color;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin: 0 auto;
-
-  &::before {
-    display: none;
-  }
-
-  &:hover {
-    background: none;
-    border: none;
-    box-shadow: none;
-    transform: scale(1.05);
-    color: $primary-dark;
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
-}
-
-.addBlockIcon {
-  font-size: 24px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  margin-right: 4px;
-  transition: all 0.2s ease;
-
-  .addBlockButton:hover & {
-    background: none;
-    transform: rotate(90deg);
-  }
-}
-
-// 로딩 및 에러 상태
+// 로딩 및 에러 상태 (CharactersPage.tsx, NotionEditor.tsx 에서 사용)
 .loadingContainer,
 .errorContainer {
   display: flex;
@@ -689,6 +294,7 @@ $font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
   }
 }
 
+// CharactersPage.tsx 에서 사용
 .retryButton {
   margin-top: 16px;
   padding: 10px 20px;
@@ -705,79 +311,7 @@ $font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
   }
 }
 
-// 블록 메뉴 드롭다운 스타일
-.blockMenuDropdown {
-  position: absolute;
-  z-index: 1000;
-  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.1));
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-bottom: 8px solid $bg-primary;
-    z-index: 1001;
-  }
-
-  .blockMenu {
-    background-color: $bg-primary;
-    border-radius: $radius-md;
-    overflow: hidden;
-    width: 200px;
-    border: 1px solid $border-color;
-    box-shadow: $shadow-md;
-  }
-}
-
-// 기존 blockMenuOverlay 스타일 수정
-.blockMenuOverlay {
-  display: none; // 오버레이는 사용하지 않음
-}
-
-.blockMenuItem {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: 12px 16px;
-  border: none;
-  background: none;
-  text-align: left;
-  cursor: pointer;
-  transition: background-color $transition-fast;
-
-  &:hover {
-    background-color: $bg-tertiary;
-  }
-
-  &:not(:last-child) {
-    border-bottom: 1px solid $border-color;
-  }
-}
-
-.blockMenuItemIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  margin-right: 12px;
-  background-color: rgba($primary-color, 0.1);
-  color: $primary-color;
-  border-radius: $radius-md;
-  font-size: 14px;
-}
-
-.blockMenuItemText {
-  font-size: 14px;
-  font-weight: 500;
-  color: $text-primary;
-}
-
-// 반응형 노트 선택 없음 상태
+// 노트 선택 없음 상태 (CharactersPage.tsx 에서 사용)
 .noNoteSelected {
   display: flex;
   flex-direction: column;
@@ -798,160 +332,9 @@ $font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
   }
 }
 
+// CharactersPage.tsx 에서 사용
 .createButton {
   padding: 10px 20px;
-  background-color: $primary-color;
-  color: white;
-  border: none;
-  border-radius: $radius-md;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color $transition-fast;
-
-  &:hover {
-    background-color: $primary-dark;
-  }
-}
-
-// 블록 컴포넌트 스타일
-.blockContainer {
-  margin-bottom: 16px;
-  padding: 16px;
-  border: 1px solid $border-color;
-  border-radius: $radius-md;
-  background-color: $bg-primary;
-  position: relative;
-  transition: border-color $transition-fast, box-shadow $transition-fast;
-
-  &:hover {
-    border-color: rgba($primary-color, 0.3);
-  }
-
-  &.editing {
-    border-color: $primary-color;
-    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
-  }
-}
-
-.blockTitleContainer {
-  display: flex;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.blockTitleEdit {
-  width: 100%;
-}
-
-.blockTitleInput {
-  width: 100%;
-  padding: 6px 10px;
-  border: 1px solid $primary-color;
-  border-radius: $radius-sm;
-  font-size: 15px;
-  font-weight: 600;
-  color: $text-primary;
-
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
-  }
-}
-
-.blockTitle {
-  font-size: 15px;
-  font-weight: 600;
-  color: $text-primary;
-  cursor: pointer;
-  padding: 2px 4px;
-  border-radius: $radius-sm;
-
-  &:hover {
-    background-color: rgba($primary-color, 0.05);
-  }
-}
-
-.blockContent {
-  width: 100%;
-}
-
-.blockOptions {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  display: flex;
-  gap: 8px;
-}
-
-.blockOptionButton {
-  width: 28px;
-  height: 28px;
-  border-radius: $radius-md;
-  background: none;
-  border: none;
-  color: $text-secondary;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background-color $transition-fast, color $transition-fast;
-
-  &:hover {
-    background-color: $bg-tertiary;
-    color: $text-primary;
-  }
-}
-
-.blockWrapper {
-  position: relative;
-  margin-bottom: 8px;
-
-  .addBlockButton {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: auto;
-    height: auto;
-    background: none;
-    border: none;
-    color: $primary-color;
-    font-size: 24px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    margin: 8px auto;
-    padding: 4px;
-    box-shadow: none;
-
-    &:hover {
-      background: none;
-      border: none;
-      box-shadow: none;
-      transform: scale(1.2);
-      color: $primary-dark;
-    }
-
-    &:active {
-      transform: scale(0.9);
-    }
-  }
-}
-
-.emptyBlocksMessage {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 32px;
-  text-align: center;
-  color: $text-secondary;
-
-  p {
-    margin-bottom: 16px;
-  }
-}
-
-.addFirstBlockButton {
-  padding: 10px 16px;
   background-color: $primary-color;
   color: white;
   border: none;
