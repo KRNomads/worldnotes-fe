@@ -7,14 +7,6 @@ import {
   NoteUpdateRequest,
   NoteResponse,
 } from "@/types/note"; // 실제 타입 경로 확인
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  withCredentials: true,
-  headers: { "Content-Type": "application/json" },
-});
 import { NotePayload, WebSocketMessage } from "@/types/socketMessage";
 import { mapNotePayloadToNote, mapNoteResponseToNote } from "@/utils/mappers";
 import api from "@/lib/api";
@@ -35,19 +27,8 @@ interface NoteState {
   getNotesByType: (type: string, projectId?: string) => Note[];
   clearNotes: () => void;
 
-<<<<<<< HEAD
-const mapNoteResponseToNote = (dto: NoteResponse): Note => ({
-  id: dto.noteId,
-  projectId: dto.projectId,
-  title: dto.title,
-  type: dto.type,
-  position: dto.position,
-  lastModified: new Date().toISOString(),
-});
-=======
   handleNoteSocketEvent: (msg: WebSocketMessage<NotePayload>) => void;
 }
->>>>>>> 6a6d23b8f6718800400defd3857c9632c6098163
 
 export const useNoteStore = create<NoteState>((set, get) => ({
   notes: [],

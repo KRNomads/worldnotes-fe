@@ -9,9 +9,7 @@ import {
   BlockResponse,
   BlockType,
   BlockPropertiesUnion,
-} from "@/types/block"; // 실제 타입 경로 확인
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+} from "@/types/block";
 import { BlockPayload, WebSocketMessage } from "@/types/socketMessage";
 import {
   mapBlockPayloadToBlock,
@@ -53,24 +51,6 @@ interface BlockState {
 
   handleBlockSocketEvent: (msg: WebSocketMessage<BlockPayload>) => void;
 }
-
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  withCredentials: true,
-  headers: { "Content-Type": "application/json" },
-});
-
-const mapBlockResponseToBlock = (dto: BlockResponse): Block => {
-  return {
-    blockId: dto.blockId,
-    noteId: dto.noteId,
-    title: dto.title,
-    fieldKey: dto.fieldKey,
-    type: dto.type,
-    properties: dto.properties,
-    position: dto.position,
-  };
-};
 
 const sortBlocksByPosition = (blocks: Block[]): Block[] => {
   if (!Array.isArray(blocks)) return [];

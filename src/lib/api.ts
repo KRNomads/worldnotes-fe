@@ -5,7 +5,8 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 const api = axios.create({
   baseURL: BACKEND_URL,
-  withCredentials: true, // 모든 요청에 쿠키 포함
+  withCredentials: true,
+  headers: { "Content-Type": "application/json" }, // 모든 요청에 쿠키 포함
 });
 
 // 응답 인터셉터 (인증 실패 처리)
