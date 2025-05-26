@@ -12,6 +12,12 @@ import {
 } from "@/types/block"; // 실제 타입 경로 확인
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+import { BlockPayload, WebSocketMessage } from "@/types/socketMessage";
+import {
+  mapBlockPayloadToBlock,
+  mapBlockResponseToBlock,
+} from "@/utils/mappers";
+import api from "@/lib/api";
 
 interface BlockState {
   blocksByNoteId: Record<string, Block[]>;
@@ -44,6 +50,8 @@ interface BlockState {
   getCustomBlocks: (noteId: string) => Block[];
   clearBlocksForNote: (noteId: string) => void;
   clearAllBlocks: () => void;
+
+  handleBlockSocketEvent: (msg: WebSocketMessage<BlockPayload>) => void;
 }
 
 const api = axios.create({
@@ -321,5 +329,57 @@ export const useBlockStore = create<BlockState>((set, get) => ({
 
   clearAllBlocks: () => {
     set({ blocksByNoteId: {}, isLoading: false, error: null });
+  },
+
+  handleBlockSocketEvent: (msg: WebSocketMessage<Partial<BlockPayload>>) => {
+    const { type, payload } = msg;
+
+    switch (type) {
+      case "BLOCK_CREATED":
+        const newBlock = mapBlockPayloadToBlock(payload as BlockPayload);
+        set((state) => {
+          const currentBlocks = state.blocksByNoteId[newBlock.noteId] || [];
+          return {
+            blocksByNoteId: {
+              ...state.blocksByNoteId,
+              [newBlock.noteId]: [...currentBlocks, newBlock].sort(
+                (a, b) => a.position - b.position
+              ),
+            },
+          };
+        });
+        break;
+
+      case "BLOCK_UPDATED":
+        const updatedBlock = mapBlockPayloadToBlock(payload as BlockPayload);
+        set((state) => {
+          const currentBlocks = state.blocksByNoteId[updatedBlock.noteId] || [];
+          return {
+            blocksByNoteId: {
+              ...state.blocksByNoteId,
+              [updatedBlock.noteId]: currentBlocks
+                .map((b) =>
+                  b.blockId === updatedBlock.blockId ? updatedBlock : b
+                )
+                .sort((a, b) => a.position - b.position),
+            },
+          };
+        });
+        break;
+
+      case "BLOCK_DELETED":
+        set((state) => {
+          const currentBlocks = state.blocksByNoteId[payload.noteId] || [];
+          return {
+            blocksByNoteId: {
+              ...state.blocksByNoteId,
+              [payload.noteId]: currentBlocks.filter(
+                (b) => b.blockId !== payload.blockId
+              ),
+            },
+          };
+        });
+        break;
+    }
   },
 }));
