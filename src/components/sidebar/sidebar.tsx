@@ -7,6 +7,7 @@ import Image from "next/image";
 import styles from "./sidebar.module.scss";
 import settingIcon from "../../../public/settingIcon.svg";
 import { useAuthStore } from "@/store/authStore";
+import { useWebSocketStore } from "@/store/websocketStore";
 
 // 모달 컴포넌트를 사이드바 파일 내에 정의
 function SettingsModal({ onClose }: { onClose: () => void }) {
@@ -88,6 +89,10 @@ export default function Sidebar({
   const { logout } = useAuthStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // ===== 웹소켓 관련 ======
+  const { isConnected, connect, disconnect } = useWebSocketStore();
+  // ========================
+
   const handleLogout = () => {
     logout();
   };
@@ -142,6 +147,20 @@ export default function Sidebar({
             >
               세계관 정보
             </Link>
+
+            <button
+              className={styles.navItem}
+              onClick={isConnected ? disconnect : connect}
+              style={{
+                background: "none",
+                border: "none",
+                color: isConnected ? "green" : "orange",
+                textAlign: "center",
+                cursor: "pointer",
+              }}
+            >
+              웹소켓 테스트
+            </button>
           </>
         ) : (
           // 메인 사이드바 메뉴
