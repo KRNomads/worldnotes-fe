@@ -1,23 +1,6 @@
 // src/app/globals.scss (또는 사용하는 경로)
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-html,
-body {
-  max-width: 100vw;
-  height: 100vh;
-  overflow-x: hidden;
-  font-family: "Inter", sans-serif;
-  background-color: #f2f2f2;
-}
+@use "tailwindcss";
 
 a {
   color: inherit;

@@ -244,7 +244,7 @@ export default function NotionEditor({ noteId }: NotionEditorProps) {
 
   // ==== UI ====
   return (
-    <div className="max-w-4xl mx-auto p-4 md:p-8">
+    <div>
       {/* 노트 Title */}
       <div className={styles.TitleformSection}>
         <input
