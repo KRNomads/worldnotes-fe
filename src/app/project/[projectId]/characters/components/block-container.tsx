@@ -51,14 +51,7 @@ export const BlockContainer: React.FC<BlockContainerProps> = ({
           <Button
             variant="ghost"
             size="icon"
-            className="cursor-grab opacity-0 group-hover:opacity-100 transition-opacity"
-          >
-            <GripVertical className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="opacity-0 group-hover:opacity-100 transition-opacity"
+            className="transition-opacity"
             onClick={() => onToggleCollapse(block.blockId)}
           >
             {block.isCollapsed ? (
@@ -73,6 +66,13 @@ export const BlockContainer: React.FC<BlockContainerProps> = ({
             value={block.title || ""}
             onChange={(e) => onUpdateBlockTitle(block.blockId, e.target.value)}
           />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="cursor-grab opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            <GripVertical className="h-4 w-4" />
+          </Button>
         </div>
         <Button
           variant="ghost"
