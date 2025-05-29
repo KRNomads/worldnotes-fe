@@ -1,30 +1,24 @@
 import { useEffect } from "react";
 import { useWebSocketStore } from "@/store/websocketStore";
 import { useBlockStore } from "@/store/blockStore";
-import { Message } from "@stomp/stompjs";
 
 /**
  * noteId: 구독할 노트 ID
  */
 export const useNoteSync = (noteId: string) => {
-  const { isSyncEnabled, subscribe, unsubscribe, connect } =
-    useWebSocketStore();
+  const { isSyncEnabled, enableSync, subscribeToNote } = useWebSocketStore();
 
   useEffect(() => {
-    if (!noteId || !isSyncEnabled) return;
+    if (!noteId) return;
 
-    connect();
+    if (!isSyncEnabled) {
+      enableSync();
+    }
 
-    const noteDestination = `/topic/note/${noteId}`;
-
-    subscribe(noteDestination, (message: Message) => {
-      const payload = JSON.parse(message.body);
+    // 새로운 구독
+    subscribeToNote(noteId, (payload) => {
       console.log("[WebSocket] 블록 이벤트:", payload);
       useBlockStore.getState().handleBlockSocketEvent(payload);
     });
-
-    return () => {
-      unsubscribe(noteDestination);
-    };
-  }, [noteId, isSyncEnabled]);
+  }, [noteId, isSyncEnabled, enableSync, subscribeToNote]);
 };
