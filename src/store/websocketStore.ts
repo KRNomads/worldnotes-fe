@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import stompClient from "@/lib/stompClient";
 import { Message, StompSubscription } from "@stomp/stompjs";
+import { handleMessage } from "@/websocket/handler";
+import { WebSocketMessage } from "@/types/socketMessage";
 
 interface WebSocketState {
   isConnected: boolean;
@@ -11,19 +13,15 @@ interface WebSocketState {
   connect: () => void;
   disconnect: () => void;
 
-  subscribe: (
-    destination: string,
-    callback: (message: Message) => void
-  ) => void;
+  subscribe: (destination: string) => void;
   unsubscribe: (destination: string) => void;
 
-  subscribeToNote: (noteId: string, callback: (msg: any) => void) => void;
-  subscribeToProject: (projectId: string, callback: (msg: any) => void) => void;
+  subscribeToNote: (noteId: string) => void;
+  subscribeToProject: (projectId: string) => void;
 }
 
 export const useWebSocketStore = create<WebSocketState>((set, get) => ({
   isConnected: false,
-  isSyncEnabled: false,
   subscriptions: {},
   currentSubscribedNoteId: null,
   currentSubscribedProjectId: null,
@@ -58,13 +56,17 @@ export const useWebSocketStore = create<WebSocketState>((set, get) => ({
     }
   },
 
-  subscribe: (destination, callback) => {
+  subscribe: (destination: string) => {
     if (!get().isConnected || get().subscriptions[destination]) {
       return;
     }
-    const subscription = stompClient.subscribe(destination, (message) => {
-      callback(JSON.parse(message.body));
-    });
+    const subscription = stompClient.subscribe(
+      destination,
+      (message: Message) => {
+        const parsed: WebSocketMessage<unknown> = JSON.parse(message.body);
+        handleMessage(parsed);
+      }
+    );
     set((state) => ({
       subscriptions: { ...state.subscriptions, [destination]: subscription },
     }));
@@ -84,25 +86,22 @@ export const useWebSocketStore = create<WebSocketState>((set, get) => ({
     }
   },
 
-  subscribeToNote: (noteId, callback) => {
+  subscribeToNote: (noteId) => {
     const { currentSubscribedNoteId, unsubscribe, subscribe } = get();
     const destination = `/note/${noteId}`;
 
-    // 이전 노트 구독 해제
     if (currentSubscribedNoteId && currentSubscribedNoteId !== noteId) {
       unsubscribe(`/note/${currentSubscribedNoteId}`);
     }
 
-    // 새 노트 구독
-    subscribe(destination, callback);
+    subscribe(destination);
     set({ currentSubscribedNoteId: noteId });
   },
 
-  subscribeToProject: (projectId, callback) => {
+  subscribeToProject: (projectId) => {
     const { currentSubscribedProjectId, unsubscribe, subscribe } = get();
     const destination = `/project/${projectId}`;
 
-    // 이전 프로젝트 구독 해제
     if (
       currentSubscribedProjectId &&
       currentSubscribedProjectId !== projectId
@@ -110,8 +109,7 @@ export const useWebSocketStore = create<WebSocketState>((set, get) => ({
       unsubscribe(`/project/${currentSubscribedProjectId}`);
     }
 
-    // 새 프로젝트 구독
-    subscribe(destination, callback);
+    subscribe(destination);
     set({ currentSubscribedProjectId: projectId });
   },
 }));

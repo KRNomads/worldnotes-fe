@@ -10,11 +10,7 @@ import {
   BlockType,
   BlockPropertiesUnion,
 } from "@/types/block";
-import { BlockPayload, WebSocketMessage } from "@/types/socketMessage";
-import {
-  mapBlockPayloadToBlock,
-  mapBlockResponseToBlock,
-} from "@/utils/mappers";
+import { mapBlockResponseToBlock } from "@/utils/mappers";
 import api from "@/lib/api";
 
 interface BlockState {
@@ -49,7 +45,10 @@ interface BlockState {
   clearBlocksForNote: (noteId: string) => void;
   clearAllBlocks: () => void;
 
-  handleBlockSocketEvent: (msg: WebSocketMessage<BlockPayload>) => void;
+  // WebSocket 등 외부 이벤트로 상태만 갱신하는 전용 메서드
+  createBlockInStore: (block: Block) => void;
+  updateBlockInStore: (block: Block) => void;
+  deleteBlockInStore: (blockId: number, noteId: string) => void;
 }
 
 const sortBlocksByPosition = (blocks: Block[]): Block[] => {
@@ -311,55 +310,47 @@ export const useBlockStore = create<BlockState>((set, get) => ({
     set({ blocksByNoteId: {}, isLoading: false, error: null });
   },
 
-  handleBlockSocketEvent: (msg: WebSocketMessage<Partial<BlockPayload>>) => {
-    const { type, payload } = msg;
+  // WebSocket 등 외부로부터 이미 최종 결과를 받은 경우, 상태만 갱신하는 메서드
+  createBlockInStore: (block: Block) => {
+    set((state) => {
+      const currentBlocks = state.blocksByNoteId[block.noteId] || [];
+      const updatedBlocks = [...currentBlocks, block].sort(
+        (a, b) => a.position - b.position
+      );
+      return {
+        blocksByNoteId: {
+          ...state.blocksByNoteId,
+          [block.noteId]: updatedBlocks,
+        },
+      };
+    });
+  },
 
-    switch (type) {
-      case "BLOCK_CREATED":
-        const newBlock = mapBlockPayloadToBlock(payload as BlockPayload);
-        set((state) => {
-          const currentBlocks = state.blocksByNoteId[newBlock.noteId] || [];
-          return {
-            blocksByNoteId: {
-              ...state.blocksByNoteId,
-              [newBlock.noteId]: [...currentBlocks, newBlock].sort(
-                (a, b) => a.position - b.position
-              ),
-            },
-          };
-        });
-        break;
+  updateBlockInStore: (block: Block) => {
+    set((state) => {
+      const currentBlocks = state.blocksByNoteId[block.noteId] || [];
+      const updatedBlocks = currentBlocks.map((b) =>
+        b.blockId === block.blockId ? block : b
+      );
+      return {
+        blocksByNoteId: {
+          ...state.blocksByNoteId,
+          [block.noteId]: updatedBlocks.sort((a, b) => a.position - b.position),
+        },
+      };
+    });
+  },
 
-      case "BLOCK_UPDATED":
-        const updatedBlock = mapBlockPayloadToBlock(payload as BlockPayload);
-        set((state) => {
-          const currentBlocks = state.blocksByNoteId[updatedBlock.noteId] || [];
-          return {
-            blocksByNoteId: {
-              ...state.blocksByNoteId,
-              [updatedBlock.noteId]: currentBlocks
-                .map((b) =>
-                  b.blockId === updatedBlock.blockId ? updatedBlock : b
-                )
-                .sort((a, b) => a.position - b.position),
-            },
-          };
-        });
-        break;
-
-      case "BLOCK_DELETED":
-        set((state) => {
-          const currentBlocks = state.blocksByNoteId[payload.noteId] || [];
-          return {
-            blocksByNoteId: {
-              ...state.blocksByNoteId,
-              [payload.noteId]: currentBlocks.filter(
-                (b) => b.blockId !== payload.blockId
-              ),
-            },
-          };
-        });
-        break;
-    }
+  deleteBlockInStore: (blockId: number, noteId: string) => {
+    set((state) => {
+      const currentBlocks = state.blocksByNoteId[noteId] || [];
+      const updatedBlocks = currentBlocks.filter((b) => b.blockId !== blockId);
+      return {
+        blocksByNoteId: {
+          ...state.blocksByNoteId,
+          [noteId]: updatedBlocks,
+        },
+      };
+    });
   },
 }));

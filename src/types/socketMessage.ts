@@ -27,6 +27,8 @@ export type MessageType =
 //   description: string;
 // }
 
+export type MessagePayload = NotePayload | BlockPayload;
+
 export interface NotePayload {
   noteId: string;
   projectId: string;

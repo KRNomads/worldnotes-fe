@@ -7,8 +7,7 @@ import {
   NoteUpdateRequest,
   NoteResponse,
 } from "@/types/note"; // 실제 타입 경로 확인
-import { NotePayload, WebSocketMessage } from "@/types/socketMessage";
-import { mapNotePayloadToNote, mapNoteResponseToNote } from "@/utils/mappers";
+import { mapNoteResponseToNote } from "@/utils/mappers";
 import api from "@/lib/api";
 
 interface NoteState {
@@ -27,7 +26,10 @@ interface NoteState {
   getNotesByType: (type: string, projectId?: string) => Note[];
   clearNotes: () => void;
 
-  handleNoteSocketEvent: (msg: WebSocketMessage<NotePayload>) => void;
+  // WebSocket 메시지 등 외부 이벤트로 상태만 수정하는 메서드
+  createNoteInStore: (note: Note) => void;
+  updateNoteInStore: (note: Note) => void;
+  deleteNoteInStore: (noteId: string) => void;
 }
 
 export const useNoteStore = create<NoteState>((set, get) => ({
@@ -203,35 +205,26 @@ export const useNoteStore = create<NoteState>((set, get) => ({
     set({ notes: [], currentNote: null, error: null, isLoading: false });
   },
 
-  handleNoteSocketEvent: (msg: WebSocketMessage<Partial<NotePayload>>) => {
-    const { type, payload } = msg;
+  createNoteInStore: (note) => {
+    set((state) => ({
+      notes: [...state.notes, note].sort((a, b) => a.position - b.position),
+      currentNote: note,
+    }));
+  },
 
-    switch (type) {
-      case "NOTE_CREATED":
-        const newNote = mapNotePayloadToNote(payload as NotePayload);
-        set((state) => ({
-          notes: [...state.notes, newNote].sort(
-            (a, b) => a.position - b.position
-          ),
-        }));
-        break;
+  updateNoteInStore: (note) => {
+    set((state) => ({
+      notes: state.notes
+        .map((n) => (n.id === note.id ? note : n))
+        .sort((a, b) => a.position - b.position),
+      currentNote: state.currentNote?.id === note.id ? note : state.currentNote,
+    }));
+  },
 
-      case "NOTE_UPDATED":
-        const updatedNote = mapNotePayloadToNote(payload as NotePayload);
-        set((state) => ({
-          notes: state.notes
-            .map((n) => (n.id === updatedNote.id ? updatedNote : n))
-            .sort((a, b) => a.position - b.position),
-        }));
-        break;
-
-      case "NOTE_DELETED":
-        set((state) => ({
-          notes: state.notes.filter((n) => n.id !== payload.noteId),
-          currentNote:
-            state.currentNote?.id === payload.noteId ? null : state.currentNote,
-        }));
-        break;
-    }
+  deleteNoteInStore: (noteId) => {
+    set((state) => ({
+      notes: state.notes.filter((n) => n.id !== noteId),
+      currentNote: state.currentNote?.id === noteId ? null : state.currentNote,
+    }));
   },
 }));
