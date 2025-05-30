@@ -19,7 +19,7 @@ export default function RenderBlockContent({
         <Textarea
           value={textProps.value}
           onChange={(e) => onPropChange(["value"], e.target.value)}
-          className="min-h-[100px] border-none focus-visible:ring-0 px-0 resize-none"
+          className="min-h-[100px] border-none focus-visible:ring-0 px-10 resize-none"
           placeholder="텍스트를 입력하세요"
         />
       );

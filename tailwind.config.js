@@ -3,10 +3,9 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./app/**/*.{js,ts,jsx,tsx,mdx}", // Next.js App Router 사용 시
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}", // Next.js Pages Router 사용 시
-    "./components/**/*.{js,ts,jsx,tsx,mdx}", // 공용 컴포넌트 폴더가 있다면
-    "./src/**/*.{js,ts,jsx,tsx,mdx}", // src 폴더를 사용한다면 이 경로도 추가
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {

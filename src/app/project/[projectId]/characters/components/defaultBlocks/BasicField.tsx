@@ -11,7 +11,7 @@ export default function BasicField({ block, onPropChange }: BasicFieldProps) {
   return (
     <Input
       type="text"
-      className="w-full"
+      className="w-full border-none focus-visible:ring-0 "
       value={textProps.value || ""}
       onChange={(e) => onPropChange(["value"], e.target.value)}
       placeholder="입력해주세요"

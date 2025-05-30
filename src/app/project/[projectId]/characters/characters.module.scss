@@ -244,6 +244,7 @@ $font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
   border-radius: $radius-lg;
   box-shadow: $shadow-md;
   overflow: hidden;
+  padding: 20px;
 
   @include mobile {
     min-width: 0;
