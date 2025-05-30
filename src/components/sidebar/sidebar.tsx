@@ -76,7 +76,13 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
 }
 
 interface SidebarProps {
-  activeItem?: "home" | "basicinfo" | "characters" | "worldbuilding";
+  activeItem?:
+    | "home"
+    | "basicinfo"
+    | "characters"
+    | "worldbuilding"
+    | "places"
+    | "events";
   isProjectSidebar?: boolean;
   projectId?: string; // 프로젝트 ID 추가
 }
@@ -136,7 +142,7 @@ export default function Sidebar({
                 activeItem === "characters" ? styles.navItemActive : ""
               }`}
             >
-              캐릭터 정보
+              캐릭터
             </Link>
 
             <Link
@@ -145,7 +151,25 @@ export default function Sidebar({
                 activeItem === "worldbuilding" ? styles.navItemActive : ""
               }`}
             >
-              세계관 정보
+              세계관 설정
+            </Link>
+
+            <Link
+              href={`/project/${projectId}/places`}
+              className={`${styles.navItem} ${
+                activeItem === "places" ? styles.navItemActive : ""
+              }`}
+            >
+              장소
+            </Link>
+
+            <Link
+              href={`/project/${projectId}/events`}
+              className={`${styles.navItem} ${
+                activeItem === "events" ? styles.navItemActive : ""
+              }`}
+            >
+              사건
             </Link>
 
             <button

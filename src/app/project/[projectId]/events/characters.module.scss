@@ -1,0 +1,350 @@
+// 사용되는 변수 정의
+$primary-color: #4f46e5;
+$primary-dark: #3730a3;
+$text-primary: #1e293b;
+$text-secondary: #64748b;
+$text-muted: #94a3b8;
+$bg-primary: #ffffff;
+$bg-secondary: #f8fafc;
+$bg-tertiary: #f1f5f9;
+$border-color: #e2e8f0;
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+  0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$radius-md: 8px;
+$radius-lg: 12px;
+$transition-fast: 150ms ease;
+$font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+  Helvetica, Arial, sans-serif;
+
+// 사용되는 브레이크포인트 믹스인
+@mixin mobile {
+  @media (max-width: 1024px) {
+    @content;
+  }
+}
+
+// 페이지 레이아웃
+.pageContainer {
+  display: flex;
+  min-height: 100vh;
+  background-color: $bg-secondary;
+  font-family: $font-sans;
+  color: $text-primary;
+  position: relative;
+
+  @include mobile {
+    flex-direction: column;
+  }
+}
+
+.mainContent {
+  margin-left: 280px;
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+
+  @include mobile {
+    margin-left: 0;
+    padding: 16px;
+    margin-top: 120px;
+  }
+}
+
+.contentWrapper {
+  margin: 0 auto;
+}
+
+.characterPageLayout {
+  display: flex;
+  gap: 24px;
+
+  @include mobile {
+    flex-direction: column;
+    gap: 28px;
+  }
+}
+
+// 노트 목록 스타일 (CharacterNoteList.tsx)
+.noteListContainer {
+  width: 280px;
+  background-color: $bg-primary;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+  overflow: hidden;
+
+  @include mobile {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+}
+
+.noteListHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid $border-color;
+  background-color: $bg-primary;
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: $text-primary;
+  }
+}
+
+.addNoteButton {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: $primary-color;
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+
+  &:hover {
+    background-color: $primary-dark;
+  }
+}
+
+.noteList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: calc(100vh - 200px); // TODO: 이 값은 상황에 따라 조절될 수 있음
+  overflow-y: auto;
+
+  @include mobile {
+    max-height: 300px;
+  }
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $bg-tertiary;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: $text-muted;
+    border-radius: 10px;
+  }
+}
+
+.noteItem {
+  padding: 14px 20px;
+  border-bottom: 1px solid $border-color;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+
+  &:hover {
+    background-color: $bg-tertiary;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.selectedNote {
+  background-color: rgba($primary-color, 0.08);
+  border-left: 3px solid $primary-color;
+}
+
+.noteTitleContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.noteTitle {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: $text-primary;
+}
+
+.noteActions {
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity $transition-fast;
+
+  .noteItem:hover & {
+    opacity: 1;
+  }
+}
+
+.editButton,
+.deleteButton {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: $radius-md;
+  transition: background-color $transition-fast;
+
+  &:hover {
+    background-color: rgba($text-primary, 0.05);
+  }
+}
+
+.editButton {
+  color: $text-secondary;
+  &:hover {
+    color: $primary-color;
+  }
+}
+
+.deleteButton {
+  color: $text-secondary;
+  &:hover {
+    color: #e53935; // 원본 SCSS의 하드코딩된 값 유지
+  }
+}
+
+.editTitleInput {
+  // CharacterNoteList.tsx 에서 사용
+  width: 100%;
+  padding: 8px 12px;
+  border: 2px solid $primary-color;
+  border-radius: $radius-md;
+  font-size: 14px;
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.2);
+  }
+}
+
+.emptyNote {
+  padding: 20px;
+  text-align: center;
+  color: $text-muted;
+  font-style: italic;
+}
+
+// 에디터 컨테이너 (CharactersPage.tsx 에서 사용)
+.editorContainer {
+  flex: 1;
+  background-color: $bg-primary;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+  overflow: hidden;
+  padding: 20px;
+
+  @include mobile {
+    min-width: 0;
+  }
+}
+
+// 노트 Title 입력 (NotionEditor.tsx 에서 사용)
+.titleInput {
+  width: 100%;
+  font-size: 24px;
+  font-weight: 600;
+  border: none;
+  padding: 10px 12px;
+  border-radius: $radius-md;
+  transition: border-color $transition-fast, box-shadow $transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color; // 이 부분은 실제 적용 시 $primary-color 가 정의되어 있어야 함
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.1); // 이 부분도 마찬가지
+  }
+}
+
+.gradientline {
+  // NotionEditor.tsx 에서 사용
+  height: 0.25rem;
+  width: 10rem;
+  margin-left: 13px; // 원본 값 유지
+  background: linear-gradient(to right, #8b5cf6, #3b82f6); // 원본 값 유지
+  border-radius: 9999px;
+  margin-bottom: 1.5rem; // 원본 값 유지
+}
+
+// 로딩 및 에러 상태 (CharactersPage.tsx, NotionEditor.tsx 에서 사용)
+.loadingContainer,
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  text-align: center;
+  padding: 32px;
+
+  @include mobile {
+    min-height: 200px;
+    padding: 24px;
+  }
+}
+
+// CharactersPage.tsx 에서 사용
+.retryButton {
+  margin-top: 16px;
+  padding: 10px 20px;
+  background-color: $primary-color;
+  color: white;
+  border: none;
+  border-radius: $radius-md;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+
+  &:hover {
+    background-color: $primary-dark;
+  }
+}
+
+// 노트 선택 없음 상태 (CharactersPage.tsx 에서 사용)
+.noNoteSelected {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  text-align: center;
+  padding: 32px;
+
+  @include mobile {
+    min-height: 200px;
+    padding: 24px;
+  }
+
+  p {
+    margin-bottom: 16px;
+    color: $text-secondary;
+  }
+}
+
+// CharactersPage.tsx 에서 사용
+.createButton {
+  padding: 10px 20px;
+  background-color: $primary-color;
+  color: white;
+  border: none;
+  border-radius: $radius-md;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+
+  &:hover {
+    background-color: $primary-dark;
+  }
+}
