@@ -10,7 +10,7 @@ import LoadingSpinner from "@/components/LoadingSpinner/LoadingSpinner";
 export default function ProjectPage() {
   const router = useRouter();
   const { projectId } = useParams();
-  const { fetchProject } = useProjectStore();
+  const { setCurrentProject, fetchProject } = useProjectStore();
 
   // fetchNotesByProject를 사용합니다.
   // 이 함수는 이제 notes 배열뿐만 아니라, activeProjectBasicInfoNote,
@@ -22,6 +22,8 @@ export default function ProjectPage() {
 
   useEffect(() => {
     if (projectId) {
+      setCurrentProject(projectId as string);
+
       // 1. 프로젝트 기본 정보 가져오기
       fetchProject(projectId as string);
 

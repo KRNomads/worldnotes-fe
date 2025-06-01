@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Edit2, Trash2 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Tag } from "@/shared/types/tag";
 import { ColorPicker } from "./color-picker";
 import { useTagStore } from "@/entities/tag/model/tagStore";
+import { Input } from "@/shared/ui/input";
+import { Button } from "@/shared/ui/button";
+import { Badge } from "@/shared/ui/badge";
 
 interface TagManagementOverlayProps {
   isOpen: boolean;

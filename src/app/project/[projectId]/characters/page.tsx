@@ -15,6 +15,7 @@ export default function CharactersPage() {
     notes,
     isLoading,
     error,
+    setCurrentNote,
     fetchNotesByProject,
     createNote,
     getNotesByType,
@@ -40,6 +41,11 @@ export default function CharactersPage() {
     }
   }, [characterNotes, selectedNoteId]);
 
+  const handleSelectNote = (noteId: string) => {
+    setSelectedNoteId(noteId);
+    setCurrentNote(noteId);
+  };
+
   const handleCreateCharacter = async () => {
     if (!projectId) return;
 
@@ -52,6 +58,7 @@ export default function CharactersPage() {
 
     if (newNote) {
       setSelectedNoteId(newNote.id);
+      setCurrentNote(newNote.id);
     }
   };
 
@@ -86,7 +93,7 @@ export default function CharactersPage() {
               <CharacterNoteList
                 notes={characterNotes}
                 selectedNoteId={selectedNoteId}
-                onSelectNote={setSelectedNoteId}
+                onSelectNote={handleSelectNote}
                 onCreateNote={handleCreateCharacter}
               />
 
