@@ -55,7 +55,7 @@ export function EditorTagSection() {
   if (!currentNote) return <div>!!노트 id 로딩 실패</div>;
 
   return (
-    <div className="border rounded-lg p-4 space-y-3 bg-white">
+    <div className="border-none rounded-lg p-4 space-y-3 bg-white">
       <div className="flex items-center gap-2 flex-wrap relative">
         {selectedTags.map((tag) => (
           <Badge
@@ -78,7 +78,7 @@ export function EditorTagSection() {
           onClick={() => setIsOverlayOpen(!isOverlayOpen)}
           variant="outline"
           size="sm"
-          className="h-6 w-6 p-0 border-gray-300"
+          className="h-7 w-7 p-0 border-gray-300 border-dashed border-muted-foreground/50 bg-background/50 hover:bg-muted/50 hover:border-muted-foreground transition-all duration-200 rounded-full  shadow-sm"
         >
           <Plus className="h-3 w-3" />
         </Button>

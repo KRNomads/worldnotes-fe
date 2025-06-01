@@ -9,6 +9,10 @@ import { Input } from "@/shared/ui/input";
 import { Button } from "@/shared/ui/button";
 import { Badge } from "@/shared/ui/badge";
 
+interface HoveredTagData extends Tag {
+  rect: DOMRect;
+}
+
 interface TagManagementOverlayProps {
   isOpen: boolean;
   onClose: () => void;
@@ -31,6 +35,11 @@ export function TagManagementOverlay({
   const [editingTag, setEditingTag] = useState<Tag | null>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ top: 0, left: 0 });
+
+  const [hoveredTagData, setHoveredTagData] = useState<HoveredTagData | null>(
+    null
+  );
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // ✅ 태그 로드
   useEffect(() => {
@@ -90,9 +99,38 @@ export function TagManagementOverlay({
     }
   };
 
+  const handleDeleteTag = async (tagId: string) => {
+    if (!window.confirm("정말로 이 태그를 삭제하시겠습니까?")) {
+      return;
+    }
+    await deleteTag(projectId, tagId);
+  };
+
   const handleSelectTag = (tag: Tag) => {
     onTagSelect(tag);
     onClose();
+  };
+
+  const clearHoverTimeout = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+  };
+
+  const handleTagMouseEnter = (
+    e: React.MouseEvent<HTMLDivElement>,
+    tag: Tag
+  ) => {
+    clearHoverTimeout();
+    const currentRect = e.currentTarget.getBoundingClientRect();
+    setHoveredTagData({ ...tag, rect: currentRect });
+  };
+
+  const handleTagMouseLeave = () => {
+    hoverTimeoutRef.current = setTimeout(() => {
+      setHoveredTagData(null);
+    }, 100); // 약간의 딜레이 후 숨김
   };
 
   if (!isOpen) return null;
@@ -103,6 +141,53 @@ export function TagManagementOverlay({
       className="fixed z-50 w-96 bg-white rounded-lg shadow-lg border overflow-hidden"
       style={{ top: position.top, left: position.left }}
     >
+      {/* 호버 액션 버튼 컨테이너 (오버레이 최상단에 위치) */}
+      {hoveredTagData &&
+        !editingTag && ( // editingTag가 아닐 때만 호버 버튼 표시
+          <div
+            id="tag-hover-actions" // 클릭 아웃 로직을 위해 ID 추가
+            className="absolute flex items-center gap-1 bg-white rounded-full shadow-md border p-1"
+            style={{
+              top:
+                hoveredTagData.rect.top -
+                (overlayRef.current?.getBoundingClientRect().top || 0),
+              left:
+                hoveredTagData.rect.left -
+                (overlayRef.current?.getBoundingClientRect().left || 0) +
+                hoveredTagData.rect.width / 2,
+              transform: "translate(-50%, -100%) translateY(-6px)", // X축 중앙 정렬, 자신의 높이만큼 위로, 추가 간격 6px
+              zIndex: 55, // 다른 요소들 위에 보이도록 z-index 설정
+            }}
+            onMouseEnter={clearHoverTimeout} // 버튼 위에 마우스 올리면 숨김 타이머 취소
+            onMouseLeave={handleTagMouseLeave} // 버튼에서 마우스 나가면 숨김 타이머 시작
+          >
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                setEditingTag(hoveredTagData); // hoveredTagData 전체를 editingTag로 설정
+                setHoveredTagData(null); // 편집 모드 진입 시 호버 UI 숨김
+              }}
+              size="sm"
+              variant="ghost"
+              className="h-5 w-5 p-0 text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-colors duration-200"
+            >
+              <Edit2 className="h-3 w-3" />
+            </Button>
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteTag(hoveredTagData.id);
+                setHoveredTagData(null); // 삭제 후 호버 UI 숨김
+              }}
+              size="sm"
+              variant="ghost"
+              className="h-5 w-5 p-0 text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors duration-200"
+            >
+              <Trash2 className="h-3 w-3" />
+            </Button>
+          </div>
+        )}
+
       {/* 새 태그 추가 */}
       <form
         onSubmit={(e) => {
@@ -135,7 +220,12 @@ export function TagManagementOverlay({
       <div className="max-h-80 overflow-y-auto p-3">
         <div className="flex flex-wrap gap-2">
           {tags.map((tag) => (
-            <div key={tag.id} className="group relative">
+            <div
+              key={tag.id}
+              className="relative"
+              onMouseEnter={(e) => handleTagMouseEnter(e, tag)}
+              onMouseLeave={handleTagMouseLeave}
+            >
               {editingTag?.id === tag.id ? (
                 <div className="flex items-center gap-2 p-2 bg-white border rounded-lg shadow-sm">
                   <Input
@@ -146,7 +236,10 @@ export function TagManagementOverlay({
                     className="h-6 text-sm w-24"
                     onKeyDown={(e) => {
                       if (e.key === "Enter") handleUpdateTag();
-                      if (e.key === "Escape") setEditingTag(null);
+                      if (e.key === "Escape") {
+                        setEditingTag(null);
+                        setHoveredTagData(null);
+                      }
                     }}
                   />
                   <ColorPicker
@@ -156,7 +249,10 @@ export function TagManagementOverlay({
                     }
                   />
                   <Button
-                    onClick={handleUpdateTag}
+                    onClick={() => {
+                      setEditingTag(null);
+                      setHoveredTagData(null);
+                    }}
                     size="sm"
                     variant="ghost"
                     className="h-5 w-5 p-0 text-xs"
@@ -188,30 +284,6 @@ export function TagManagementOverlay({
                     >
                       {tag.name}
                     </Badge>
-                  </div>
-                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 -translate-y-1 flex gap-1 opacity-0 scale-90 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 ease-in-out bg-white rounded-full shadow-md border p-1 z-50">
-                    <Button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setEditingTag(tag);
-                      }}
-                      size="sm"
-                      variant="ghost"
-                      className="h-4 w-4 p-0 text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-colors duration-200"
-                    >
-                      <Edit2 className="h-2.5 w-2.5" />
-                    </Button>
-                    <Button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        deleteTag(projectId, tag.id);
-                      }}
-                      size="sm"
-                      variant="ghost"
-                      className="h-4 w-4 p-0 text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors duration-200"
-                    >
-                      <Trash2 className="h-2.5 w-2.5" />
-                    </Button>
                   </div>
                 </div>
               )}
