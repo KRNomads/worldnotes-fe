@@ -20,6 +20,7 @@ import LoadingSpinner from "@/components/LoadingSpinner/LoadingSpinner";
 import CharacterDefaultUi from "./character-default-ui";
 import { getDefaultProperties } from "@/shared/utils/blockUtils";
 import { BlockContainer } from "./block-container";
+import { EditorTagSection } from "@/entities/editor/ui/editor-tag-section";
 
 const DEBOUNCE_DELAY = 1000;
 
@@ -256,6 +257,8 @@ export default function NotionEditor({ noteId }: NotionEditorProps) {
         />
         <div className={styles.gradientline}></div>
       </div>
+
+      <EditorTagSection />
 
       {/* 기본 블록 */}
       <CharacterDefaultUi

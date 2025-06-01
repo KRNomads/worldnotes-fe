@@ -1,33 +1,61 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Plus, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Tag } from "@/shared/types/tag";
 import { TagManagementOverlay } from "@/entities/tag/ui/tag-management-overlay";
 import { useProjectStore } from "@/store/projectStore";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
+import { useNoteStore } from "@/store/noteStore";
+import { useNoteTagStore } from "@/entities/tag/model/noteTagStore";
 
-export function EditorTagSection({ editorId }: { editorId: string }) {
+export function EditorTagSection() {
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
+
   const currentProject = useProjectStore((state) => state.currentProject);
+  const currentNote = useNoteStore((state) => state.currentNote);
 
-  if (!currentProject) return null;
+  const { loadNoteTags, noteTags, addTagToNote, removeTagFromNote } =
+    useNoteTagStore();
 
-  const handleTagSelect = (tag: Tag) => {
+  // 최초에 노트별 태그 로드
+  useEffect(() => {
+    if (currentNote) {
+      loadNoteTags(currentNote.id);
+    }
+  }, [currentNote, loadNoteTags]);
+
+  // 노트별 태그 로드 후 selectedTags를 업데이트
+  useEffect(() => {
+    if (currentNote && noteTags[currentNote.id]) {
+      setSelectedTags(noteTags[currentNote.id]);
+    }
+  }, [noteTags, currentNote]);
+
+  // ✅ 태그 추가: 전역 상태 & API 연동
+  const handleTagSelect = async (tag: Tag) => {
     if (!selectedTags.find((t) => t.id === tag.id)) {
-      setSelectedTags((prev) => [...prev, tag]);
+      if (currentNote) {
+        await addTagToNote(currentNote.id, tag.id); // ✅ 실제 API 호출
+        // 상태는 noteTagStore에서 noteTags가 자동 업데이트됨 → useEffect로 반영됨
+      }
     }
   };
 
-  const handleTagRemove = (tagId: string) => {
-    setSelectedTags((prev) => prev.filter((tag) => tag.id !== tagId));
+  // ✅ 태그 제거: 전역 상태 & API 연동
+  const handleTagRemove = async (tagId: string) => {
+    if (currentNote) {
+      await removeTagFromNote(currentNote.id, tagId); // ✅ 실제 API 호출
+      // 상태는 noteTagStore에서 noteTags가 자동 업데이트됨 → useEffect로 반영됨
+    }
   };
+
+  if (!currentProject) return <div>!!프로젝트 id 로딩 실패</div>;
+  if (!currentNote) return <div>!!노트 id 로딩 실패</div>;
 
   return (
     <div className="border rounded-lg p-4 space-y-3 bg-white">
-      <h3 className="font-semibold text-gray-800">에디터 {editorId}</h3>
-
       <div className="flex items-center gap-2 flex-wrap relative">
         {selectedTags.map((tag) => (
           <Badge
@@ -54,10 +82,6 @@ export function EditorTagSection({ editorId }: { editorId: string }) {
         >
           <Plus className="h-3 w-3" />
         </Button>
-      </div>
-
-      <div className="mt-4 p-4 bg-gray-50 rounded border-2 border-dashed min-h-24">
-        <p className="text-gray-500 text-sm">에디터 내용 영역...</p>
       </div>
 
       <TagManagementOverlay

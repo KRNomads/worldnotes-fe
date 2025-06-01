@@ -1,10 +1,6 @@
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 import { TAG_DEFAULT_COLORS } from "../lib/tag-colors";
+import { Button } from "@/shared/ui/button";
 
 export function ColorPicker({
   selectedColor,
