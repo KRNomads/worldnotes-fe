@@ -3,7 +3,7 @@
 import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { produce } from "immer";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Type } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import {
   DropdownMenu,
@@ -294,20 +294,26 @@ export default function NotionEditor({ noteId }: NotionEditorProps) {
       <div className="mt-8 flex justify-center">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="gap-2">
-              <PlusCircle className="h-4 w-4" />
-              블록 추가
+            <Button
+              variant="outline"
+              className="gap-2 border-dashed border-muted-foreground/50 bg-background/50 hover:bg-muted/50 hover:border-muted-foreground transition-all duration-200 rounded-full px-4 shadow-sm"
+            >
+              <PlusCircle className="h-4 w-4 text-primary" />
+              <span className="font-medium">블록 추가</span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="center">
-            <DropdownMenuItem onClick={() => handleAddBlock("TEXT")}>
-              텍스트
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleAddBlock("IMAGE")}>
-              이미지
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleAddBlock("TAGS")}>
-              태그
+          <DropdownMenuContent
+            align="center"
+            side="top"
+            sideOffset={6}
+            className="w-56 backdrop-blur-sm bg-background/95 border-muted-foreground/20 shadow-lg rounded-lg p-2"
+          >
+            <DropdownMenuItem
+              onClick={() => handleAddBlock("TEXT")}
+              className="flex items-center gap-2 py-2 px-3 cursor-pointer hover:bg-primary/10 rounded-md transition-colors"
+            >
+              <Type className="h-4 w-4 text-primary" />
+              <span>텍스트</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
