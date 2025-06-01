@@ -1,5 +1,5 @@
 import { GripVertical, ChevronDown, ChevronUp, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import { cn } from "@/shared/lib/utils";
 import { Block } from "@/shared/types/block";
 import RenderBlockContent from "./render-block-content";

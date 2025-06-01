@@ -8,7 +8,7 @@ import { useProjectStore } from "@/store/projectStore";
 import { useNoteStore } from "@/store/noteStore";
 import { useBlockStore } from "@/store/blockStore";
 import { NOTE_TYPES } from "@/shared/types/note";
-import type { TextBlockProperties, Block } from "@/shared/types/block";
+import type { TextBlockProperties } from "@/shared/types/block";
 
 export function useDebounceCallback<T extends (...args: any[]) => void>(
   callback: T,
