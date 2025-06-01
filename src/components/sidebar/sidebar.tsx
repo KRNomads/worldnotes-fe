@@ -7,7 +7,7 @@ import Image from "next/image";
 import styles from "./sidebar.module.scss";
 import settingIcon from "../../../public/settingIcon.svg";
 import { useAuthStore } from "@/store/authStore";
-import { useWebSocketStore } from "@/store/websocketStore";
+import { useWebSocketStore } from "@/processes/websocket/model/websocketStore";
 
 // 모달 컴포넌트를 사이드바 파일 내에 정의
 function SettingsModal({ onClose }: { onClose: () => void }) {

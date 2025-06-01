@@ -6,9 +6,9 @@ import {
   NoteCreateRequest,
   NoteUpdateRequest,
   NoteResponse,
-} from "@/types/note"; // 실제 타입 경로 확인
-import { mapNoteResponseToNote } from "@/utils/mappers";
-import api from "@/lib/api";
+} from "@/shared/types/note"; // 실제 타입 경로 확인
+import { mapNoteResponseToNote } from "@/shared/utils/mappers";
+import api from "@/shared/lib/api";
 
 interface NoteState {
   notes: Note[];

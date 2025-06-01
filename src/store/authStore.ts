@@ -1,6 +1,6 @@
 // src/store/authStore.ts
 import { create } from "zustand";
-import api from "@/lib/api";
+import api from "@/shared/lib/api";
 
 interface User {
   id: string;

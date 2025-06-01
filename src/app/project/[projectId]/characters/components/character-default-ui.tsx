@@ -1,6 +1,6 @@
 "use client";
 
-import type { Block } from "@/types/block";
+import type { Block } f@/shared/types/blockblock";
 import type React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";

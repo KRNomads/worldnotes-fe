@@ -4,10 +4,10 @@ import {
   CreateProjectRequest,
   CreateProjectResponse,
   Project,
-} from "@/types/project";
+} from "@/shared/types/project";
 import { AxiosResponse } from "axios";
-import api from "@/lib/api";
-import { mapProjectResponseToProject } from "@/utils/mappers";
+import api from "@/shared/lib/api";
+import { mapProjectResponseToProject } from "@/shared/utils/mappers";
 
 interface ProjectState {
   projects: Project[];

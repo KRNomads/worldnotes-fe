@@ -9,9 +9,9 @@ import {
   BlockResponse,
   BlockType,
   BlockPropertiesUnion,
-} from "@/types/block";
-import { mapBlockResponseToBlock } from "@/utils/mappers";
-import api from "@/lib/api";
+} from "@/shared/types/block";
+import { mapBlockResponseToBlock } from "@/shared/utils/mappers";
+import api from "@/shared/lib/api";
 
 interface BlockState {
   blocksByNoteId: Record<string, Block[]>;

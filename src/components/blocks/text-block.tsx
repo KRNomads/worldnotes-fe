@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect, ChangeEvent } from "react"; // ChangeEvent 임포트
-import type { Block, TextBlockProperties } from "@/types/block";
+import type { Block, TextBlockProperties } from "@/shared/types/block";
 
 interface TextBlockComponentProps {
   block: Block & { properties: TextBlockProperties };

@@ -1,25 +1,34 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import type { Block, BlockUpdateRequest, ImageBlockProperties } from "@/types/block"
-import styles from "../../characters.module.scss"
+import { useState, useEffect } from "react";
+import type {
+  Block,
+  BlockUpdateRequest,
+  ImageBlockProperties,
+} from "@/shared/types/block";
+import styles from "../../characters.module.scss";
 
 interface ImageBlockProps {
-  block: Block
-  isEditing: boolean
-  onUpdate: (updateData: BlockUpdateRequest) => Promise<void>
-  onEditingChange: (isEditing: boolean) => void
+  block: Block;
+  isEditing: boolean;
+  onUpdate: (updateData: BlockUpdateRequest) => Promise<void>;
+  onEditingChange: (isEditing: boolean) => void;
 }
 
-export default function ImageBlock({ block, isEditing, onUpdate, onEditingChange }: ImageBlockProps) {
-  const properties = block.properties as ImageBlockProperties
-  const [url, setUrl] = useState(properties.url)
-  const [caption, setCaption] = useState(properties.caption || "")
+export default function ImageBlock({
+  block,
+  isEditing,
+  onUpdate,
+  onEditingChange,
+}: ImageBlockProps) {
+  const properties = block.properties as ImageBlockProperties;
+  const [url, setUrl] = useState(properties.url);
+  const [caption, setCaption] = useState(properties.caption || "");
 
   useEffect(() => {
-    setUrl(properties.url)
-    setCaption(properties.caption || "")
-  }, [properties.url, properties.caption])
+    setUrl(properties.url);
+    setCaption(properties.caption || "");
+  }, [properties.url, properties.caption]);
 
   const handleSave = async () => {
     await onUpdate({
@@ -28,9 +37,9 @@ export default function ImageBlock({ block, isEditing, onUpdate, onEditingChange
         url,
         caption,
       },
-    })
-    onEditingChange(false)
-  }
+    });
+    onEditingChange(false);
+  };
 
   if (isEditing) {
     return (
@@ -71,7 +80,8 @@ export default function ImageBlock({ block, isEditing, onUpdate, onEditingChange
               alt={caption || "이미지 미리보기"}
               className={styles.imagePreview}
               onError={(e) => {
-                ;(e.target as HTMLImageElement).src = "/placeholder.svg?height=200&width=300"
+                (e.target as HTMLImageElement).src =
+                  "/placeholder.svg?height=200&width=300";
               }}
             />
           </div>
@@ -84,20 +94,23 @@ export default function ImageBlock({ block, isEditing, onUpdate, onEditingChange
           <button
             className={styles.cancelButton}
             onClick={() => {
-              setUrl(properties.url)
-              setCaption(properties.caption || "")
-              onEditingChange(false)
+              setUrl(properties.url);
+              setCaption(properties.caption || "");
+              onEditingChange(false);
             }}
           >
             취소
           </button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
-    <div className={styles.imageBlockDisplay} onClick={() => onEditingChange(true)}>
+    <div
+      className={styles.imageBlockDisplay}
+      onClick={() => onEditingChange(true)}
+    >
       {url ? (
         <div className={styles.imageContainer}>
           <img
@@ -105,7 +118,8 @@ export default function ImageBlock({ block, isEditing, onUpdate, onEditingChange
             alt={caption || "이미지"}
             className={styles.blockImage}
             onError={(e) => {
-              ;(e.target as HTMLImageElement).src = "/placeholder.svg?height=200&width=300"
+              (e.target as HTMLImageElement).src =
+                "/placeholder.svg?height=200&width=300";
             }}
           />
           {caption && <p className={styles.imageCaption}>{caption}</p>}
@@ -116,5 +130,5 @@ export default function ImageBlock({ block, isEditing, onUpdate, onEditingChange
         </div>
       )}
     </div>
-  )
+  );
 }

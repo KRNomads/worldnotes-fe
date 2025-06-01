@@ -13,12 +13,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useBlockStore } from "@/store/blockStore";
 import { useNoteStore } from "@/store/noteStore";
-import { Block, BlockCreateRequest, BlockType } from "@/types/block";
+import { Block, BlockCreateRequest, BlockType } from "@/shared/types/block";
 import styles from "../characters.module.scss";
 import { debounce } from "lodash";
 import LoadingSpinner from "@/components/LoadingSpinner/LoadingSpinner";
 import CharacterDefaultUi from "./character-default-ui";
-import { getDefaultProperties } from "@/utils/blockUtils";
+import { getDefaultProperties } from "@/shared/utils/blockUtils";
 import { BlockContainer } from "./block-container";
 
 const DEBOUNCE_DELAY = 1000;

@@ -2,7 +2,7 @@
 
 import type React from "react";
 import { useState, useEffect } from "react";
-import type { Note } from "@/types/note";
+import type { Note } from "@/shared/types/note";
 import { useNoteStore } from "@/store/noteStore";
 import styles from "../characters.module.scss";
 
