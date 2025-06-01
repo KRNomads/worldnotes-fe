@@ -13,8 +13,8 @@ interface TagManagementOverlayProps {
   isOpen: boolean;
   onClose: () => void;
   onTagSelect: (tag: Tag) => void;
-  triggerRef: React.RefObject<HTMLButtonElement>;
-  projectId: string; // ✅ projectId를 props로 받는다!
+  triggerRef: React.RefObject<HTMLButtonElement | null>;
+  projectId: string;
 }
 
 export function TagManagementOverlay({
