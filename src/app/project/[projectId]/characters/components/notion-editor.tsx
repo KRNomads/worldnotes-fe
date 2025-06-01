@@ -4,13 +4,13 @@ import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { produce } from "immer";
 import { PlusCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/shared/ui/dropdown-menu";
 import { useBlockStore } from "@/store/blockStore";
 import { useNoteStore } from "@/store/noteStore";
 import { Block, BlockCreateRequest, BlockType } from "@/shared/types/block";

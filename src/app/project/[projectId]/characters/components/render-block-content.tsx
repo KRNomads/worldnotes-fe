@@ -1,4 +1,4 @@
-import { Textarea } from "@/components/ui/textarea";
+import { Textarea } from "@/shared/ui/textarea";
 import { Block, TextBlockProperties } from "@/shared/types/block";
 
 interface RenderBlockContentProps {

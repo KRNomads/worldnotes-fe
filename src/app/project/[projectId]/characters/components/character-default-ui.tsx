@@ -1,10 +1,10 @@
 "use client";
 
-import type { Block } f@/shared/types/blockblock";
+import type { Block } from "@/shared/types/block";
 import type React from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
+import { Label } from "@/shared/ui/label";
+import { Button } from "@/shared/ui/button";
 import { User, X, Camera, Upload } from "lucide-react";
 import { useState, useRef, useCallback } from "react";
 import BasicField from "./defaultBlocks/BasicField";
