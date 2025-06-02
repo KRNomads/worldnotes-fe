@@ -3,9 +3,9 @@
 
 import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useNoteStore } from "@/store/noteStore";
-import { useProjectStore } from "@/store/projectStore";
-import LoadingSpinner from "@/components/LoadingSpinner/LoadingSpinner";
+import { useNoteStore } from "@/entities/note/store/noteStore";
+import { useProjectStore } from "@/entities/project/store/projectStore";
+import LoadingSpinner from "@/shared/ui/LoadingSpinner/LoadingSpinner";
 
 export default function ProjectPage() {
   const router = useRouter();

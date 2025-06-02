@@ -1,5 +1,5 @@
-import { useBlockStore } from "@/store/blockStore";
-import { useNoteStore } from "@/store/noteStore";
+import { useBlockStore } from "@/entities/block/store/blockStore";
+import { useNoteStore } from "@/entities/note/store/noteStore";
 import {
   BlockPayload,
   NotePayload,

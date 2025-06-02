@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useWebSocketStore } from "@/processes/websocket/model/websocketStore";
+import { useWebSocketStore } from "@/processes/websocket/store/websocketStore";
 
 /**
  * noteId: 구독할 노트 ID

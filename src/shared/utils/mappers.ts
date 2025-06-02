@@ -1,6 +1,6 @@
-import { Block, BlockResponse } from "@/shared/types/block";
-import { Note, NoteResponse } from "@/shared/types/note";
-import { Project, ProjectResponse } from "@/shared/types/project";
+import { Block, BlockResponse } from "@/entities/block/types/block";
+import { Note, NoteResponse } from "@/entities/note/types/note";
+import { Project, ProjectResponse } from "@/entities/project/types/project";
 import { BlockPayload, NotePayload } from "@/shared/types/socketMessage";
 
 // BlockResponse → Block

@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { useNoteStore } from "@/store/noteStore";
-import Sidebar from "@/components/sidebar/sidebar";
+import { useNoteStore } from "@/entities/note/store/noteStore";
+import Sidebar from "@/widgets/sidebar/sidebar";
 import CharacterNoteList from "./components/character-note-list";
-import LoadingSpinner from "@/components/LoadingSpinner/LoadingSpinner";
+import LoadingSpinner from "@/shared/ui/LoadingSpinner/LoadingSpinner";
 import styles from "./characters.module.scss";
 import NotionEditor from "./components/notion-editor";
 

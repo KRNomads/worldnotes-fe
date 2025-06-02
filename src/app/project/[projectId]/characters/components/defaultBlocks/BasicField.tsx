@@ -1,5 +1,5 @@
 import { Input } from "@/shared/ui/input";
-import { Block, TextBlockProperties } from "@/shared/types/block";
+import { Block, TextBlockProperties } from "@/entities/block/types/block";
 
 interface BasicFieldProps {
   block: Block;

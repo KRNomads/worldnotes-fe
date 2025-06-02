@@ -1,0 +1,301 @@
+"use client";
+
+import { useState, useRef, useEffect } from "react";
+import { Edit2, Trash2 } from "lucide-react";
+import { Tag } from "@/entities/tag/types/tag";
+import { ColorPicker } from "./color-picker";
+import { useTagStore } from "@/entities/tag/store/tagStore";
+import { Input } from "@/shared/ui/input";
+import { Button } from "@/shared/ui/button";
+import { Badge } from "@/shared/ui/badge";
+
+interface HoveredTagData extends Tag {
+  rect: DOMRect;
+}
+
+interface TagManagementOverlayProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onTagSelect: (tag: Tag) => void;
+  triggerRef: React.RefObject<HTMLButtonElement | null>;
+  projectId: string;
+}
+
+export function TagManagementOverlay({
+  isOpen,
+  onClose,
+  onTagSelect,
+  triggerRef,
+  projectId,
+}: TagManagementOverlayProps) {
+  const { tags, loadTags, createTag, deleteTag, updateTag } = useTagStore();
+
+  const [newTagName, setNewTagName] = useState("");
+  const [selectedColor, setSelectedColor] = useState("#F3D015");
+  const [editingTag, setEditingTag] = useState<Tag | null>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+
+  const [hoveredTagData, setHoveredTagData] = useState<HoveredTagData | null>(
+    null
+  );
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // ✅ 태그 로드
+  useEffect(() => {
+    if (isOpen) {
+      loadTags(projectId);
+    }
+  }, [isOpen, loadTags, projectId]);
+
+  // 위치 계산
+  useEffect(() => {
+    if (isOpen && triggerRef.current) {
+      const triggerRect = triggerRef.current.getBoundingClientRect();
+      setPosition({
+        top: triggerRect.bottom + 8,
+        left: triggerRect.left,
+      });
+    }
+  }, [isOpen, triggerRef]);
+
+  // 외부 클릭 감지
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        overlayRef.current &&
+        !overlayRef.current.contains(event.target as Node) &&
+        triggerRef.current &&
+        !triggerRef.current.contains(event.target as Node)
+      ) {
+        onClose();
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [isOpen, onClose, triggerRef]);
+
+  const handleCreateTag = async () => {
+    if (newTagName.trim()) {
+      await createTag(projectId, newTagName.trim(), selectedColor);
+      setNewTagName("");
+      setSelectedColor("#F3D015");
+    }
+  };
+
+  const handleUpdateTag = async () => {
+    if (editingTag && editingTag.name.trim()) {
+      await updateTag(
+        projectId,
+        editingTag.id,
+        editingTag.name.trim(),
+        editingTag.color
+      );
+      setEditingTag(null);
+    }
+  };
+
+  const handleDeleteTag = async (tagId: string) => {
+    if (!window.confirm("정말로 이 태그를 삭제하시겠습니까?")) {
+      return;
+    }
+    await deleteTag(projectId, tagId);
+  };
+
+  const handleSelectTag = (tag: Tag) => {
+    onTagSelect(tag);
+    onClose();
+  };
+
+  const clearHoverTimeout = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+  };
+
+  const handleTagMouseEnter = (
+    e: React.MouseEvent<HTMLDivElement>,
+    tag: Tag
+  ) => {
+    clearHoverTimeout();
+    const currentRect = e.currentTarget.getBoundingClientRect();
+    setHoveredTagData({ ...tag, rect: currentRect });
+  };
+
+  const handleTagMouseLeave = () => {
+    hoverTimeoutRef.current = setTimeout(() => {
+      setHoveredTagData(null);
+    }, 100); // 약간의 딜레이 후 숨김
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div
+      ref={overlayRef}
+      className="fixed z-50 w-96 bg-white rounded-lg shadow-lg border overflow-hidden"
+      style={{ top: position.top, left: position.left }}
+    >
+      {/* 호버 액션 버튼 컨테이너 (오버레이 최상단에 위치) */}
+      {hoveredTagData &&
+        !editingTag && ( // editingTag가 아닐 때만 호버 버튼 표시
+          <div
+            id="tag-hover-actions" // 클릭 아웃 로직을 위해 ID 추가
+            className="absolute flex items-center gap-1 bg-white rounded-full shadow-md border p-1"
+            style={{
+              top:
+                hoveredTagData.rect.top -
+                (overlayRef.current?.getBoundingClientRect().top || 0),
+              left:
+                hoveredTagData.rect.left -
+                (overlayRef.current?.getBoundingClientRect().left || 0) +
+                hoveredTagData.rect.width / 2,
+              transform: "translate(-50%, -100%) translateY(-6px)", // X축 중앙 정렬, 자신의 높이만큼 위로, 추가 간격 6px
+              zIndex: 55, // 다른 요소들 위에 보이도록 z-index 설정
+            }}
+            onMouseEnter={clearHoverTimeout} // 버튼 위에 마우스 올리면 숨김 타이머 취소
+            onMouseLeave={handleTagMouseLeave} // 버튼에서 마우스 나가면 숨김 타이머 시작
+          >
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                setEditingTag(hoveredTagData); // hoveredTagData 전체를 editingTag로 설정
+                setHoveredTagData(null); // 편집 모드 진입 시 호버 UI 숨김
+              }}
+              size="sm"
+              variant="ghost"
+              className="h-5 w-5 p-0 text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-colors duration-200"
+            >
+              <Edit2 className="h-3 w-3" />
+            </Button>
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteTag(hoveredTagData.id);
+                setHoveredTagData(null); // 삭제 후 호버 UI 숨김
+              }}
+              size="sm"
+              variant="ghost"
+              className="h-5 w-5 p-0 text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors duration-200"
+            >
+              <Trash2 className="h-3 w-3" />
+            </Button>
+          </div>
+        )}
+
+      {/* 새 태그 추가 */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleCreateTag();
+        }}
+        className="flex items-center gap-2 border-b px-4 py-3 bg-gray-50"
+      >
+        <Input
+          placeholder="새 태그명"
+          value={newTagName}
+          onChange={(e) => setNewTagName(e.target.value)}
+          className="flex-1 h-8 bg-gray-100 border-gray-300"
+        />
+        <ColorPicker
+          selectedColor={selectedColor}
+          onColorChange={setSelectedColor}
+        />
+        <Button
+          type="submit"
+          size="sm"
+          variant="outline"
+          className="h-8 px-3 text-sm border-gray-400 text-gray-600 hover:bg-gray-100"
+        >
+          추가
+        </Button>
+      </form>
+
+      {/* 태그 리스트 */}
+      <div className="max-h-80 overflow-y-auto p-3">
+        <div className="flex flex-wrap gap-2">
+          {tags.map((tag) => (
+            <div
+              key={tag.id}
+              className="relative"
+              onMouseEnter={(e) => handleTagMouseEnter(e, tag)}
+              onMouseLeave={handleTagMouseLeave}
+            >
+              {editingTag?.id === tag.id ? (
+                <div className="flex items-center gap-2 p-2 bg-white border rounded-lg shadow-sm">
+                  <Input
+                    value={editingTag.name}
+                    onChange={(e) =>
+                      setEditingTag({ ...editingTag, name: e.target.value })
+                    }
+                    className="h-6 text-sm w-24"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleUpdateTag();
+                      if (e.key === "Escape") {
+                        setEditingTag(null);
+                        setHoveredTagData(null);
+                      }
+                    }}
+                  />
+                  <ColorPicker
+                    selectedColor={editingTag.color}
+                    onColorChange={(color) =>
+                      setEditingTag({ ...editingTag, color })
+                    }
+                  />
+                  <Button
+                    onClick={() => {
+                      setEditingTag(null);
+                      setHoveredTagData(null);
+                    }}
+                    size="sm"
+                    variant="ghost"
+                    className="h-5 w-5 p-0 text-xs"
+                  >
+                    ✓
+                  </Button>
+                  <Button
+                    onClick={() => setEditingTag(null)}
+                    size="sm"
+                    variant="ghost"
+                    className="h-5 w-5 p-0 text-xs"
+                  >
+                    ✕
+                  </Button>
+                </div>
+              ) : (
+                <div className="relative">
+                  <div
+                    onClick={() => handleSelectTag(tag)}
+                    className="cursor-pointer"
+                  >
+                    <Badge
+                      className="text-sm font-medium px-3 py-1 rounded-full border-2 cursor-pointer transition-all duration-300 ease-in-out hover:shadow-md group-hover:scale-105 group-hover:brightness-95"
+                      style={{
+                        backgroundColor: tag.color,
+                        color: "white",
+                        borderColor: tag.color,
+                      }}
+                    >
+                      {tag.name}
+                    </Badge>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        {tags.length === 0 && (
+          <div className="px-4 py-8 text-center text-gray-500 text-sm">
+            생성된 태그가 없습니다.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

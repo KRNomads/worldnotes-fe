@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { useNoteStore } from "@/store/noteStore";
-import Sidebar from "@/components/sidebar/sidebar";
-import LoadingSpinner from "@/components/LoadingSpinner/LoadingSpinner";
+import { useNoteStore } from "@/entities/note/store/noteStore";
+import Sidebar from "@/widgets/sidebar/sidebar";
+import LoadingSpinner from "@/shared/ui/LoadingSpinner/LoadingSpinner";
 import styles from "./characters.module.scss";
 import TimeLineEditor from "./components/time-line-editor";
 

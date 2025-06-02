@@ -4,7 +4,7 @@ import {
   TextBlockProperties,
   ImageBlockProperties,
   TagsBlockProperties,
-} from "@/shared/types/block"; // 타입 정의가 있는 경로로 변경
+} from "@/entities/block/types/block"; // 타입 정의가 있는 경로로 변경
 
 export function getDefaultProperties(type: BlockType): BlockPropertiesUnion {
   switch (type) {

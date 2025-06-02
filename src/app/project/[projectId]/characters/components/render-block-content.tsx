@@ -1,5 +1,5 @@
 import { Textarea } from "@/shared/ui/textarea";
-import { Block, TextBlockProperties } from "@/shared/types/block";
+import { Block, TextBlockProperties } from "@/entities/block/types/block";
 
 interface RenderBlockContentProps {
   block: Block;

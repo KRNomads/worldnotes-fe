@@ -11,16 +11,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
-import { useBlockStore } from "@/store/blockStore";
-import { useNoteStore } from "@/store/noteStore";
-import { Block, BlockCreateRequest, BlockType } from "@/shared/types/block";
+import { useBlockStore } from "@/entities/block/store/blockStore";
+import { useNoteStore } from "@/entities/note/store/noteStore";
+import {
+  Block,
+  BlockCreateRequest,
+  BlockType,
+} from "@/entities/block/types/block";
 import styles from "../characters.module.scss";
 import { debounce } from "lodash";
-import LoadingSpinner from "@/components/LoadingSpinner/LoadingSpinner";
+import LoadingSpinner from "@/shared/ui/LoadingSpinner/LoadingSpinner";
 import CharacterDefaultUi from "./character-default-ui";
 import { getDefaultProperties } from "@/shared/utils/blockUtils";
 import { BlockContainer } from "./block-container";
-import { EditorTagSection } from "@/entities/editor/ui/editor-tag-section";
+import { EditorTagSection } from "@/features/editor/ui/editor-tag-section";
 
 const DEBOUNCE_DELAY = 1000;
 

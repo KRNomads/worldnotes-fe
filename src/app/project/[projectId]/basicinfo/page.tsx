@@ -3,12 +3,12 @@
 import { useEffect, useMemo, useState, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
 import styles from "./basicinfo.module.scss";
-import Sidebar from "@/components/sidebar/sidebar";
-import { useProjectStore } from "@/store/projectStore";
-import { useNoteStore } from "@/store/noteStore";
-import { useBlockStore } from "@/store/blockStore";
-import { NOTE_TYPES } from "@/shared/types/note";
-import type { TextBlockProperties } from "@/shared/types/block";
+import Sidebar from "@/widgets/sidebar/sidebar";
+import { useProjectStore } from "@/entities/project/store/projectStore";
+import { useNoteStore } from "@/entities/note/store/noteStore";
+import { useBlockStore } from "@/entities/block/store/blockStore";
+import { NOTE_TYPES } from "@/entities/note/types/note";
+import type { TextBlockProperties } from "@/entities/block/types/block";
 
 export function useDebounceCallback<T extends (...args: any[]) => void>(
   callback: T,
