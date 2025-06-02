@@ -1,3 +1,5 @@
+// src/features/block-editor/ui/block-editor.tsx
+
 "use client";
 
 import type React from "react";
@@ -18,21 +20,29 @@ import {
   BlockCreateRequest,
   BlockType,
 } from "@/entities/block/types/block";
-import styles from "../characters.module.scss";
 import { debounce } from "lodash";
 import LoadingSpinner from "@/shared/ui/LoadingSpinner/LoadingSpinner";
-import CharacterDefaultUi from "./character-default-ui";
 import { getDefaultProperties } from "@/shared/utils/blockUtils";
-import { BlockContainer } from "./block-container";
-import { EditorTagSection } from "@/features/editor/ui/editor-tag-section";
+import { BlockContainer } from "@/features/block-editor/ui/block-container";
+import { EditorTagSection } from "./editor-tag-section";
+import styles from "@/features/block-editor/ui/block-editor.module.scss";
 
 const DEBOUNCE_DELAY = 1000;
 
-interface NotionEditorProps {
+interface BlockEditorProps {
   noteId: string;
+  placeholder?: string;
+  renderDefaultBlocks?: (
+    defaultBlocks: Block[],
+    onPropChange: (id: number, path: (string | number)[], value: string) => void
+  ) => React.ReactNode;
 }
 
-export default function NotionEditor({ noteId }: NotionEditorProps) {
+export default function BlockEditor({
+  noteId,
+  placeholder,
+  renderDefaultBlocks,
+}: BlockEditorProps) {
   const {
     notes,
     updateNote,
@@ -109,31 +119,24 @@ export default function NotionEditor({ noteId }: NotionEditorProps) {
     }, DEBOUNCE_DELAY)
   ).current;
 
-  // ==== 입력 핸들러 ====
-
-  // 노트 타이틀
-  const handleCharacterTitleChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  // ==== 핸들러 ====
+  const handleNoteTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
     setNoteTitle(newTitle);
     autosaveNoteTitle(newTitle);
   };
 
-  // 블록 타이틀
   const handleUpdateBlockTitle = (id: number, newTitle: string) => {
-    // 로컬 업데이트 (즉시 UI 반영)
     setCustomBlocks((prev) =>
       prev.map((b) => (b.blockId === id ? { ...b, title: newTitle } : b))
     );
     autosaveBlockTitle(id, newTitle);
   };
 
-  // 블록 프로퍼티
   const handleUpdateBlockProperties = (
     id: number,
     path: (string | number)[],
-    value: any,
+    value: string,
     isDefaultBlock: boolean
   ) => {
     const updater = isDefaultBlock ? setDefaultBlocks : setCustomBlocks;
@@ -154,7 +157,6 @@ export default function NotionEditor({ noteId }: NotionEditorProps) {
     autosaveBlockProperties(id, path, value);
   };
 
-  // ==== 블록 생성 ====
   const handleAddBlock = async (type: BlockType) => {
     const newBlockData: BlockCreateRequest = {
       noteId,
@@ -166,13 +168,11 @@ export default function NotionEditor({ noteId }: NotionEditorProps) {
     if (createdBlock) refreshBlocks();
   };
 
-  // ==== 블록 삭제 ====
   const handleDeleteBlock = async (id: number) => {
     const success = await deleteBlock(id, noteId);
     if (success) refreshBlocks();
   };
 
-  // ==== 접기 ====
   const handleToggleCollapse = (id: number) => {
     setCustomBlocks((prev) =>
       prev.map((b) =>
@@ -181,14 +181,11 @@ export default function NotionEditor({ noteId }: NotionEditorProps) {
     );
   };
 
-  // ==== 드래그 & 드랍 ====
   const handleDragStart = (id: number) => setIsDragging(id);
-
   const handleDragOver = (e: React.DragEvent, id: number) => {
     e.preventDefault();
     setDragOverId(id);
   };
-
   const handleDrop = (targetId: number) => {
     if (!isDragging || isDragging === targetId) {
       setIsDragging(null);
@@ -231,7 +228,7 @@ export default function NotionEditor({ noteId }: NotionEditorProps) {
   // ==== 로딩 처리 ====
   if (isLoadingBlocks) {
     return (
-      <div className={styles.loadingContainer}>
+      <div className="p-4 text-center">
         <LoadingSpinner />
         <p>정보 구성 중...</p>
       </div>
@@ -240,7 +237,7 @@ export default function NotionEditor({ noteId }: NotionEditorProps) {
 
   if (errorBlocks) {
     return (
-      <div className={styles.errorContainer}>
+      <div className="p-4 text-center text-red-500">
         <p>오류: {errorBlocks}</p>
         <button onClick={() => fetchBlocksByNote(noteId)}>재시도</button>
       </div>
@@ -256,8 +253,8 @@ export default function NotionEditor({ noteId }: NotionEditorProps) {
           type="text"
           className={styles.titleInput}
           value={noteTitle}
-          onChange={handleCharacterTitleChange}
-          placeholder="캐릭터 이름"
+          onChange={handleNoteTitleChange}
+          placeholder={placeholder ?? ""}
         />
         <div className={styles.gradientline}></div>
       </div>
@@ -265,12 +262,10 @@ export default function NotionEditor({ noteId }: NotionEditorProps) {
       <EditorTagSection />
 
       {/* 기본 블록 */}
-      <CharacterDefaultUi
-        defaultBlocks={defaultBlocks}
-        onPropChange={(id, path, value) =>
+      {renderDefaultBlocks &&
+        renderDefaultBlocks(defaultBlocks, (id, path, value) =>
           handleUpdateBlockProperties(id, path, value, true)
-        }
-      />
+        )}
 
       {/* 커스텀 블록 */}
       <div className="space-y-6">

@@ -7,7 +7,7 @@ import Sidebar from "@/widgets/sidebar/sidebar";
 import CharacterNoteList from "./components/character-note-list";
 import LoadingSpinner from "@/shared/ui/LoadingSpinner/LoadingSpinner";
 import styles from "./characters.module.scss";
-import NotionEditor from "./components/notion-editor";
+import CharacterBlockEditor from "../../../../widgets/character-block-editor/character-block-editor";
 
 export default function CharactersPage() {
   const { projectId } = useParams();
@@ -35,9 +35,11 @@ export default function CharactersPage() {
     // 노트가 로드되고, 아직 선택된 노트가 없으며, 캐릭터 노트가 존재할 경우 첫번째 노트를 선택
     if (characterNotes.length > 0 && !selectedNoteId) {
       setSelectedNoteId(characterNotes[0].id);
+      setCurrentNote(characterNotes[0].id);
     } else if (characterNotes.length === 0 && selectedNoteId) {
       // 만약 캐릭터 노트가 모두 삭제되어 비어있게 되면 선택된 ID도 초기화
       setSelectedNoteId(null);
+      setCurrentNote(null);
     }
   }, [characterNotes, selectedNoteId]);
 
@@ -99,7 +101,10 @@ export default function CharactersPage() {
 
               <div className={styles.editorContainer}>
                 {selectedNoteId ? (
-                  <NotionEditor noteId={selectedNoteId} key={selectedNoteId} />
+                  <CharacterBlockEditor
+                    noteId={selectedNoteId}
+                    key={selectedNoteId}
+                  />
                 ) : (
                   <div className={styles.noNoteSelected}>
                     <p>캐릭터를 선택하거나 새로운 캐릭터를 생성해주세요.</p>

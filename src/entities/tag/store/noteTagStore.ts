@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { Tag } from "@/entities/tag/types/tag";
-import { tagApi } from "@/shared/api/tagApi";
 import { useTagStore } from "./tagStore";
+import { tagApi } from "../api/tagApi";
 
 interface NoteTagState {
   noteTags: Record<string, Tag[]>; // noteId별 태그 목록

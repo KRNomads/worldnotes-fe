@@ -3,7 +3,7 @@ import { Block, TextBlockProperties } from "@/entities/block/types/block";
 
 interface BasicFieldProps {
   block: Block;
-  onPropChange: (path: (string | number)[], value: any) => void;
+  onPropChange: (path: (string | number)[], value: string) => void;
 }
 
 export default function BasicField({ block, onPropChange }: BasicFieldProps) {

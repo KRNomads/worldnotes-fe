@@ -7,7 +7,7 @@ import { Label } from "@/shared/ui/label";
 import { Button } from "@/shared/ui/button";
 import { User, X, Camera, Upload } from "lucide-react";
 import { useState, useRef, useCallback } from "react";
-import BasicField from "./defaultBlocks/BasicField";
+import BasicField from "../../block-editor/ui/defaultBlocks/BasicField";
 
 function indexBlocksByFieldKey(blocks: Block[]): Record<string, Block> {
   return blocks.reduce((acc, block) => {
@@ -20,7 +20,7 @@ function indexBlocksByFieldKey(blocks: Block[]): Record<string, Block> {
 
 interface CharacterDefaultUiProps {
   defaultBlocks: Block[];
-  onPropChange: (id: number, path: (string | number)[], value: any) => void;
+  onPropChange: (id: number, path: (string | number)[], value: string) => void;
   onImageChange?: (imageUrl: string) => void;
   initialImage?: string;
 }

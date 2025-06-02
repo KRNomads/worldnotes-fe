@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { Plus, X } from "lucide-react";
 import { Tag } from "@/entities/tag/types/tag";
-import { TagManagementOverlay } from "@/entities/tag/ui/tag-management-overlay";
 import { useProjectStore } from "@/entities/project/store/projectStore";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { useNoteStore } from "@/entities/note/store/noteStore";
 import { useNoteTagStore } from "@/entities/tag/store/noteTagStore";
+import { TagManagementOverlay } from "@/features/tag/ui/tag-management-overlay";
 
 export function EditorTagSection() {
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);

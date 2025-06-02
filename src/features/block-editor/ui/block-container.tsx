@@ -15,7 +15,7 @@ interface BlockContainerProps {
   onToggleCollapse: (id: number) => void;
   onDeleteBlock: (id: number) => void;
   onUpdateBlockTitle: (id: number, title: string) => void;
-  onPropChange: (id: number, path: (string | number)[], value: any) => void;
+  onPropChange: (id: number, path: (string | number)[], value: string) => void;
 }
 
 export const BlockContainer: React.FC<BlockContainerProps> = ({

@@ -4,9 +4,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useNoteStore } from "@/entities/note/store/noteStore";
 import Sidebar from "@/widgets/sidebar/sidebar";
-import LoadingSpinner from "@/shared/ui/LoadingSpinner/LoadingSpinner";
 import styles from "./characters.module.scss";
-import TimeLineEditor from "./components/time-line-editor";
+import TimeLineEditor from "../../../../widgets/time-line-editor/ui/time-line-editor";
 
 export default function CharactersPage() {
   const { projectId } = useParams();

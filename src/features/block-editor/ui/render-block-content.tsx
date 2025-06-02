@@ -3,7 +3,7 @@ import { Block, TextBlockProperties } from "@/entities/block/types/block";
 
 interface RenderBlockContentProps {
   block: Block;
-  onPropChange: (path: (string | number)[], value: any) => void;
+  onPropChange: (path: (string | number)[], value: string) => void;
 }
 
 export default function RenderBlockContent({

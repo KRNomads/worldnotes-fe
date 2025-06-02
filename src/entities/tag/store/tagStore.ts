@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { tagApi } from "@/shared/api/tagApi";
 import { Tag } from "@/entities/tag/types/tag";
+import { tagApi } from "../api/tagApi";
 
 interface TagState {
   tags: Tag[];
