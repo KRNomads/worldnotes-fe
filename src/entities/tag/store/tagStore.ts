@@ -6,6 +6,10 @@ interface TagState {
   tags: Tag[];
   isLoading: boolean;
   error: string | null;
+
+  selectedColor: string;
+  setSelectedColor: (color: string) => void;
+
   loadTags: (projectId: string) => Promise<void>;
   createTag: (projectId: string, name: string, color: string) => Promise<void>;
   updateTag: (
@@ -21,6 +25,8 @@ export const useTagStore = create<TagState>((set) => ({
   tags: [],
   isLoading: false,
   error: null,
+  selectedColor: "#F3D015",
+  setSelectedColor: (color) => set({ selectedColor: color }),
 
   loadTags: async (projectId) => {
     set({ isLoading: true, error: null });

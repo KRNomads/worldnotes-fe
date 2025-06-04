@@ -11,30 +11,41 @@ interface TagBadgeProps {
 }
 
 export function TagBadge({ tag, onClick, removable = false }: TagBadgeProps) {
+  const handleRemoveClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // 이벤트 버블링 방지
+    onClick?.();
+  };
+
   return (
-    <div className="group relative">
+    <div className="relative">
       <Badge
-        className="text-sm font-medium px-3 py-1 rounded-full border-2 cursor-pointer transition-all duration-300 ease-in-out hover:shadow-md hover:scale-105 hover:brightness-95"
+        className="text-sm font-medium px-3 py-1 rounded-full border-2 cursor-default hover:shadow-md hover:scale-105 hover:brightness-95 transition-all duration-300 ease-in-out flex items-center"
         style={{
           backgroundColor: tag.color,
           color: "white",
           borderColor: tag.color,
         }}
-        onClick={onClick}
       >
         {tag.name}
         {removable && (
-          <span className="inline-flex items-center justify-center ml-1 transition-transform duration-300 ease-in-out group-hover:rotate-90">
-            <X className="h-3 w-3" />
+          <span className="relative group ml-1 cursor-pointer">
+            <X
+              className="h-3 w-3 transition-transform duration-300 ease-in-out group-hover:rotate-90"
+              onClick={handleRemoveClick}
+            />
+            {/* 툴팁 - X 위에만 표시 */}
+            <div
+              className="absolute bottom-full left-1/2 transform -translate-x-1/2 -translate-y-3 
+             opacity-0 group-hover:opacity-100 
+             transition-opacity duration-300 
+             bg-gray-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-[100]
+             pointer-events-none"
+            >
+              클릭하여 제거
+            </div>
           </span>
         )}
       </Badge>
-
-      {removable && (
-        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 -translate-y-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gray-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50">
-          클릭하여 제거
-        </div>
-      )}
     </div>
   );
 }

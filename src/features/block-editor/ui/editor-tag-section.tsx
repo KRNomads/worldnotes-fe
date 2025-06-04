@@ -1,96 +1,104 @@
-import { useState, useRef, useEffect } from "react";
-import { Plus, X } from "lucide-react";
-import { Tag } from "@/entities/tag/types/tag";
+import { useRef, useEffect, useState, useMemo } from "react";
+import { Plus } from "lucide-react";
+
 import { useProjectStore } from "@/entities/project/store/projectStore";
-import { Badge } from "@/shared/ui/badge";
-import { Button } from "@/shared/ui/button";
 import { useNoteStore } from "@/entities/note/store/noteStore";
 import { useNoteTagStore } from "@/entities/tag/store/noteTagStore";
+import { useTagStore } from "@/entities/tag/store/tagStore";
+
 import { TagManagementOverlay } from "@/features/tag/ui/tag-management-overlay";
+import { TagBadge } from "@/features/tag/ui/tag-badge";
+import { Button } from "@/shared/ui/button";
+
+import { Tag } from "@/entities/tag/types/tag";
 
 export function EditorTagSection() {
-  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
   const currentProject = useProjectStore((state) => state.currentProject);
   const currentNote = useNoteStore((state) => state.currentNote);
 
-  const { loadNoteTags, noteTags, addTagToNote, removeTagFromNote } =
+  const { noteTags, loadNoteTags, addTagToNote, removeTagFromNote } =
     useNoteTagStore();
+  const allTags = useTagStore((state) => state.tags);
+  const loadTags = useTagStore((state) => state.loadTags);
 
-  // 최초에 노트별 태그 로드
+  // 로딩
   useEffect(() => {
-    if (currentNote) {
-      loadNoteTags(currentNote.id);
-    }
+    if (currentProject) loadTags(currentProject.id);
+  }, [currentProject, loadTags]);
+
+  useEffect(() => {
+    if (currentNote) loadNoteTags(currentNote.id);
   }, [currentNote, loadNoteTags]);
 
-  // 노트별 태그 로드 후 selectedTags를 업데이트
-  useEffect(() => {
-    if (currentNote && noteTags[currentNote.id]) {
-      setSelectedTags(noteTags[currentNote.id]);
-    }
-  }, [noteTags, currentNote]);
+  // 현재 선택된 태그 ID들
+  const selectedTagIds = currentNote ? noteTags[currentNote.id] || [] : [];
 
-  // ✅ 태그 추가: 전역 상태 & API 연동
-  const handleTagSelect = async (tag: Tag) => {
-    if (!selectedTags.find((t) => t.id === tag.id)) {
-      if (currentNote) {
-        await addTagToNote(currentNote.id, tag.id); // ✅ 실제 API 호출
-        // 상태는 noteTagStore에서 noteTags가 자동 업데이트됨 → useEffect로 반영됨
-      }
+  // id → Tag 객체 매핑
+  const tagMap = useMemo(() => {
+    return Object.fromEntries(allTags.map((tag) => [tag.id, tag]));
+  }, [allTags]);
+
+  // 실제 Tag 객체 리스트
+  const selectedTags = useMemo(() => {
+    return selectedTagIds
+      .map((id) => tagMap[id])
+      .filter((tag): tag is Tag => Boolean(tag));
+  }, [selectedTagIds, tagMap]);
+
+  const handleTagAdd = async (tag: Tag) => {
+    if (currentNote && !selectedTagIds.includes(tag.id)) {
+      await addTagToNote(currentNote.id, tag.id);
     }
   };
 
-  // ✅ 태그 제거: 전역 상태 & API 연동
   const handleTagRemove = async (tagId: string) => {
     if (currentNote) {
-      await removeTagFromNote(currentNote.id, tagId); // ✅ 실제 API 호출
-      // 상태는 noteTagStore에서 noteTags가 자동 업데이트됨 → useEffect로 반영됨
+      await removeTagFromNote(currentNote.id, tagId);
     }
   };
 
-  if (!currentProject) return <div>!!프로젝트 id 로딩 실패</div>;
-  if (!currentNote) return <div>!!노트 id 로딩 실패</div>;
+  if (!currentProject) return <div>⚠️ 프로젝트 ID 로딩 실패</div>;
+  if (!currentNote) return <div>⚠️ 노트 ID 로딩 실패</div>;
 
   return (
-    <div className="border-none rounded-lg p-4 space-y-3 bg-white">
-      <div className="flex items-center gap-2 flex-wrap relative">
-        {selectedTags.map((tag) => (
-          <Badge
-            key={tag.id}
-            className="text-sm font-medium px-3 py-1 rounded-full border-2"
-            style={{
-              backgroundColor: tag.color,
-              color: "white",
-              borderColor: tag.color,
-            }}
-            onClick={() => handleTagRemove(tag.id)}
+    <div className="bg-white border-none rounded-lg p-4 space-y-3">
+      <div className="relative">
+        <div className="flex items-center gap-2 flex-wrap">
+          {selectedTags.map((tag) => (
+            <TagBadge
+              key={tag.id}
+              tag={tag}
+              removable
+              onClick={() => handleTagRemove(tag.id)}
+            />
+          ))}
+
+          <Button
+            ref={triggerRef}
+            onClick={() => setIsOverlayOpen(!isOverlayOpen)}
+            variant="outline"
+            size="sm"
+            className="h-8 px-3 border-dashed border-muted-foreground/50 bg-background/50 hover:bg-muted/50 hover:border-muted-foreground transition-all duration-200 rounded-full shadow-sm"
           >
-            {tag.name}
-            <X className="ml-1 h-3 w-3" />
-          </Badge>
-        ))}
+            <Plus className="w-3 h-3" />
+          </Button>
+        </div>
 
-        <Button
-          ref={triggerRef}
-          onClick={() => setIsOverlayOpen(!isOverlayOpen)}
-          variant="outline"
-          size="sm"
-          className="h-7 w-7 p-0 border-gray-300 border-dashed border-muted-foreground/50 bg-background/50 hover:bg-muted/50 hover:border-muted-foreground transition-all duration-200 rounded-full  shadow-sm"
-        >
-          <Plus className="h-3 w-3" />
-        </Button>
+        {isOverlayOpen && (
+          <div className="absolute top-full left-0 mt-2 z-50">
+            <TagManagementOverlay
+              isOpen={isOverlayOpen}
+              onClose={() => setIsOverlayOpen(false)}
+              onTagSelect={handleTagAdd}
+              triggerRef={triggerRef}
+              projectId={currentProject.id}
+            />
+          </div>
+        )}
       </div>
-
-      <TagManagementOverlay
-        isOpen={isOverlayOpen}
-        onClose={() => setIsOverlayOpen(false)}
-        onTagSelect={handleTagSelect}
-        triggerRef={triggerRef}
-        projectId={currentProject.id}
-      />
     </div>
   );
 }

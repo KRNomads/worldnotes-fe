@@ -39,7 +39,7 @@ export const tagApi = {
 
   // 노트에 연결된 태그 목록
   getTagsByNote: (noteId: string) =>
-    api.get<Tag[]>(`/api/v1/notes/${noteId}/tags`).then((res) => res.data),
+    api.get<string[]>(`/api/v1/notes/${noteId}/tags`).then((res) => res.data),
 
   // 노트에 태그 연결
   addTagToNote: (noteId: string, tagId: string) =>

@@ -1,10 +1,8 @@
 import { create } from "zustand";
-import { Tag } from "@/entities/tag/types/tag";
-import { useTagStore } from "./tagStore";
 import { tagApi } from "../api/tagApi";
 
 interface NoteTagState {
-  noteTags: Record<string, Tag[]>; // noteId별 태그 목록
+  noteTags: Record<string, string[]>;
   isLoading: boolean;
   error: string | null;
 
@@ -21,12 +19,11 @@ export const useNoteTagStore = create<NoteTagState>((set) => ({
   loadNoteTags: async (noteId) => {
     set({ isLoading: true, error: null });
     try {
-      const tags = await tagApi.getTagsByNote(noteId);
+      const tagIds = await tagApi.getTagsByNote(noteId); // string[]
       set((state) => ({
-        noteTags: { ...state.noteTags, [noteId]: tags },
+        noteTags: { ...state.noteTags, [noteId]: tagIds },
         isLoading: false,
       }));
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       set({
         error: "노트 태그를 불러오는데 실패했습니다",
@@ -38,15 +35,14 @@ export const useNoteTagStore = create<NoteTagState>((set) => ({
   addTagToNote: async (noteId, tagId) => {
     try {
       await tagApi.addTagToNote(noteId, tagId);
-
-      const allTags = useTagStore.getState().tags; // tagStore 참조
-      const newTag = allTags.find((t) => t.id === tagId);
-      if (!newTag) return;
-
       set((state) => {
-        const currentTags = state.noteTags[noteId] || [];
+        const current = state.noteTags[noteId] || [];
+        if (current.includes(tagId)) return {};
         return {
-          noteTags: { ...state.noteTags, [noteId]: [...currentTags, newTag] },
+          noteTags: {
+            ...state.noteTags,
+            [noteId]: [...current, tagId],
+          },
         };
       });
     } catch (err) {
@@ -60,8 +56,7 @@ export const useNoteTagStore = create<NoteTagState>((set) => ({
       set((state) => ({
         noteTags: {
           ...state.noteTags,
-          [noteId]:
-            state.noteTags[noteId]?.filter((tag) => tag.id !== tagId) || [],
+          [noteId]: (state.noteTags[noteId] || []).filter((id) => id !== tagId),
         },
       }));
     } catch (err) {

@@ -28,10 +28,17 @@ export function TagManagementOverlay({
   triggerRef,
   projectId,
 }: TagManagementOverlayProps) {
-  const { tags, loadTags, createTag, deleteTag, updateTag } = useTagStore();
+  const {
+    tags,
+    loadTags,
+    createTag,
+    deleteTag,
+    updateTag,
+    selectedColor,
+    setSelectedColor,
+  } = useTagStore();
 
   const [newTagName, setNewTagName] = useState("");
-  const [selectedColor, setSelectedColor] = useState("#F3D015");
   const [editingTag, setEditingTag] = useState<Tag | null>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ top: 0, left: 0 });
@@ -62,14 +69,34 @@ export function TagManagementOverlay({
   // 외부 클릭 감지
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (
-        overlayRef.current &&
-        !overlayRef.current.contains(event.target as Node) &&
-        triggerRef.current &&
-        !triggerRef.current.contains(event.target as Node)
-      ) {
-        onClose();
+      const target = event.target as Node;
+
+      // TagManagementOverlay 자체를 클릭했는지 확인
+      if (overlayRef.current && overlayRef.current.contains(target)) {
+        return; // 오버레이 내부 클릭은 무시
       }
+
+      // 트리거 버튼 클릭은 무시
+      if (triggerRef.current && triggerRef.current.contains(target)) {
+        return;
+      }
+
+      // ✨ 추가된 부분: ColorPicker의 팝오버 콘텐츠 내부 클릭은 무시
+      const colorPickerPopover = document.querySelector(
+        '[data-color-picker-popover="true"]'
+      );
+      if (colorPickerPopover && colorPickerPopover.contains(target)) {
+        return;
+      }
+
+      // ✨ 추가된 부분: 호버 액션 버튼 컨테이너 내부 클릭은 무시
+      const hoverActions = document.getElementById("tag-hover-actions");
+      if (hoverActions && hoverActions.contains(target)) {
+        return;
+      }
+
+      // 위의 모든 조건에 해당하지 않으면 오버레이 닫기
+      onClose();
     }
 
     if (isOpen) {
@@ -188,23 +215,35 @@ export function TagManagementOverlay({
           </div>
         )}
 
-      {/* 새 태그 추가 */}
+      {/* 태그 생성/수정 폼 */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          handleCreateTag();
+          if (editingTag) {
+            handleUpdateTag();
+          } else {
+            handleCreateTag();
+          }
         }}
         className="flex items-center gap-2 border-b px-4 py-3 bg-gray-50"
       >
         <Input
-          placeholder="새 태그명"
-          value={newTagName}
-          onChange={(e) => setNewTagName(e.target.value)}
+          placeholder="태그 이름"
+          value={editingTag ? editingTag.name : newTagName}
+          onChange={(e) =>
+            editingTag
+              ? setEditingTag({ ...editingTag, name: e.target.value })
+              : setNewTagName(e.target.value)
+          }
           className="flex-1 h-8 bg-gray-100 border-gray-300"
         />
         <ColorPicker
-          selectedColor={selectedColor}
-          onColorChange={setSelectedColor}
+          selectedColor={editingTag ? editingTag.color : selectedColor}
+          onColorChange={(color) =>
+            editingTag
+              ? setEditingTag({ ...editingTag, color })
+              : setSelectedColor(color)
+          }
         />
         <Button
           type="submit"
@@ -212,8 +251,19 @@ export function TagManagementOverlay({
           variant="outline"
           className="h-8 px-3 text-sm border-gray-400 text-gray-600 hover:bg-gray-100"
         >
-          추가
+          {editingTag ? "수정" : "추가"}
         </Button>
+        {editingTag && (
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            className="h-8 px-2 text-sm text-gray-500"
+            onClick={() => setEditingTag(null)}
+          >
+            취소
+          </Button>
+        )}
       </form>
 
       {/* 태그 리스트 */}
@@ -226,67 +276,23 @@ export function TagManagementOverlay({
               onMouseEnter={(e) => handleTagMouseEnter(e, tag)}
               onMouseLeave={handleTagMouseLeave}
             >
-              {editingTag?.id === tag.id ? (
-                <div className="flex items-center gap-2 p-2 bg-white border rounded-lg shadow-sm">
-                  <Input
-                    value={editingTag.name}
-                    onChange={(e) =>
-                      setEditingTag({ ...editingTag, name: e.target.value })
-                    }
-                    className="h-6 text-sm w-24"
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") handleUpdateTag();
-                      if (e.key === "Escape") {
-                        setEditingTag(null);
-                        setHoveredTagData(null);
-                      }
+              <div className="relative">
+                <div
+                  onClick={() => handleSelectTag(tag)}
+                  className="cursor-pointer"
+                >
+                  <Badge
+                    className="text-sm font-medium px-3 py-1 rounded-full border-2 cursor-pointer transition-all duration-300 ease-in-out hover:shadow-md group-hover:scale-105 group-hover:brightness-95"
+                    style={{
+                      backgroundColor: tag.color,
+                      color: "white",
+                      borderColor: tag.color,
                     }}
-                  />
-                  <ColorPicker
-                    selectedColor={editingTag.color}
-                    onColorChange={(color) =>
-                      setEditingTag({ ...editingTag, color })
-                    }
-                  />
-                  <Button
-                    onClick={() => {
-                      setEditingTag(null);
-                      setHoveredTagData(null);
-                    }}
-                    size="sm"
-                    variant="ghost"
-                    className="h-5 w-5 p-0 text-xs"
                   >
-                    ✓
-                  </Button>
-                  <Button
-                    onClick={() => setEditingTag(null)}
-                    size="sm"
-                    variant="ghost"
-                    className="h-5 w-5 p-0 text-xs"
-                  >
-                    ✕
-                  </Button>
+                    {tag.name}
+                  </Badge>
                 </div>
-              ) : (
-                <div className="relative">
-                  <div
-                    onClick={() => handleSelectTag(tag)}
-                    className="cursor-pointer"
-                  >
-                    <Badge
-                      className="text-sm font-medium px-3 py-1 rounded-full border-2 cursor-pointer transition-all duration-300 ease-in-out hover:shadow-md group-hover:scale-105 group-hover:brightness-95"
-                      style={{
-                        backgroundColor: tag.color,
-                        color: "white",
-                        borderColor: tag.color,
-                      }}
-                    >
-                      {tag.name}
-                    </Badge>
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
           ))}
         </div>
