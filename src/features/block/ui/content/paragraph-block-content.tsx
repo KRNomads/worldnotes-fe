@@ -85,8 +85,10 @@ export default function ParagraphBlockContent({
     },
     editorProps: {
       attributes: {
-        class: getEditorClasses(block.type),
-        placeholder: "글적어",
+        class:
+          "flex w-full border border-input bg-background py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm overflow-y-hidden min-h-[100px] border-none focus-visible:ring-0 px-10 resize-none",
+        placeholder: "텍스트를 입력하세요",
+        style: "height: 100px;",
       },
       handleKeyDown: (view, event) => {
         onKeyDown(event as KeyboardEvent);
@@ -127,8 +129,10 @@ export default function ParagraphBlockContent({
   useEffect(() => {
     if (editor) {
       const element = editor.view.dom as HTMLElement;
-      element.className = getEditorClasses(block.type);
-      element.setAttribute("placeholder", "글적어");
+      element.className =
+        "flex w-full border border-input bg-background py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm overflow-y-hidden min-h-[100px] border-none focus-visible:ring-0 px-10 resize-none";
+      element.setAttribute("placeholder", "텍스트를 입력하세요");
+      element.style.height = "100px";
     }
   }, [block.type, editor]);
 
@@ -172,7 +176,7 @@ export default function ParagraphBlockContent({
   if (!editor) return null;
 
   return (
-    <div className="relative pointer-events-auto select-text">
+    <div className="relative pointer-events-auto select-text ">
       <EditorContent editor={editor} />
 
       {showToolbar && (
