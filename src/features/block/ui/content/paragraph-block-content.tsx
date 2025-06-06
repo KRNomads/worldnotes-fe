@@ -50,6 +50,7 @@ export default function ParagraphBlockContent({
       Highlight.configure({ multicolor: true }),
     ],
     content: props.content,
+    immediatelyRender: false,
     onUpdate: ({ editor }) => {
       onPropChange(["content"], editor.getJSON());
     },
@@ -65,18 +66,21 @@ export default function ParagraphBlockContent({
       const { from, to } = editor.state.selection;
 
       if (from !== to) {
+        const editorElement = editor.view.dom;
+        const editorRect = editorElement.getBoundingClientRect();
+
         const start = editor.view.coordsAtPos(from);
         const end = editor.view.coordsAtPos(to);
         const safeTop = Math.max(start.top - 50, 10);
 
         setToolbarPosition({
-          top: safeTop,
-          left: (start.left + end.left) / 2,
+          top: safeTop - editorRect.top,
+          left: (start.left + end.left) / 2 - editorRect.left,
         });
 
-        setShowToolbar(true); // ✅ 텍스트 선택 시 툴바 보이기
+        setShowToolbar(true);
       } else {
-        setShowToolbar(false); // ✅ 선택 해제 시 툴바 숨김
+        setShowToolbar(false);
       }
     },
     editorProps: {
@@ -90,23 +94,29 @@ export default function ParagraphBlockContent({
       },
       handleDOMEvents: {
         mouseup: (view, event) => {
-          const { state } = view;
-          const { from, to } = state.selection;
+          setTimeout(() => {
+            if (!editor) return;
+            const { state } = view;
+            const { from, to } = state.selection;
 
-          if (from !== to) {
-            const start = view.coordsAtPos(from);
-            const end = view.coordsAtPos(to);
-            const safeTop = Math.max(start.top - 50, 10);
+            if (from !== to) {
+              const editorElement = editor.view.dom;
+              const editorRect = editorElement.getBoundingClientRect();
 
-            setToolbarPosition({
-              top: safeTop,
-              left: (start.left + end.left) / 2,
-            });
+              const start = editor.view.coordsAtPos(from);
+              const end = editor.view.coordsAtPos(to);
+              const safeTop = Math.max(start.top - 50, 10);
 
-            setShowToolbar(true); // ✅ 드래그로 선택 시 툴바 띄움
-          } else {
-            setShowToolbar(false);
-          }
+              setToolbarPosition({
+                top: safeTop - editorRect.top,
+                left: (start.left + end.left) / 2 - editorRect.left,
+              });
+
+              setShowToolbar(true);
+            } else {
+              setShowToolbar(false);
+            }
+          }, 0);
 
           return false;
         },
@@ -127,7 +137,6 @@ export default function ParagraphBlockContent({
       editor.commands.focus("end");
     }
   }, [hasFocus, editor]);
-
   const handleFormat = useCallback(
     (format: string, value?: string) => {
       if (!editor) return;
@@ -163,7 +172,7 @@ export default function ParagraphBlockContent({
   if (!editor) return null;
 
   return (
-    <div className="relative">
+    <div className="relative pointer-events-auto select-text">
       <EditorContent editor={editor} />
 
       {showToolbar && (
