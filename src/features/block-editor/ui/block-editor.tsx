@@ -22,10 +22,10 @@ import {
 } from "@/entities/block/types/block";
 import { debounce } from "lodash";
 import LoadingSpinner from "@/shared/ui/LoadingSpinner/LoadingSpinner";
-import { getDefaultProperties } from "@/shared/utils/blockUtils";
-import { BlockContainer } from "@/features/block-editor/ui/block-container";
 import { EditorTagSection } from "./editor-tag-section";
 import styles from "@/features/block-editor/ui/block-editor.module.scss";
+import { BlockContainer } from "@/features/block/ui/block-container";
+import { getDefaultProperties } from "../lib/blockUtils";
 
 const DEBOUNCE_DELAY = 1000;
 
@@ -34,7 +34,8 @@ interface BlockEditorProps {
   placeholder?: string;
   renderDefaultBlocks?: (
     defaultBlocks: Block[],
-    onPropChange: (id: number, path: (string | number)[], value: string) => void
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onPropChange: (id: number, path: (string | number)[], value: any) => void
   ) => React.ReactNode;
 }
 
@@ -59,10 +60,12 @@ export default function BlockEditor({
     createBlock,
     updateBlockTitle,
     updateBlockProperties,
+    updateBlockIsCollapsed,
     deleteBlock,
   } = useBlockStore();
 
   const [noteTitle, setNoteTitle] = useState("");
+  const [focusedBlockId, setFocusedBlockId] = useState<number | null>(null);
   const [defaultBlocks, setDefaultBlocks] = useState<Block[]>([]);
   const [customBlocks, setCustomBlocks] = useState<Block[]>([]);
   const [isDragging, setIsDragging] = useState<number | null>(null);
@@ -102,6 +105,7 @@ export default function BlockEditor({
       if (!updatedBlock) return;
 
       const updatedProperties = produce(updatedBlock.properties, (draft) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let curr: any = draft;
         for (let i = 0; i < path.length - 1; i++) {
           curr = curr[path[i]];
@@ -146,6 +150,7 @@ export default function BlockEditor({
         const block = draft.find((b) => b.blockId === id);
         if (!block) return;
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let curr: any = block.properties;
         for (let i = 0; i < path.length - 1; i++) {
           curr = curr[path[i]];
@@ -173,12 +178,22 @@ export default function BlockEditor({
     if (success) refreshBlocks();
   };
 
-  const handleToggleCollapse = (id: number) => {
+  const handleToggleCollapse = async (id: number) => {
+    const targetBlock = customBlocks.find((b) => b.blockId === id);
+    if (!targetBlock) return;
+
+    const newIsCollapsed = !targetBlock.isCollapsed;
+
+    // UI 먼저 업데이트
     setCustomBlocks((prev) =>
       prev.map((b) =>
-        b.blockId === id ? { ...b, isCollapsed: !b.isCollapsed } : b
+        b.blockId === id ? { ...b, isCollapsed: newIsCollapsed } : b
       )
     );
+
+    // 서버에 저장
+    const updated = await updateBlockIsCollapsed(id, noteId, newIsCollapsed);
+    if (updated) refreshBlocks();
   };
 
   const handleDragStart = (id: number) => setIsDragging(id);
@@ -206,6 +221,26 @@ export default function BlockEditor({
 
     setIsDragging(null);
     setDragOverId(null);
+  };
+
+  const handleFocus = (blockId: number) => {
+    setFocusedBlockId(blockId);
+  };
+
+  const handleKeyDown = (e: KeyboardEvent, blockId: number) => {
+    // ArrowUp / ArrowDown 로 포커스 이동
+    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+      e.preventDefault();
+      moveFocus(blockId, e.key === "ArrowUp" ? -1 : 1);
+    }
+  };
+
+  const moveFocus = (currentId: number, direction: -1 | 1) => {
+    const index = customBlocks.findIndex((b) => b.blockId === currentId);
+    const nextBlock = customBlocks[index + direction];
+    if (nextBlock) {
+      setFocusedBlockId(nextBlock.blockId);
+    }
   };
 
   // ==== 초기 데이터 로드 ====
@@ -268,7 +303,7 @@ export default function BlockEditor({
         )}
 
       {/* 커스텀 블록 */}
-      <div className="space-y-6">
+      <div className="space-y-2">
         {customBlocks.map((block) => (
           <BlockContainer
             key={block.blockId}
@@ -288,6 +323,8 @@ export default function BlockEditor({
             onPropChange={(id, path, value) =>
               handleUpdateBlockProperties(id, path, value, false)
             }
+            onFocus={() => handleFocus(block.blockId)}
+            onKeyDown={(e) => handleKeyDown(e, block.blockId)}
           />
         ))}
       </div>
@@ -316,6 +353,13 @@ export default function BlockEditor({
             >
               <Type className="h-4 w-4 text-primary" />
               <span>텍스트</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => handleAddBlock("PARAGRAPH")}
+              className="flex items-center gap-2 py-2 px-3 cursor-pointer hover:bg-primary/10 rounded-md transition-colors"
+            >
+              <Type className="h-4 w-4 text-primary" />
+              <span>문단</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -1,7 +1,9 @@
 // src/types/block.ts
 
+import { JSONContent } from "@tiptap/react";
+
 // 블록 타입
-export type BlockType = "TEXT" | "IMAGE" | "TAGS";
+export type BlockType = "TEXT" | "IMAGE" | "TAGS" | "PARAGRAPH";
 
 // 기본 블록 속성 (discriminator를 위해 모든 properties 객체에 포함될 수 있음)
 export interface BaseBlockProperties {
@@ -12,7 +14,8 @@ export interface BaseBlockProperties {
 export type BlockPropertiesUnion =
   | TextBlockProperties
   | ImageBlockProperties
-  | TagsBlockProperties;
+  | TagsBlockProperties
+  | ParagraphBlockProperties;
 
 // TEXT 타입 블록의 properties
 export interface TextBlockProperties extends BaseBlockProperties {
@@ -33,6 +36,12 @@ export interface TagsBlockProperties extends BaseBlockProperties {
   tags: string[];
 }
 
+// PARAGRAPH 타입 블록의 properties
+export interface ParagraphBlockProperties extends BaseBlockProperties {
+  type: "PARAGRAPH";
+  richText: JSONContent;
+}
+
 /**
  * API 명세의 BlockDto 기반 타입
  * - isDefault 필드 제거
@@ -47,7 +56,7 @@ export interface Block {
   type: BlockType;
   properties: BlockPropertiesUnion;
   position: number; // 서버 응답에 포함되므로 유지
-  isCollapsed?: boolean;
+  isCollapsed: boolean;
 }
 
 /**

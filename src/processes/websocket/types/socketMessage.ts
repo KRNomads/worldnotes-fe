@@ -47,4 +47,5 @@ export interface BlockPayload {
   type: BlockType;
   properties: BlockPropertiesUnion;
   position: number;
+  isCollapsed: boolean;
 }

@@ -1,0 +1,197 @@
+"use client";
+
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Link from "@tiptap/extension-link";
+import Underline from "@tiptap/extension-underline";
+import TextStyle from "@tiptap/extension-text-style";
+import Color from "@tiptap/extension-color";
+import Highlight from "@tiptap/extension-highlight";
+import { useEffect, useCallback, useState } from "react";
+import FormatToolbar from "./format-toolbar";
+import { Block, ParagraphBlockProperties } from "@/entities/block/types/block";
+
+interface ParagraphBlockContentProps {
+  block: Block;
+  onFocus: () => void;
+  onKeyDown: (e: KeyboardEvent) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onPropChange: (path: (string | number)[], value: any) => void;
+}
+
+export default function ParagraphBlockContent({
+  block,
+  onPropChange,
+  onFocus,
+  onKeyDown,
+}: ParagraphBlockContentProps) {
+  const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
+  const [hasFocus, setHasFocus] = useState(false);
+  const [showToolbar, setShowToolbar] = useState(false); // ✅ 툴바 표시 상태 추가
+
+  const props = block.properties as ParagraphBlockProperties;
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        heading: {
+          levels: [1, 2, 3],
+        },
+      }),
+      Link.configure({
+        openOnClick: false,
+        HTMLAttributes: {
+          class: "text-blue-500 underline cursor-pointer",
+        },
+      }),
+      Underline,
+      TextStyle,
+      Color,
+      Highlight.configure({ multicolor: true }),
+    ],
+    content: props.content,
+    onUpdate: ({ editor }) => {
+      onPropChange(["content"], editor.getJSON());
+    },
+    onFocus: () => {
+      onFocus();
+      setHasFocus(true);
+    },
+    onBlur: () => {
+      setHasFocus(false);
+      setShowToolbar(false); // ✅ 포커스 해제 시 툴바 숨김
+    },
+    onSelectionUpdate: ({ editor }) => {
+      const { from, to } = editor.state.selection;
+
+      if (from !== to) {
+        const start = editor.view.coordsAtPos(from);
+        const end = editor.view.coordsAtPos(to);
+        const safeTop = Math.max(start.top - 50, 10);
+
+        setToolbarPosition({
+          top: safeTop,
+          left: (start.left + end.left) / 2,
+        });
+
+        setShowToolbar(true); // ✅ 텍스트 선택 시 툴바 보이기
+      } else {
+        setShowToolbar(false); // ✅ 선택 해제 시 툴바 숨김
+      }
+    },
+    editorProps: {
+      attributes: {
+        class: getEditorClasses(block.type),
+        placeholder: "글적어",
+      },
+      handleKeyDown: (view, event) => {
+        onKeyDown(event as KeyboardEvent);
+        return false;
+      },
+      handleDOMEvents: {
+        mouseup: (view, event) => {
+          const { state } = view;
+          const { from, to } = state.selection;
+
+          if (from !== to) {
+            const start = view.coordsAtPos(from);
+            const end = view.coordsAtPos(to);
+            const safeTop = Math.max(start.top - 50, 10);
+
+            setToolbarPosition({
+              top: safeTop,
+              left: (start.left + end.left) / 2,
+            });
+
+            setShowToolbar(true); // ✅ 드래그로 선택 시 툴바 띄움
+          } else {
+            setShowToolbar(false);
+          }
+
+          return false;
+        },
+      },
+    },
+  });
+
+  useEffect(() => {
+    if (editor) {
+      const element = editor.view.dom as HTMLElement;
+      element.className = getEditorClasses(block.type);
+      element.setAttribute("placeholder", "글적어");
+    }
+  }, [block.type, editor]);
+
+  useEffect(() => {
+    if (hasFocus && editor) {
+      editor.commands.focus("end");
+    }
+  }, [hasFocus, editor]);
+
+  const handleFormat = useCallback(
+    (format: string, value?: string) => {
+      if (!editor) return;
+
+      switch (format) {
+        case "bold":
+          editor.chain().focus().toggleBold().run();
+          break;
+        case "italic":
+          editor.chain().focus().toggleItalic().run();
+          break;
+        case "underline":
+          editor.chain().focus().toggleUnderline().run();
+          break;
+        case "strikethrough":
+          editor.chain().focus().toggleStrike().run();
+          break;
+        case "textColor":
+          if (value) {
+            editor.chain().focus().setColor(value).run();
+          }
+          break;
+        case "bgColor":
+          if (value) {
+            editor.chain().focus().setHighlight({ color: value }).run();
+          }
+          break;
+      }
+    },
+    [editor]
+  );
+
+  if (!editor) return null;
+
+  return (
+    <div className="relative">
+      <EditorContent editor={editor} />
+
+      {showToolbar && (
+        <FormatToolbar position={toolbarPosition} onFormat={handleFormat} />
+      )}
+    </div>
+  );
+}
+
+// 에디터 클래스 스타일
+function getEditorClasses(type: Block["type"]): string {
+  const baseClasses = "outline-none w-full resize-none bg-transparent";
+
+  switch (type) {
+    // case "heading1":
+    //   return `${baseClasses} text-3xl font-bold py-2`;
+    // case "heading2":
+    //   return `${baseClasses} text-2xl font-bold py-2`;
+    // case "heading3":
+    //   return `${baseClasses} text-xl font-bold py-1`;
+    // case "quote":
+    //   return `${baseClasses} border-l-4 border-gray-300 pl-4 py-2 italic text-gray-700`;
+    // case "code":
+    //   return `${baseClasses} font-mono bg-gray-100 p-3 rounded text-sm`;
+    // case "bulletList":
+    // case "numberedList":
+    //   return `${baseClasses} pl-6`;
+    default:
+      return `${baseClasses} py-1`;
+  }
+}

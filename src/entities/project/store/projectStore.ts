@@ -6,7 +6,7 @@ import {
   CreateProjectRequest,
   CreateProjectResponse,
 } from "@/entities/project/types/project";
-import { mapProjectResponseToProject } from "@/shared/utils/mappers";
+import { mapProjectResponseToProject } from "@/entities/block/lib/mappers";
 import { projectApi } from "../api/projectApi";
 
 interface ProjectState {

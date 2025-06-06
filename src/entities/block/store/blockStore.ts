@@ -1,6 +1,6 @@
 // src/entities/block/model/blockStore.ts
 import { create } from "zustand";
-import { mapBlockResponseToBlock } from "@/shared/utils/mappers";
+import { mapBlockResponseToBlock } from "@/entities/block/lib/mappers";
 import { blockApi } from "../api/blockApi";
 import {
   Block,
@@ -35,6 +35,11 @@ interface BlockState {
     noteId: string,
     type: BlockType,
     properties: BlockPropertiesUnion
+  ) => Promise<Block | null>;
+  updateBlockIsCollapsed: (
+    blockId: number,
+    noteId: string,
+    isCollapsed: boolean
   ) => Promise<Block | null>;
   deleteBlock: (blockId: number, noteId: string) => Promise<boolean>;
   getBlocksForNote: (noteId: string) => Block[];
@@ -188,6 +193,9 @@ export const useBlockStore = create<BlockState>((set, get) => ({
 
   updateBlockProperties: (blockId, noteId, type, properties) =>
     get().updateBlock(blockId, noteId, { type, properties }),
+
+  updateBlockIsCollapsed: (blockId, noteId, isCollapsed) =>
+    get().updateBlock(blockId, noteId, { isCollapsed }),
 
   deleteBlock: async (blockId, noteId) => {
     set({ isLoading: true, error: null });

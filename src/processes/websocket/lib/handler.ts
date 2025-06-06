@@ -8,7 +8,7 @@ import {
 import {
   mapBlockPayloadToBlock,
   mapNotePayloadToNote,
-} from "@/shared/utils/mappers";
+} from "@/entities/block/lib/mappers";
 
 export function handleMessage(msg: WebSocketMessage<unknown>) {
   switch (msg.type) {

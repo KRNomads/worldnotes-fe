@@ -15,7 +15,10 @@ interface BlockContainerProps {
   onToggleCollapse: (id: number) => void;
   onDeleteBlock: (id: number) => void;
   onUpdateBlockTitle: (id: number, title: string) => void;
-  onPropChange: (id: number, path: (string | number)[], value: string) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onPropChange: (id: number, path: (string | number)[], value: any) => void;
+  onFocus: () => void;
+  onKeyDown: (e: KeyboardEvent) => void;
 }
 
 export const BlockContainer: React.FC<BlockContainerProps> = ({
@@ -30,15 +33,15 @@ export const BlockContainer: React.FC<BlockContainerProps> = ({
   onDeleteBlock,
   onUpdateBlockTitle,
   onPropChange,
+  onFocus,
+  onKeyDown,
 }) => {
   return (
     <div
-      key={block.blockId}
       className={cn(
-        "p-4 rounded-lg border border-transparent hover:border-gray-200 transition-all group",
+        "p-3 rounded-lg border border-transparent hover:border-gray-200 transition-all group",
         isDragging === block.blockId && "opacity-50",
-        dragOverId === block.blockId && "border-blue-300 bg-blue-50",
-        block.isCollapsed && "bg-gray-50"
+        dragOverId === block.blockId && "border-blue-300 bg-blue-50"
       )}
       draggable
       onDragStart={() => onDragStart(block.blockId)}
@@ -47,11 +50,11 @@ export const BlockContainer: React.FC<BlockContainerProps> = ({
       onDragEnd={onDragEnd}
     >
       <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-1">
           <Button
             variant="ghost"
             size="icon"
-            className="transition-opacity"
+            className="transition-opacity cursor-pointer"
             onClick={() => onToggleCollapse(block.blockId)}
           >
             {block.isCollapsed ? (
@@ -62,7 +65,11 @@ export const BlockContainer: React.FC<BlockContainerProps> = ({
           </Button>
           <input
             type="text"
-            className="text-sm font-medium text-muted-foreground bg-transparent focus:outline-none w-full"
+            className={cn(
+              "text-lg font-medium bg-transparent focus:outline-none w-full",
+              "text-muted-foreground", // 기본 색상
+              block.isCollapsed && "opacity-60" // 접혔을 때만 연하게
+            )}
             value={block.title || ""}
             onChange={(e) => onUpdateBlockTitle(block.blockId, e.target.value)}
           />
@@ -70,6 +77,8 @@ export const BlockContainer: React.FC<BlockContainerProps> = ({
             variant="ghost"
             size="icon"
             className="cursor-grab opacity-0 group-hover:opacity-100 transition-opacity"
+            draggable
+            onDragStart={() => onDragStart(block.blockId)}
           >
             <GripVertical className="h-4 w-4" />
           </Button>
@@ -77,16 +86,26 @@ export const BlockContainer: React.FC<BlockContainerProps> = ({
         <Button
           variant="ghost"
           size="icon"
-          className="opacity-0 group-hover:opacity-100 transition-opacity"
+          className="opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
           onClick={() => onDeleteBlock(block.blockId)}
         >
           <X className="h-4 w-4" />
         </Button>
       </div>
-      <RenderBlockContent
-        block={block}
-        onPropChange={(path, value) => onPropChange(block.blockId, path, value)}
-      />
+
+      {/* 줄 추가 */}
+      <div className="border-b border-gray-300 mb-3" />
+
+      {!block.isCollapsed && (
+        <RenderBlockContent
+          block={block}
+          onPropChange={(path, value) =>
+            onPropChange(block.blockId, path, value)
+          }
+          onFocus={onFocus}
+          onKeyDown={onKeyDown}
+        />
+      )}
     </div>
   );
 };

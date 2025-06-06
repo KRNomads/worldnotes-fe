@@ -5,7 +5,7 @@ import {
   NoteCreateRequest,
   NoteUpdateRequest,
 } from "@/entities/note/types/note";
-import { mapNoteResponseToNote } from "@/shared/utils/mappers";
+import { mapNoteResponseToNote } from "@/entities/block/lib/mappers";
 import { noteApi } from "../api/noteApi";
 
 interface NoteState {

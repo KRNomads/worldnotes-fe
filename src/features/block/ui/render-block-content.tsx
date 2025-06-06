@@ -1,13 +1,19 @@
 import { Textarea } from "@/shared/ui/textarea";
 import { Block, TextBlockProperties } from "@/entities/block/types/block";
+import ParagraphBlockContent from "./content/paragraph-block-content";
 
 interface RenderBlockContentProps {
   block: Block;
-  onPropChange: (path: (string | number)[], value: string) => void;
+  onFocus: () => void;
+  onKeyDown: (e: KeyboardEvent) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onPropChange: (path: (string | number)[], value: any) => void;
 }
 
 export default function RenderBlockContent({
   block,
+  onFocus,
+  onKeyDown,
   onPropChange,
 }: RenderBlockContentProps) {
   if (block.isCollapsed) return null;
@@ -29,5 +35,15 @@ export default function RenderBlockContent({
     case "TAGS":
       //const tagProps = block.properties as TagsBlockProperties;
       return <div className="space-y-2">{"태그 블록"}</div>;
+    case "PARAGRAPH":
+      //const tagProps = block.properties as TagsBlockProperties;
+      return (
+        <ParagraphBlockContent
+          block={block}
+          onFocus={onFocus}
+          onKeyDown={onKeyDown}
+          onPropChange={onPropChange}
+        />
+      );
   }
 }

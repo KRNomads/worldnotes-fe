@@ -1,7 +1,10 @@
 import { Block, BlockResponse } from "@/entities/block/types/block";
 import { Note, NoteResponse } from "@/entities/note/types/note";
 import { Project, ProjectResponse } from "@/entities/project/types/project";
-import { BlockPayload, NotePayload } from "@/shared/types/socketMessage";
+import {
+  BlockPayload,
+  NotePayload,
+} from "@/processes/websocket/types/socketMessage";
 
 // BlockResponse → Block
 export const mapBlockResponseToBlock = (dto: BlockResponse): Block => ({
@@ -12,6 +15,7 @@ export const mapBlockResponseToBlock = (dto: BlockResponse): Block => ({
   type: dto.type,
   properties: dto.properties,
   position: dto.position,
+  isCollapsed: dto.isCollapsed,
 });
 
 // BlockPayload → Block
@@ -23,6 +27,7 @@ export const mapBlockPayloadToBlock = (payload: BlockPayload): Block => ({
   type: payload.type,
   properties: payload.properties,
   position: payload.position,
+  isCollapsed: payload.isCollapsed,
 });
 
 // NoteResponse → Note
