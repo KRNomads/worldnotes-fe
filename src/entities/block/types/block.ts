@@ -39,7 +39,7 @@ export interface TagsBlockProperties extends BaseBlockProperties {
 // PARAGRAPH 타입 블록의 properties
 export interface ParagraphBlockProperties extends BaseBlockProperties {
   type: "PARAGRAPH";
-  richText: JSONContent;
+  content: JSONContent;
 }
 
 /**

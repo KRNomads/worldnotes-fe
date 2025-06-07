@@ -3,6 +3,7 @@ import { Button } from "@/shared/ui/button";
 import { cn } from "@/shared/lib/utils";
 import { Block } from "@/entities/block/types/block";
 import RenderBlockContent from "./render-block-content";
+import { useRef } from "react";
 
 interface BlockContainerProps {
   block: Block;
@@ -36,18 +37,42 @@ export const BlockContainer: React.FC<BlockContainerProps> = ({
   onFocus,
   onKeyDown,
 }) => {
+  const dragRef = useRef<HTMLDivElement>(null);
+
+  const handleDragStart = (
+    e: React.DragEvent<HTMLButtonElement>,
+    id: number
+  ) => {
+    if (dragRef.current) {
+      // 임시로 opacity 제거
+      dragRef.current.style.opacity = "1";
+
+      const rect = dragRef.current.getBoundingClientRect();
+      e.dataTransfer.setDragImage(
+        dragRef.current,
+        rect.width / 2,
+        rect.height / 2
+      );
+
+      // 원래 상태로 복원
+      setTimeout(() => {
+        dragRef.current!.style.opacity = "";
+      }, 0);
+    }
+
+    onDragStart(id);
+  };
+
   return (
     <div
+      ref={dragRef}
       className={cn(
         "p-3 rounded-lg border border-transparent hover:border-gray-200 transition-all group",
         isDragging === block.blockId && "opacity-50",
         dragOverId === block.blockId && "border-blue-300 bg-blue-50"
       )}
-      draggable
-      onDragStart={() => onDragStart(block.blockId)}
       onDragOver={(e) => onDragOver(e, block.blockId)}
       onDrop={() => onDrop(block.blockId)}
-      onDragEnd={onDragEnd}
     >
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2 flex-1">
@@ -76,9 +101,10 @@ export const BlockContainer: React.FC<BlockContainerProps> = ({
           <Button
             variant="ghost"
             size="icon"
-            className="cursor-grab opacity-0 group-hover:opacity-100 transition-opacity"
+            className="cursor-grab opacity-0 group-hover:opacity-100 transition-opacity pointer-events-auto"
             draggable
-            onDragStart={() => onDragStart(block.blockId)}
+            onDragStart={(e) => handleDragStart(e, block.blockId)}
+            onDragEnd={onDragEnd}
           >
             <GripVertical className="h-4 w-4" />
           </Button>
