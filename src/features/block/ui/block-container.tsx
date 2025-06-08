@@ -1,4 +1,4 @@
-import { GripVertical, ChevronDown, ChevronUp, X } from "lucide-react";
+import { GripVertical, ChevronDown, X, ChevronRight } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { cn } from "@/shared/lib/utils";
 import { Block } from "@/entities/block/types/block";
@@ -83,9 +83,9 @@ export const BlockContainer: React.FC<BlockContainerProps> = ({
             onClick={() => onToggleCollapse(block.blockId)}
           >
             {block.isCollapsed ? (
-              <ChevronDown className="h-4 w-4" />
+              <ChevronRight className="h-4 w-4" />
             ) : (
-              <ChevronUp className="h-4 w-4" />
+              <ChevronDown className="h-4 w-4" />
             )}
           </Button>
           <input
