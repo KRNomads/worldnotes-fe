@@ -4,12 +4,20 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useNoteStore } from "@/entities/note/store/noteStore";
 import Sidebar from "@/widgets/sidebar/sidebar";
-import CharacterNoteList from "./components/character-note-list";
 import LoadingSpinner from "@/shared/ui/LoadingSpinner/LoadingSpinner";
-import styles from "./characters.module.scss";
-import CharacterBlockEditor from "../../../../widgets/character-block-editor/character-block-editor";
+import styles from "./page.module.scss";
+import GenericBlockEditor from "@/widgets/generic-block-editor/generic-block-editor";
+import GenericNoteList from "@/widgets/generic-note-list/generic-note-list";
+import { NOTE_TYPES, NoteType } from "@/entities/note/types/note";
 
-export default function CharactersPage() {
+const NEW_NOTE_TITLES: Record<NoteType, string> = {
+  CHARACTER: "새 캐릭터",
+  EVENT: "새 사건",
+  PLACE: "새 장소",
+  DETAILS: "새 설정",
+};
+
+export default function NotePage() {
   const { projectId } = useParams();
   const {
     notes,
@@ -22,8 +30,10 @@ export default function CharactersPage() {
   } = useNoteStore();
 
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
+  const [selectedNoteType, setSelectedNoteType] =
+    useState<NoteType>("CHARACTER");
 
-  const characterNotes = getNotesByType("CHARACTER", projectId as string);
+  const typedNotes = getNotesByType(selectedNoteType, projectId as string);
 
   useEffect(() => {
     if (projectId) {
@@ -32,30 +42,27 @@ export default function CharactersPage() {
   }, [projectId, fetchNotesByProject]);
 
   useEffect(() => {
-    // 노트가 로드되고, 아직 선택된 노트가 없으며, 캐릭터 노트가 존재할 경우 첫번째 노트를 선택
-    if (characterNotes.length > 0 && !selectedNoteId) {
-      setSelectedNoteId(characterNotes[0].id);
-      setCurrentNote(characterNotes[0].id);
-    } else if (characterNotes.length === 0 && selectedNoteId) {
-      // 만약 캐릭터 노트가 모두 삭제되어 비어있게 되면 선택된 ID도 초기화
+    if (typedNotes.length > 0 && !selectedNoteId) {
+      setSelectedNoteId(typedNotes[0].id);
+      setCurrentNote(typedNotes[0].id);
+    } else if (typedNotes.length === 0 && selectedNoteId) {
       setSelectedNoteId(null);
       setCurrentNote(null);
     }
-  }, [characterNotes, selectedNoteId]);
+  }, [typedNotes, selectedNoteId]);
 
   const handleSelectNote = (noteId: string) => {
     setSelectedNoteId(noteId);
     setCurrentNote(noteId);
   };
 
-  const handleCreateCharacter = async () => {
+  const handleCreateNote = async () => {
     if (!projectId) return;
 
-    // NoteCreateRequest의 title은 string 타입이므로 "새 캐릭터"는 유효합니다.
     const newNote = await createNote({
       projectId: projectId as string,
-      title: "새 캐릭터", // NoteCreateRequest.title은 string
-      type: "CHARACTER",
+      title: NEW_NOTE_TITLES[selectedNoteType] || "새 노트",
+      type: selectedNoteType,
     });
 
     if (newNote) {
@@ -64,21 +71,42 @@ export default function CharactersPage() {
     }
   };
 
-  // JSX 구조 및 클래스명은 원본과 동일하게 유지
   return (
     <div className={styles.pageContainer}>
       <Sidebar
-        activeItem="characters"
+        activeItem="notes"
         isProjectSidebar={true}
         projectId={projectId as string}
       />
 
       <main className={styles.mainContent}>
         <div className={styles.contentWrapper}>
+          <div className={styles.typeSelector}>
+            <div className="flex gap-2 mb-4">
+              {Object.entries(NOTE_TYPES).map(([typeKey, typeLabel]) => (
+                <button
+                  key={typeKey}
+                  className={`px-4 py-2 rounded-md border text-sm font-medium transition 
+        ${
+          selectedNoteType === typeKey
+            ? "bg-blue-100 border-blue-500 text-blue-700"
+            : "bg-white border-gray-300 text-gray-700 hover:bg-gray-100"
+        }`}
+                  onClick={() => {
+                    setSelectedNoteType(typeKey as NoteType);
+                    setSelectedNoteId(null);
+                  }}
+                >
+                  {typeLabel}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {isLoading && notes.length === 0 ? (
             <div className={styles.loadingContainer}>
               <LoadingSpinner />
-              <p>캐릭터 노트를 불러오는 중...</p>
+              <p>노트를 불러오는 중...</p>
             </div>
           ) : error ? (
             <div className={styles.errorContainer}>
@@ -92,27 +120,32 @@ export default function CharactersPage() {
             </div>
           ) : (
             <div className={styles.characterPageLayout}>
-              <CharacterNoteList
-                notes={characterNotes}
+              <GenericNoteList
+                notes={typedNotes}
                 selectedNoteId={selectedNoteId}
                 onSelectNote={handleSelectNote}
-                onCreateNote={handleCreateCharacter}
+                onCreateNote={handleCreateNote}
+                type={selectedNoteType}
               />
 
               <div className={styles.editorContainer}>
                 {selectedNoteId ? (
-                  <CharacterBlockEditor
-                    noteId={selectedNoteId}
+                  <GenericBlockEditor
                     key={selectedNoteId}
+                    noteId={selectedNoteId}
+                    type={selectedNoteType}
                   />
                 ) : (
                   <div className={styles.noNoteSelected}>
-                    <p>캐릭터를 선택하거나 새로운 캐릭터를 생성해주세요.</p>
+                    <p>
+                      {NOTE_TYPES[selectedNoteType]}를 선택하거나 새로운 노트를
+                      생성해주세요.
+                    </p>
                     <button
                       className={styles.createButton}
-                      onClick={handleCreateCharacter}
+                      onClick={handleCreateNote}
                     >
-                      새 캐릭터 생성
+                      새 노트 생성
                     </button>
                   </div>
                 )}

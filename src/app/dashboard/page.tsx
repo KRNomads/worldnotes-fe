@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import styles from "./dashboard.module.scss";
+import styles from "./page.module.scss";
 import Sidebar from "@/widgets/sidebar/sidebar";
 import { useProjectStore } from "@/entities/project/store/projectStore";
 import LoadingSpinner from "@/shared/ui/LoadingSpinner/LoadingSpinner";

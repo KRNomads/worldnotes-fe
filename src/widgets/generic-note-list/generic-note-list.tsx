@@ -1,34 +1,45 @@
 "use client";
 
-import type React from "react";
-import { useState, useEffect, useMemo, useCallback } from "react";
 import type { Note } from "@/entities/note/types/note";
 import { useNoteStore } from "@/entities/note/store/noteStore";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import SearchInput from "@/widgets/serchinput/serchInput";
-import styles from "../characters.module.scss";
 import { getInitialConsonantsWithEsHangul } from "@/shared/utils/hangul";
+import styles from "./generic-note-list.module.scss"; // 필요시 이름 변경 가능
 
 interface ProcessedNote extends Note {
   titleChosung?: string;
 }
 
-interface CharacterNoteListProps {
+interface GenericNoteListProps {
+  type: "CHARACTER" | "EVENT" | "PLACE" | "DETAILS";
   notes: Note[];
   selectedNoteId: string | null;
   onSelectNote: (noteId: string) => void;
   onCreateNote: () => void;
 }
 
-export default function CharacterNoteList({
+export default function GenericNoteList({
+  type,
   notes,
   selectedNoteId,
   onSelectNote,
   onCreateNote,
-}: CharacterNoteListProps) {
+}: GenericNoteListProps) {
   const { updateNote, deleteNote } = useNoteStore();
+
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+
+  const typeLabelMap = {
+    CHARACTER: "캐릭터",
+    EVENT: "사건",
+    PLACE: "장소",
+    DETAILS: "설정",
+  };
+
+  const label = typeLabelMap[type] || "노트";
 
   const processedNotes: ProcessedNote[] = useMemo(() => {
     return notes.map((note) => ({
@@ -37,23 +48,17 @@ export default function CharacterNoteList({
     }));
   }, [notes]);
 
-  // 검색 결과를 직접 계산하여 동기적으로 처리
   const displayedNotes = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return processedNotes;
-    }
+    if (!searchQuery.trim()) return processedNotes;
 
-    // 제목으로 검색
     const titleMatches = processedNotes.filter((note) =>
       note.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    // 초성으로 검색
     const chosungMatches = processedNotes.filter((note) =>
       note.titleChosung?.includes(searchQuery)
     );
 
-    // 중복 제거하여 결과 합치기
     const allMatches = [...titleMatches];
     chosungMatches.forEach((note) => {
       if (!titleMatches.some((match) => match.id === note.id)) {
@@ -64,18 +69,6 @@ export default function CharacterNoteList({
     return allMatches;
   }, [processedNotes, searchQuery]);
 
-  const fuseOptions = useMemo(
-    () => ({
-      keys: [
-        { name: "title", weight: 0.7 },
-        { name: "titleChosung", weight: 0.3 },
-      ],
-      threshold: 0.4,
-      ignoreLocation: true,
-    }),
-    []
-  );
-
   useEffect(() => {
     if (
       editingNoteId &&
@@ -84,19 +77,6 @@ export default function CharacterNoteList({
       setEditingNoteId(null);
     }
   }, [processedNotes, editingNoteId]);
-
-  const handleSearchQueryChange = useCallback((value: string) => {
-    setSearchQuery(value);
-  }, []);
-
-  // SearchInput 컴포넌트를 위한 빈 핸들러 (실제로는 useMemo로 계산)
-  const handleSearchResults = useCallback((results: ProcessedNote[]) => {
-    // 이제 사용하지 않음 - useMemo로 동기적으로 계산
-  }, []);
-
-  const handleSearchClear = useCallback(() => {
-    setSearchQuery("");
-  }, []);
 
   const handleEditStart = useCallback((note: ProcessedNote) => {
     setEditingNoteId(note.id);
@@ -108,15 +88,11 @@ export default function CharacterNoteList({
       await updateNote(editingNoteId, { title: editTitle.trim() });
       setEditingNoteId(null);
     } else if (editingNoteId) {
-      const originalNote = processedNotes.find(
-        (note) => note.id === editingNoteId
-      );
-      if (originalNote) {
-        setEditTitle(originalNote.title);
-      }
+      const originalNote = processedNotes.find((n) => n.id === editingNoteId);
+      if (originalNote) setEditTitle(originalNote.title);
       setEditingNoteId(null);
     }
-  }, [editingNoteId, editTitle, processedNotes, updateNote]);
+  }, [editingNoteId, editTitle, updateNote, processedNotes]);
 
   const handleEditCancel = useCallback(() => {
     setEditingNoteId(null);
@@ -124,55 +100,53 @@ export default function CharacterNoteList({
 
   const handleKeyDownOnEdit = useCallback(
     (e: React.KeyboardEvent) => {
-      if (e.key === "Enter") {
-        handleEditSave();
-      } else if (e.key === "Escape") {
-        handleEditCancel();
-      }
+      if (e.key === "Enter") handleEditSave();
+      if (e.key === "Escape") handleEditCancel();
     },
     [handleEditSave, handleEditCancel]
   );
 
   const handleDeleteNote = useCallback(
     async (noteId: string) => {
-      if (window.confirm("정말로 이 캐릭터를 삭제하시겠습니까?")) {
+      if (window.confirm(`정말로 이 ${label}을 삭제하시겠습니까?`)) {
         const success = await deleteNote(noteId);
         if (success && selectedNoteId === noteId) {
-          const remainingOriginalNotes = notes.filter(
-            (note) => note.id !== noteId
-          );
-          if (remainingOriginalNotes.length > 0) {
-            onSelectNote(remainingOriginalNotes[0].id);
-          } else {
-            onSelectNote("");
-          }
+          const remaining = notes.filter((n) => n.id !== noteId);
+          onSelectNote(remaining.length > 0 ? remaining[0].id : "");
         }
       }
     },
-    [deleteNote, selectedNoteId, notes, onSelectNote]
+    [deleteNote, selectedNoteId, notes, onSelectNote, label]
   );
 
   return (
     <div className={styles.noteListContainer}>
       <div className={styles.noteListHeader}>
-        <h2>캐릭터 목록</h2>
+        <h2>{label} 목록</h2>
         <button
           className={styles.addNoteButton}
           onClick={onCreateNote}
-          aria-label="새 캐릭터 추가"
+          aria-label={`${label} 추가`}
         >
           +
         </button>
       </div>
 
       <SearchInput<ProcessedNote>
-        placeholder="캐릭터 이름 또는 초성으로 검색..."
+        placeholder={`${label} 이름 또는 초성으로 검색...`}
         value={searchQuery}
-        onChange={handleSearchQueryChange}
-        onClear={handleSearchClear}
+        onChange={setSearchQuery}
+        onClear={() => setSearchQuery("")}
         data={processedNotes}
-        fuseOptions={fuseOptions}
-        onSearchResults={handleSearchResults}
+        fuseOptions={{
+          keys: [
+            { name: "title", weight: 0.7 },
+            { name: "titleChosung", weight: 0.3 },
+          ],
+          threshold: 0.4,
+          ignoreLocation: true,
+        }}
+        onSearchResults={() => {}}
         className={styles.customSearchInput}
       />
 
@@ -180,8 +154,8 @@ export default function CharacterNoteList({
         {displayedNotes.length === 0 ? (
           <li className={styles.emptyNote}>
             {searchQuery
-              ? `"${searchQuery}"에 해당하는 캐릭터가 없습니다.`
-              : "캐릭터가 없습니다. 새 캐릭터를 추가해보세요."}
+              ? `"${searchQuery}"에 해당하는 ${label}이 없습니다.`
+              : `${label}이 없습니다. 새 ${label}을 추가해보세요.`}
           </li>
         ) : (
           displayedNotes.map((note) => (
@@ -191,10 +165,7 @@ export default function CharacterNoteList({
                 selectedNoteId === note.id ? styles.selectedNote : ""
               }`}
               onClick={() => {
-                if (editingNoteId !== note.id) {
-                  console.log("Clicking note:", note.title, note.id); // 디버깅용
-                  onSelectNote(note.id);
-                }
+                if (editingNoteId !== note.id) onSelectNote(note.id);
               }}
             >
               {editingNoteId === note.id ? (
@@ -220,7 +191,7 @@ export default function CharacterNoteList({
                         e.stopPropagation();
                         handleEditStart(note);
                       }}
-                      aria-label="캐릭터 이름 수정"
+                      aria-label={`${label} 이름 수정`}
                     >
                       ✎
                     </button>
@@ -230,7 +201,7 @@ export default function CharacterNoteList({
                         e.stopPropagation();
                         handleDeleteNote(note.id);
                       }}
-                      aria-label="캐릭터 삭제"
+                      aria-label={`${label} 삭제`}
                     >
                       ×
                     </button>
@@ -244,7 +215,7 @@ export default function CharacterNoteList({
 
       {searchQuery && (
         <div className={styles.searchResultInfo}>
-          총 {displayedNotes.length}개의 캐릭터가 검색되었습니다.
+          총 {displayedNotes.length}개의 {label}이 검색되었습니다.
         </div>
       )}
     </div>

@@ -1,0 +1,144 @@
+// 사용되는 변수 정의
+$primary-color: #4f46e5;
+$primary-dark: #3730a3;
+$text-primary: #1e293b;
+$text-secondary: #64748b;
+$text-muted: #94a3b8;
+$bg-primary: #ffffff;
+$bg-secondary: #f8fafc;
+$bg-tertiary: #f1f5f9;
+$border-color: #e2e8f0;
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+  0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$radius-md: 8px;
+$radius-lg: 12px;
+$transition-fast: 150ms ease;
+$font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+  Helvetica, Arial, sans-serif;
+
+// 사용되는 브레이크포인트 믹스인
+@mixin mobile {
+  @media (max-width: 1024px) {
+    @content;
+  }
+}
+
+.pageContainer {
+  display: flex;
+  min-height: 100vh;
+  background-color: $bg-secondary;
+  font-family: $font-sans;
+  color: $text-primary;
+  position: relative;
+
+  @include mobile {
+    flex-direction: column;
+  }
+}
+
+.mainContent {
+  margin-left: 280px;
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+
+  @include mobile {
+    margin-left: 0;
+    padding: 16px;
+    margin-top: 120px;
+  }
+}
+
+.contentWrapper {
+  margin: 0 auto;
+}
+
+.characterPageLayout {
+  display: flex;
+  gap: 24px;
+
+  @include mobile {
+    flex-direction: column;
+    gap: 28px;
+  }
+}
+
+.editorContainer {
+  flex: 1;
+  background-color: $bg-primary;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+  overflow: hidden;
+  padding: 20px;
+
+  @include mobile {
+    min-width: 0;
+  }
+}
+
+.loadingContainer,
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  text-align: center;
+  padding: 32px;
+
+  @include mobile {
+    min-height: 200px;
+    padding: 24px;
+  }
+}
+
+.retryButton {
+  margin-top: 16px;
+  padding: 10px 20px;
+  background-color: $primary-color;
+  color: white;
+  border: none;
+  border-radius: $radius-md;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+
+  &:hover {
+    background-color: $primary-dark;
+  }
+}
+
+.noNoteSelected {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  text-align: center;
+  padding: 32px;
+
+  @include mobile {
+    min-height: 200px;
+    padding: 24px;
+  }
+
+  p {
+    margin-bottom: 16px;
+    color: $text-secondary;
+  }
+}
+
+.createButton {
+  padding: 10px 20px;
+  background-color: $primary-color;
+  color: white;
+  border: none;
+  border-radius: $radius-md;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+
+  &:hover {
+    background-color: $primary-dark;
+  }
+}

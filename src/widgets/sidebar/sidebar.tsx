@@ -76,13 +76,7 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
 }
 
 interface SidebarProps {
-  activeItem?:
-    | "home"
-    | "basicinfo"
-    | "characters"
-    | "worldbuilding"
-    | "places"
-    | "events";
+  activeItem?: "home" | "basicinfo" | "notes" | "maps" | "plots";
   isProjectSidebar?: boolean;
   projectId?: string; // 프로젝트 ID 추가
 }
@@ -128,7 +122,7 @@ export default function Sidebar({
           // 프로젝트 관련 사이드바 메뉴 (동적 라우팅 적용)
           <>
             <Link
-              href={`/project/${projectId}/basicinfo`}
+              href={`/project/${projectId}`}
               className={`${styles.navItem} ${
                 activeItem === "basicinfo" ? styles.navItemActive : ""
               }`}
@@ -137,39 +131,30 @@ export default function Sidebar({
             </Link>
 
             <Link
-              href={`/project/${projectId}/characters`}
+              href={`/project/${projectId}/notes`}
               className={`${styles.navItem} ${
-                activeItem === "characters" ? styles.navItemActive : ""
+                activeItem === "notes" ? styles.navItemActive : ""
               }`}
             >
-              캐릭터
+              노트 편집
             </Link>
 
             <Link
-              href={`/project/${projectId}/worldbuilding`}
+              href={`/project/${projectId}/maps`}
               className={`${styles.navItem} ${
-                activeItem === "worldbuilding" ? styles.navItemActive : ""
+                activeItem === "maps" ? styles.navItemActive : ""
               }`}
             >
-              세계관 설정
+              지도
             </Link>
 
             <Link
-              href={`/project/${projectId}/places`}
+              href={`/project/${projectId}/plots`}
               className={`${styles.navItem} ${
-                activeItem === "places" ? styles.navItemActive : ""
+                activeItem === "plots" ? styles.navItemActive : ""
               }`}
             >
-              장소
-            </Link>
-
-            <Link
-              href={`/project/${projectId}/events`}
-              className={`${styles.navItem} ${
-                activeItem === "events" ? styles.navItemActive : ""
-              }`}
-            >
-              사건
+              플롯
             </Link>
 
             <button

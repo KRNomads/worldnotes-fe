@@ -31,8 +31,9 @@ export interface NoteUpdateRequest {
 
 // 노트 타입 상수 (필요에 따라 사용)
 export const NOTE_TYPES = {
-  BASIC_INFO: "BASIC_INFO",
   CHARACTER: "CHARACTER",
+  EVENT: "EVENT",
+  PLACE: "PLACE",
   DETAILS: "DETAILS",
 } as const;
 
