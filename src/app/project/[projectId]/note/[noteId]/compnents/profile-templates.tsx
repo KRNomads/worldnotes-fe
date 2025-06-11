@@ -22,27 +22,27 @@ export function CharacterProfile() {
         <Button
           variant="ghost"
           size="icon"
-          className="absolute top-3 right-3 text-white hover:bg-white/20"
+          className="absolute top-3 right-3 text-black hover:bg-white/20"
         >
           <Edit3 className="h-4 w-4" />
         </Button>
       </div>
       <CardContent className="relative px-6 pb-6">
-        <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-12">
-          <div className="relative">
-            <div className="w-24 h-24 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-100">
+        <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-12 ">
+          <div className="relative ">
+            <div className="w-24 h-24 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-100 sm:-mt-34">
               <Image
                 src="/placeholder.svg?height=96&width=96"
                 alt="캐릭터 프로필"
                 width={96}
                 height={96}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover "
               />
             </div>
             <Button
               variant="outline"
               size="icon"
-              className="absolute -bottom-1 -right-1 h-7 w-7 rounded-full bg-white shadow-sm"
+              className="absolute bottom-0 left-17 sm:bottom-10 sm:right-0 h-7 w-7 rounded-full bg-white shadow-sm border-gray-300"
             >
               <Edit3 className="h-3 w-3" />
             </Button>
@@ -50,11 +50,13 @@ export function CharacterProfile() {
 
           <div className="flex-1 sm:mb-2">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">엘라리온</h1>
-                <p className="text-gray-600">하이 엘프 마법사</p>
+              <div className="flex flex-col sm:gap-2">
+                <h1 className="text-2xl font-bold text-gray-900 sm:mt-3">
+                  엘라리온
+                </h1>
+                <p className="text-gray-600 ">하이 엘프 마법사</p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 sm:mb-3">
                 <Badge
                   variant="secondary"
                   className="bg-mint-100 text-mint-700 hover:bg-mint-200"
@@ -112,7 +114,7 @@ export function LocationProfile() {
       <CardContent className="relative px-6 pb-6">
         <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-12">
           <div className="relative">
-            <div className="w-24 h-24 rounded-lg border-4 border-white shadow-lg overflow-hidden bg-gray-100">
+            <div className="w-24 h-24 rounded-lg border-4 border-white shadow-lg overflow-hidden bg-gray-100 -mt-8">
               <Image
                 src="/placeholder.svg?height=96&width=96"
                 alt="장소 이미지"
