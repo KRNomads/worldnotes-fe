@@ -18,7 +18,7 @@ export default function NoteLayout({
 
       {/* 데스크탑 레이아웃 */}
       <div className="flex w-full gap-6 mt-8">
-        <div className="hidden lg:block w-80 shrink-0">
+        <div className="hidden lg:block w-90 shrink-0">
           <NoteList />
         </div>
         <div className="flex-1 overflow-hidden">{children}</div>

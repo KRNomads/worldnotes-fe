@@ -83,7 +83,7 @@ function NoteCreateButton({
         <Plus className="h-4 w-4 mr-1" /> 새 노트
       </Button>
       {open && (
-        <div className="absolute z-10 mt-2 w-40 bg-white border rounded-md shadow-md">
+        <div className="absolute z-10 mt-2 w-25 bg-white border rounded-md shadow-md">
           {NOTE_TYPES.map((type) => (
             <button
               key={type}
@@ -186,7 +186,7 @@ export function NoteList() {
       <div
         className={`
           lg:relative lg:translate-x-0 lg:shadow-none lg:bg-transparent lg:z-auto
-          fixed inset-y-0 left-0 z-50 w-80 bg-white shadow-lg transform transition-all duration-300
+          fixed inset-y-0 left-0 z-50 w-90 bg-white shadow-lg transform transition-all duration-300
           ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
         `}
       >
