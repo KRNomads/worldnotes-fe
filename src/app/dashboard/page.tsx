@@ -1,43 +1,87 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+
+import {
+  Plus,
+  BookOpen,
+  Users,
+  Calendar,
+  MoreVertical,
+  Trash2,
+} from "lucide-react";
+import { Button } from "@/shared/ui/button";
+import { Card, CardContent } from "@/shared/ui/card";
+import { Badge } from "@/shared/ui/badge";
 import { useRouter } from "next/navigation";
-import styles from "./page.module.scss";
-import Sidebar from "@/widgets/sidebar/sidebar";
 import { useProjectStore } from "@/entities/project/store/projectStore";
-import LoadingSpinner from "@/shared/ui/LoadingSpinner/LoadingSpinner";
+import { useEffect, useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/shared/ui/alert-dialog";
 
 export default function Dashboard() {
   const router = useRouter();
   const {
     projects,
     isLoading,
-    error,
     fetchUserProjects,
     createProject,
-    updateProject,
     deleteProject,
   } = useProjectStore();
 
-  // 수정 관련 상태 추가
-  const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
-  const [editedTitle, setEditedTitle] = useState("");
-
   // 삭제 확인 모달 상태
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
+
+  const keywords = ["판타지", "마법", "중세", "모험"];
+  const noteCount = 20;
+  const author = "고쳐야함";
+  const image = null;
 
   // 컴포넌트 마운트 시 사용자의 프로젝트 목록 가져오기
   useEffect(() => {
     fetchUserProjects();
   }, [fetchUserProjects]);
 
+  const handleMenuClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  // 상대적 시간 계산 함수
+  const getRelativeTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 1) return "어제";
+    if (diffDays <= 7) return `${diffDays}일 전`;
+    if (diffDays <= 30) return `${Math.ceil(diffDays / 7)}주 전`;
+    return dateString.slice(5); // MM-DD 형태로 표시
+  };
+
   // 새 프로젝트 생성 핸들러
   const handleNewProject = async () => {
     try {
       // 기본 "새 작품" 타이틀로 빈 프로젝트 생성
       const newProject = await createProject({
-        title: "새 작품",
+        title: "새 프로젝트",
       });
 
       console.log("생성된 프로젝트:", newProject);
@@ -53,66 +97,18 @@ export default function Dashboard() {
     }
   };
 
-  // 기존 프로젝트 클릭 핸들러
-  const handleProjectClick = (projectId: string) => {
-    // 편집 모드일 때는 프로젝트로 이동하지 않음
-    if (editingProjectId === projectId) {
-      return;
-    }
-    router.push(`/project/${projectId}`);
-  };
-
-  // 수정 버튼 클릭 핸들러
-  const handleEditClick = (
-    event: React.MouseEvent,
-    projectId: string,
-    currentTitle: string
-  ) => {
-    event.stopPropagation(); // 이벤트 버블링 방지
-    setEditingProjectId(projectId);
-    setEditedTitle(currentTitle);
-  };
-
-  // 타이틀 변경 저장 핸들러
-  const handleSaveTitle = async (
-    event: React.MouseEvent,
-    projectId: string
-  ) => {
-    event.stopPropagation(); // 이벤트 버블링 방지
-
-    if (!editedTitle.trim()) {
-      alert("제목을 입력해주세요.");
-      return;
-    }
-
-    try {
-      await updateProject(projectId, { title: editedTitle });
-      setEditingProjectId(null);
-    } catch (error) {
-      console.error("프로젝트 제목 업데이트 실패:", error);
-      alert("제목 변경에 실패했습니다. 다시 시도해주세요.");
-    }
-  };
-
-  // 편집 취소 핸들러
-  const handleCancelEdit = (event: React.MouseEvent) => {
-    event.stopPropagation(); // 이벤트 버블링 방지
-    setEditingProjectId(null);
-  };
-
   // 삭제 버튼 클릭 핸들러
   const handleDeleteClick = (event: React.MouseEvent, projectId: string) => {
-    event.stopPropagation(); // 이벤트 버블링 방지
+    event.stopPropagation();
     setProjectToDelete(projectId);
-    setShowDeleteConfirm(true);
+    setDeleteDialogOpen(true);
   };
 
-  // 삭제 확인 핸들러
   const handleConfirmDelete = async () => {
     if (projectToDelete) {
       try {
         await deleteProject(projectToDelete);
-        setShowDeleteConfirm(false);
+        setDeleteDialogOpen(false); // 다이얼로그 닫기
         setProjectToDelete(null);
       } catch (error) {
         console.error("프로젝트 삭제 실패:", error);
@@ -121,152 +117,265 @@ export default function Dashboard() {
     }
   };
 
-  // 삭제 취소 핸들러
-  const handleCancelDelete = () => {
-    setShowDeleteConfirm(false);
-    setProjectToDelete(null);
-  };
-
   return (
-    <div className={styles.container}>
-      {/* 사이드바 컴포넌트 */}
-      <Sidebar activeItem="home" isProjectSidebar={false} />
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-100 sticky top-0 z-10">
+        <div className="max-w-4xl mx-auto px-4 py-6">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-light text-gray-800 tracking-wide">
+              WorldNote
+            </h1>
+            <Button
+              className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-full px-6 py-2 shadow-sm"
+              onClick={handleNewProject}
+              disabled={isLoading}
+            >
+              <Plus className="w-4 h-4 mr-2" />새 프로젝트
+            </Button>
+          </div>
+        </div>
+      </header>
 
-      {/* 메인 콘텐츠 영역 */}
-      <div className={styles.mainArea}>
-        {/* 헤더 */}
-        <div className={styles.header}>
-          <h1 className={styles.welcomeMessage}>안녕하세요!</h1>
-          <button
-            className={styles.newProjectButton}
-            onClick={handleNewProject}
-            disabled={isLoading}
-          >
-            {isLoading ? "생성 중..." : "+ 새 작품"}
-          </button>
+      {/* Main Content */}
+      <main className="max-w-4xl mx-auto px-4 py-12">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-light text-gray-700 mb-4">
+            나의 세계관
+          </h2>
+          <p className="text-gray-500 text-lg font-light">
+            창작의 여정을 시작해보세요
+          </p>
         </div>
 
-        {/* 최근 작품 섹션 */}
-        <h2 className={styles.sectionTitle}>최근 작품</h2>
-
-        {/* 조건부 렌더링 */}
-        {isLoading ? (
-          <div className={styles.loadingContainer}>
-            <LoadingSpinner />
-            <p>프로젝트를 불러오는 중...</p>
-          </div>
-        ) : error ? (
-          <div className={styles.errorContainer}>
-            <p>{error}</p>
-            <button onClick={fetchUserProjects} className={styles.retryButton}>
-              다시 시도
-            </button>
-          </div>
-        ) : (
-          <div className={styles.projectsContainer}>
-            {projects.length === 0 ? (
-              <p>최근 작업한 작품이 없습니다.</p>
-            ) : (
-              projects.map((project) => (
-                <div
-                  key={project.id}
-                  className={styles.projectCard}
-                  onClick={() => handleProjectClick(project.id)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      handleProjectClick(project.id);
-                    }
-                  }}
-                >
-                  <div className={styles.projectHeader}>
-                    {editingProjectId === project.id ? (
-                      <div
-                        className={styles.editTitleContainer}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <input
-                          type="text"
-                          className={styles.editTitleInput}
-                          value={editedTitle}
-                          onChange={(e) => setEditedTitle(e.target.value)}
-                          autoFocus
-                        />
-                        <div className={styles.editButtons}>
-                          <button
-                            className={styles.saveButton}
-                            onClick={(e) => handleSaveTitle(e, project.id)}
+        {/* Projects Grid */}
+        <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+          {projects.map((project) => (
+            <div key={project.id} className="relative group">
+              <Link href={`/project/${project.id}`}>
+                <Card className="group hover:shadow-lg transition-all duration-300 border-0 shadow-sm bg-white rounded-2xl overflow-hidden cursor-pointer">
+                  {/* 데스크톱: 세로형 레이아웃 */}
+                  <div className="hidden md:block">
+                    <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
+                      <Image
+                        src={image || "/placeholder.svg"}
+                        alt={project.title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <div className="absolute top-3 right-3 flex flex-wrap justify-end gap-1.5 max-w-[70%]">
+                        {keywords.slice(0, 2).map((keyword, index) => (
+                          <Badge
+                            key={index}
+                            variant="secondary"
+                            className="bg-white/90 text-gray-700 rounded-full px-3 py-1 text-xs font-medium"
                           >
-                            저장
-                          </button>
-                          <button
-                            className={styles.cancelButton}
-                            onClick={handleCancelEdit}
+                            {keyword}
+                          </Badge>
+                        ))}
+                        {keywords.length > 2 && (
+                          <Badge
+                            variant="secondary"
+                            className="bg-white/90 text-gray-700 rounded-full px-3 py-1 text-xs font-medium"
                           >
-                            취소
-                          </button>
+                            +{keywords.length - 2}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                    <CardContent className="p-6 relative">
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="text-xl font-medium text-gray-800 group-hover:text-emerald-600 transition-colors flex-1 pr-2">
+                          {project.title}
+                        </h3>
+                        <div className="flex-shrink-0">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 bg-white/90 hover:bg-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={handleMenuClick}
+                              >
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-40">
+                              <DropdownMenuItem
+                                className="flex items-center gap-2 text-red-600 focus:text-red-600"
+                                onClick={(e) =>
+                                  handleDeleteClick(e, project.id)
+                                }
+                              >
+                                <Trash2 className="h-4 w-4" />
+                                삭제
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       </div>
-                    ) : (
-                      <>
-                        <h3 className={styles.projectTitle}>{project.title}</h3>
-                        <button
-                          className={styles.editButton}
-                          onClick={(e) =>
-                            handleEditClick(e, project.id, project.title)
-                          }
-                        >
-                          수정
-                        </button>
-                      </>
-                    )}
+                      <p className="text-gray-500 text-sm mb-4 line-clamp-2 leading-relaxed h-10">
+                        {project.description}
+                      </p>
+                      <div className="flex items-center justify-between text-xs text-gray-400">
+                        <div className="flex items-center gap-4">
+                          <span className="flex items-center gap-1">
+                            <Users className="w-3 h-3" />
+                            {author}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <BookOpen className="w-3 h-3" />
+                            {noteCount}개 노트
+                          </span>
+                        </div>
+                        <div className="flex flex-col items-end">
+                          <span className="text-[10px] text-gray-400 mb-0.5">
+                            최근 수정
+                          </span>
+                          <span className="flex items-center gap-1 text-gray-500">
+                            <Calendar className="w-3 h-3" />
+                            {getRelativeTime(project.lastModified)}
+                          </span>
+                        </div>
+                      </div>
+                    </CardContent>
                   </div>
 
-                  <div className={styles.projectFooter}>
-                    <p className={styles.lastModified}>
-                      {project.lastModified} 수정
-                    </p>
-                    <button
-                      className={styles.deleteButton}
+                  {/* 모바일: 가로형 레이아웃 */}
+                  <div className="md:hidden flex min-h-[120px]">
+                    <div className="w-28 h-[120px] bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden flex-shrink-0 ml-2">
+                      <div className="relative w-full h-full">
+                        <Image
+                          src={image || "/placeholder.svg"}
+                          alt={project.title}
+                          fill
+                          className="object-cover block group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    </div>
+                    <div className="p-3 flex-1 flex flex-col">
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {keywords.slice(0, 2).map((keyword, index) => (
+                          <Badge
+                            key={index}
+                            variant="secondary"
+                            className="bg-gray-100 text-gray-600 rounded-full px-2 py-0.5 text-xs"
+                          >
+                            {keyword}
+                          </Badge>
+                        ))}
+                        {keywords.length > 2 && (
+                          <Badge
+                            variant="secondary"
+                            className="bg-gray-100 text-gray-600 rounded-full px-2 py-0.5 text-xs"
+                          >
+                            +{keywords.length - 2}
+                          </Badge>
+                        )}
+                      </div>
+
+                      <h3 className="text-base font-medium text-gray-800 mb-1 group-hover:text-emerald-600 transition-colors line-clamp-1">
+                        {project.title}
+                      </h3>
+
+                      <p className="text-gray-500 text-xs mb-3 line-clamp-2 leading-relaxed h-8">
+                        {project.description}
+                      </p>
+
+                      <div className="flex items-center justify-between text-xs text-gray-400 mt-auto">
+                        <div className="flex items-center gap-3">
+                          <span className="flex items-center gap-1">
+                            <Users className="w-3 h-3" />
+                            {author}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <BookOpen className="w-3 h-3" />
+                            {noteCount}개
+                          </span>
+                        </div>
+                        <div className="flex flex-col items-end">
+                          <span className="text-[10px] text-gray-400 leading-tight">
+                            최근 수정
+                          </span>
+                          <span className="flex items-center gap-1 text-gray-500 text-[11px]">
+                            <Calendar className="w-2.5 h-2.5" />
+                            {getRelativeTime(project.lastModified)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
+
+              {/* 모바일 전용 메뉴 버튼 */}
+              <div className="absolute top-3 right-3 z-10 md:hidden">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 bg-white/90 hover:bg-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={handleMenuClick}
+                    >
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-40">
+                    <DropdownMenuItem
+                      className="flex items-center gap-2 text-red-600 focus:text-red-600"
                       onClick={(e) => handleDeleteClick(e, project.id)}
                     >
+                      <Trash2 className="h-4 w-4" />
                       삭제
-                    </button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        )}
-
-        {/* 삭제 확인 모달 */}
-        {showDeleteConfirm && (
-          <div className={styles.modalOverlay}>
-            <div className={styles.modal}>
-              <h3>작품 삭제</h3>
-              <p>정말 이 작품을 삭제하시겠습니까?</p>
-              <p className={styles.warningText}>
-                이 작업은 되돌릴 수 없습니다.
-              </p>
-              <div className={styles.modalButtons}>
-                <button
-                  className={styles.cancelDeleteButton}
-                  onClick={handleCancelDelete}
-                >
-                  취소
-                </button>
-                <button
-                  className={styles.confirmDeleteButton}
-                  onClick={handleConfirmDelete}
-                >
-                  삭제
-                </button>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
+          ))}
+        </div>
+
+        {/* Empty State for new users */}
+        {projects.length === 0 && (
+          <div className="text-center py-20">
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <BookOpen className="w-12 h-12 text-gray-400" />
+            </div>
+            <h3 className="text-xl font-light text-gray-600 mb-2">
+              아직 프로젝트가 없습니다
+            </h3>
+            <p className="text-gray-400 mb-8">첫 번째 세계관을 만들어보세요</p>
+            <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-full px-8 py-3">
+              <Plus className="w-4 h-4 mr-2" />
+              프로젝트 시작하기
+            </Button>
           </div>
         )}
-      </div>
+      </main>
+
+      {/* 삭제 확인 다이얼로그 */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className="bg-white shadow-lg z-50">
+          <AlertDialogHeader>
+            <AlertDialogTitle>프로젝트 삭제</AlertDialogTitle>
+            <AlertDialogDescription>
+              정말로 이 프로젝트를 삭제하시겠습니까?
+              <br />
+              삭제된 프로젝트와 모든 노트는 복구할 수 없습니다.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>취소</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              삭제
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

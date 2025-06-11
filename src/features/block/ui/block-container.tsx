@@ -119,9 +119,6 @@ export const BlockContainer: React.FC<BlockContainerProps> = ({
         </Button>
       </div>
 
-      {/* 줄 추가 */}
-      <div className="border-b border-gray-300 mb-3" />
-
       {!block.isCollapsed && (
         <RenderBlockContent
           block={block}

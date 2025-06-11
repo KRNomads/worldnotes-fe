@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useNoteStore } from "@/entities/note/store/noteStore";
-import Sidebar from "@/widgets/sidebar/sidebar";
 import LoadingSpinner from "@/shared/ui/LoadingSpinner/LoadingSpinner";
 import styles from "./page.module.scss";
 import GenericBlockEditor from "@/widgets/generic-block-editor/generic-block-editor";
@@ -73,11 +72,11 @@ export default function NotePage() {
 
   return (
     <div className={styles.pageContainer}>
-      <Sidebar
+      {/* <Sidebar
         activeItem="notes"
         isProjectSidebar={true}
         projectId={projectId as string}
-      />
+      /> */}
 
       <main className={styles.mainContent}>
         <div className={styles.contentWrapper}>

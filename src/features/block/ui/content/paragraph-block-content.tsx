@@ -86,7 +86,7 @@ export default function ParagraphBlockContent({
     editorProps: {
       attributes: {
         class:
-          "flex w-full border border-input bg-background py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm overflow-y-hidden min-h-[100px] border-none focus-visible:ring-0 px-10 resize-none",
+          "flex w-full border border-input bg-background py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm overflow-y-hidden min-h-[100px] border-none focus-visible:ring-0 resize-none",
         placeholder: "텍스트를 입력하세요",
         style: "height: 100px;",
       },
@@ -130,7 +130,7 @@ export default function ParagraphBlockContent({
     if (editor) {
       const element = editor.view.dom as HTMLElement;
       element.className =
-        "flex w-full border border-input bg-background py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm overflow-y-hidden min-h-[100px] border-none focus-visible:ring-0 px-10 resize-none";
+        "flex w-full border border-input bg-background py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm overflow-y-hidden min-h-[100px] border-none focus-visible:ring-0 resize-none";
       element.setAttribute("placeholder", "텍스트를 입력하세요");
       element.style.height = "100px";
     }
@@ -177,7 +177,9 @@ export default function ParagraphBlockContent({
 
   return (
     <div className="relative pointer-events-auto select-text ">
-      <EditorContent editor={editor} />
+      <div className="bg-gray-50 p-3 rounded-md border border-gray-100">
+        <EditorContent editor={editor} />
+      </div>
 
       {showToolbar && (
         <FormatToolbar position={toolbarPosition} onFormat={handleFormat} />

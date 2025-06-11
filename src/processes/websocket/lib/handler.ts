@@ -4,7 +4,7 @@ import {
   BlockPayload,
   NotePayload,
   WebSocketMessage,
-} from "@/shared/types/socketMessage";
+} from "@/processes/websocket/types/socketMessage";
 import {
   mapBlockPayloadToBlock,
   mapNotePayloadToNote,

@@ -2,8 +2,10 @@
 
 import { useNoteStore } from "@/entities/note/store/noteStore";
 import { useProjectStore } from "@/entities/project/store/projectStore";
+import { ProjectSidebar } from "@/widgets/project-sidebar/project-sidebar";
+import { ProjectHeader } from "@/widgets/project-header/project-header";
 import { useParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function ProjectLayout({
   children,
@@ -13,6 +15,8 @@ export default function ProjectLayout({
   const { projectId } = useParams();
   const { setCurrentProject, fetchProject } = useProjectStore();
   const { fetchNotesByProject } = useNoteStore();
+
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (projectId) {
@@ -24,5 +28,14 @@ export default function ProjectLayout({
     }
   }, [projectId, fetchProject, fetchNotesByProject, setCurrentProject]);
 
-  return <>{children}</>;
+  return (
+    <div className="relative min-h-screen bg-gray-50">
+      <ProjectHeader onMenuClick={() => setSidebarOpen(true)} />
+      <ProjectSidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
+      <main className="pt-16 p-4 lg:p-6 max-w-6xl mx-auto">{children}</main>
+    </div>
+  );
 }

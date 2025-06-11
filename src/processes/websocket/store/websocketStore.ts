@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import stompClient from "@/processes/websocket/lib/stompClient";
 import { Message, StompSubscription } from "@stomp/stompjs";
-import { WebSocketMessage } from "@/shared/types/socketMessage";
 import { handleMessage } from "@/processes/websocket/lib/handler";
+import { WebSocketMessage } from "../types/socketMessage";
 
 interface WebSocketState {
   isConnected: boolean;
