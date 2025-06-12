@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Notebook, Plus, X } from "lucide-react";
+import { Notebook, Plus, SortDesc, X } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { useNoteStore } from "@/entities/note/store/noteStore";
@@ -10,6 +10,12 @@ import { Note, NoteType } from "@/entities/note/types/note";
 import SearchInput from "@/widgets/serchinput/serchInput";
 import { getInitialConsonantsWithEsHangul } from "@/shared/utils/hangul";
 import styles from "./note-list.module.scss";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/ui/dropdown-menu";
 
 // ─────────────────────────────────────────────
 // 상수
@@ -112,11 +118,23 @@ export function NoteList() {
   const [isOpen, setIsOpen] = useState(false);
 
   const { notes, setCurrentNote, createNote } = useNoteStore();
-
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
-  const [selectedNoteType, setSelectedNoteType] = useState<NoteType | "ALL">(
-    "ALL"
-  );
+
+  const noteTypes = [
+    { label: "전체", type: "ALL" },
+    { label: "캐릭터", type: "CHARACTER" },
+    { label: "설정", type: "DETAILS" },
+    { label: "장소", type: "PLACE" },
+    { label: "사건", type: "EVENT" },
+  ];
+  const sortOptions = [
+    { label: "최근수정순", value: "updatedAt" },
+    { label: "만든날짜순", value: "createdAt" },
+    { label: "이름순", value: "title" },
+  ];
+  const [activeFilter, setActiveFilter] = useState("ALL");
+  const [sortBy, setSortBy] = useState("updatedAt");
+
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleCreateNote = async (type: NoteType) => {
@@ -142,9 +160,9 @@ export function NoteList() {
 
   const displayedNotes = useMemo(() => {
     const typedNotes =
-      selectedNoteType === "ALL"
+      activeFilter === "ALL"
         ? processedNotes
-        : processedNotes.filter((note) => note.type === selectedNoteType);
+        : processedNotes.filter((note) => note.type === activeFilter);
 
     if (!searchQuery.trim()) return typedNotes;
 
@@ -163,7 +181,7 @@ export function NoteList() {
     });
 
     return merged;
-  }, [processedNotes, selectedNoteType, searchQuery]);
+  }, [processedNotes, activeFilter, searchQuery]);
 
   return (
     <>
@@ -211,38 +229,81 @@ export function NoteList() {
             <NoteCreateButton onSelectType={handleCreateNote} />
           </div>
 
-          {/* 노트 타입 필터 */}
-          <div className="flex space-x-2 overflow-x-auto pb-2">
-            {["ALL", ...NOTE_TYPES].map((type) => (
-              <Button
-                key={type}
-                variant={selectedNoteType === type ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedNoteType(type as NoteType | "ALL")}
-              >
-                {type === "ALL" ? "전체" : getTypeName(type)}
-              </Button>
-            ))}
-          </div>
+          {/* 필터링 및 정렬 컨트롤 */}
+          <div className="flex flex-col gap-3 mt-3">
+            {/* 필터 버튼 그룹 */}
+            <div className="flex flex-wrap gap-1">
+              {noteTypes.map((noteType) => (
+                <Button
+                  key={noteType.label}
+                  variant={
+                    activeFilter === noteType.type ? "default" : "outline"
+                  }
+                  size="sm"
+                  className={`text-xs ${
+                    activeFilter === noteType.type
+                      ? "bg-teal-600 hover:bg-teal-700"
+                      : "hover:bg-teal-50 hover:text-teal-600"
+                  }`}
+                  onClick={() => setActiveFilter(noteType.type)}
+                >
+                  {noteType.label}
+                </Button>
+              ))}
+            </div>
 
-          {/* 검색 */}
-          <SearchInput<ProcessedNote>
-            placeholder={`노트 이름 또는 초성으로 검색...`}
-            value={searchQuery}
-            onChange={setSearchQuery}
-            onClear={() => setSearchQuery("")}
-            data={processedNotes}
-            fuseOptions={{
-              keys: [
-                { name: "title", weight: 0.7 },
-                { name: "titleChosung", weight: 0.3 },
-              ],
-              threshold: 0.4,
-              ignoreLocation: true,
-            }}
-            onSearchResults={() => {}}
-            className={styles.customSearchInput}
-          />
+            {/* 검색 */}
+            <SearchInput<ProcessedNote>
+              placeholder={`노트 이름 또는 초성으로 검색...`}
+              value={searchQuery}
+              onChange={setSearchQuery}
+              onClear={() => setSearchQuery("")}
+              data={processedNotes}
+              fuseOptions={{
+                keys: [
+                  { name: "title", weight: 0.7 },
+                  { name: "titleChosung", weight: 0.3 },
+                ],
+                threshold: 0.4,
+                ignoreLocation: true,
+              }}
+              onSearchResults={() => {}}
+              className={styles.customSearchInput}
+            />
+
+            {/* 정렬 드롭다운 */}
+            <div className="flex items-center justify-between">
+              <div className="text-xs text-gray-500">
+                {displayedNotes.length}개의 노트
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs flex items-center gap-1"
+                  >
+                    <SortDesc className="h-3 w-3" />
+                    {
+                      sortOptions.find((option) => option.value === sortBy)
+                        ?.label
+                    }
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {sortOptions.map((option) => (
+                    <DropdownMenuItem
+                      key={option.value}
+                      className="text-xs"
+                      onClick={() => setSortBy(option.value)}
+                    >
+                      {option.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
 
           {/* 노트 카드 목록 */}
           <div className="space-y-2">
