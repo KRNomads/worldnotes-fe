@@ -1,0 +1,113 @@
+import {
+  Calendar,
+  MapPin,
+  Users,
+  AlertTriangle,
+  Target,
+  Globe,
+  Star,
+  Shield,
+  BookOpen,
+  Zap,
+  History,
+} from "lucide-react";
+import { EventTemplate } from "../type/TemplateMap";
+
+export const EVENT_BASICINFO_TEMPLATES: EventTemplate = {
+  basic: [
+    {
+      key: "title",
+      label: "사건명",
+      icon: BookOpen,
+      color: "bg-blue-100 text-blue-700",
+      defaultValue: "이름 없는 사건",
+      popular: true,
+    },
+    {
+      key: "date",
+      label: "발생일",
+      icon: Calendar,
+      color: "bg-yellow-100 text-yellow-700",
+      defaultValue: "미상",
+      popular: true,
+    },
+    {
+      key: "location",
+      label: "장소",
+      icon: MapPin,
+      color: "bg-purple-100 text-purple-700",
+      defaultValue: "불명",
+      popular: true,
+    },
+  ],
+  type: [
+    {
+      key: "eventType",
+      label: "사건 유형",
+      icon: Target,
+      color: "bg-orange-100 text-orange-700",
+      defaultValue: "전쟁",
+      popular: true,
+    },
+    {
+      key: "scale",
+      label: "규모",
+      icon: Globe,
+      color: "bg-emerald-100 text-emerald-700",
+      defaultValue: "지역적",
+      popular: false,
+    },
+    {
+      key: "dangerLevel",
+      label: "위험도",
+      icon: AlertTriangle,
+      color: "bg-red-100 text-red-700",
+      defaultValue: "높음",
+      popular: false,
+    },
+  ],
+  participants: [
+    {
+      key: "involvedFactions",
+      label: "관련 세력",
+      icon: Users,
+      color: "bg-teal-100 text-teal-700",
+      defaultValue: "불명",
+      popular: true,
+    },
+    {
+      key: "keyFigures",
+      label: "핵심 인물",
+      icon: Star,
+      color: "bg-amber-100 text-amber-700",
+      defaultValue: "불명",
+      popular: true,
+    },
+  ],
+  consequence: [
+    {
+      key: "cause",
+      label: "원인",
+      icon: History,
+      color: "bg-gray-100 text-gray-700",
+      defaultValue: "불명",
+      popular: false,
+    },
+    {
+      key: "result",
+      label: "결과",
+      icon: Zap,
+      color: "bg-indigo-100 text-indigo-700",
+      defaultValue: "미확인",
+      popular: true,
+    },
+    {
+      key: "aftermath",
+      label: "후속 영향",
+      icon: Shield,
+      color: "bg-slate-100 text-slate-700",
+      defaultValue: "미확인",
+      popular: false,
+    },
+  ],
+};

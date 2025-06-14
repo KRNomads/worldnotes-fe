@@ -82,18 +82,6 @@ export function ProjectSidebar({ isOpen, onClose }: ProjectSidebarProps) {
                 <BookOpen className="h-4 w-4 mr-3 text-gray-500" />
                 모든 노트
               </Link>
-              <Link
-                href={`/project/${projectId}/note`}
-                className={cn(
-                  "flex items-center px-2 py-2 text-sm rounded-md",
-                  pathname === `/project/${projectId}/note`
-                    ? "bg-gray-100 text-mint-600"
-                    : "text-gray-700 hover:bg-gray-100 hover:text-mint-600"
-                )}
-              >
-                <BookOpen className="h-4 w-4 mr-3 text-gray-500" />
-                모든 노트 2
-              </Link>
             </div>
           </div>
 

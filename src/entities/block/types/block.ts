@@ -89,6 +89,7 @@ export interface BlockUpdateRequest {
   title?: string | null;
   type?: BlockType;
   properties?: BlockPropertiesUnion;
+  isCollapsed?: boolean;
 }
 
 // API 응답은 대부분 Block 타입 객체 또는 그 배열일 것으로 예상

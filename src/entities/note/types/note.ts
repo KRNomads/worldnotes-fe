@@ -3,7 +3,7 @@ export interface Note {
   id: string;
   projectId: string;
   title: string;
-  type: string;
+  type: NoteType;
   position: number; // 이건 노트순서
   lastModified?: string;
 }
@@ -13,7 +13,7 @@ export interface NoteResponse {
   noteId: string;
   projectId: string;
   title: string;
-  type: string;
+  type: NoteType;
   position: number;
 }
 
@@ -21,7 +21,7 @@ export interface NoteResponse {
 export interface NoteCreateRequest {
   projectId: string;
   title: string;
-  type: string; // "BASIC_INFO" | "CHARACTER" | "DETAILS"
+  type: NoteType;
 }
 
 // 노트 업데이트 요청 타입
@@ -35,6 +35,7 @@ export const NOTE_TYPES = {
   EVENT: "EVENT",
   PLACE: "PLACE",
   DETAILS: "DETAILS",
+  ITEM: "ITEM",
 } as const;
 
 // 노트 타입 (타입 안정성을 위해 필요하다면 사용)

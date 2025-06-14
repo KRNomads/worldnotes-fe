@@ -58,18 +58,18 @@ export function UserProfile() {
               <User className="mr-2 h-4 w-4" />
               <span>프로필</span>
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            {/* <DropdownMenuItem>
               <CreditCard className="mr-2 h-4 w-4" />
               <span>결제 정보</span>
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
             <DropdownMenuItem>
               <Settings className="mr-2 h-4 w-4" />
               <span>설정</span>
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            {/* <DropdownMenuItem>
               <Bell className="mr-2 h-4 w-4" />
               <span>알림</span>
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem>
