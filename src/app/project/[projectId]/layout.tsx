@@ -6,7 +6,6 @@ import type React from "react";
 import { Menu } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { ProjectSidebar } from "@/widgets/project-sidebar/project-sidebar";
-import { ModeToggle } from "@/widgets/mode-toggle/mode-toggle";
 import { useNoteStore } from "@/entities/note/store/noteStore";
 import { useProjectStore } from "@/entities/project/store/projectStore";
 
@@ -44,14 +43,10 @@ export default function ProjectLayout({
             variant="ghost"
             size="icon"
             onClick={() => setSidebarOpen(true)}
-            className="md:hidden"
           >
             <Menu className="w-5 h-5" />
             <span className="sr-only">Open sidebar</span>
           </Button>
-          <div className="flex items-center">
-            <h1 className="text-xl font-bold text-[#81DFCF]">WorldNote</h1>
-          </div>
         </header>
 
         <main className="flex-1 pt-4 p-4 lg:p-6 max-w-6xl mx-auto w-full">

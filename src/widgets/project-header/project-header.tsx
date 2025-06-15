@@ -1,6 +1,3 @@
-import { Button } from "@/shared/ui/button";
-import { Edit2, Share2 } from "lucide-react";
-
 interface Project {
   id: string;
   title: string;
@@ -29,17 +26,6 @@ export function ProjectHeader({ project }: ProjectHeaderProps) {
             {project.description}
           </p>
         </div>
-      </div>
-
-      <div className="flex flex-wrap gap-2">
-        <Button variant="outline" size="sm" className="gap-1">
-          <Edit2 className="w-4 h-4" />
-          편집
-        </Button>
-        <Button variant="outline" size="sm" className="gap-1">
-          <Share2 className="w-4 h-4" />
-          공유
-        </Button>
       </div>
     </div>
   );

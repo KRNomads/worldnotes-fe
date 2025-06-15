@@ -20,25 +20,64 @@ interface ProjectSidebarProps {
 }
 
 export function ProjectSidebar({ isOpen, onClose }: ProjectSidebarProps) {
-  const { id: projectId } = useParams();
+  const params = useParams();
   const pathname = usePathname();
+
+  // projectId 파라미터 안전하게 가져오기
+  const projectId = Array.isArray(params.projectId)
+    ? params.projectId[0]
+    : params.projectId;
+
+  // 프로젝트 ID가 없으면 사이드바를 렌더링하지 않음
+  if (!projectId) {
+    console.log("ProjectSidebar - projectId가 없습니다"); // 디버깅용
+    return null;
+  }
+
+  const menuItems = [
+    {
+      title: "기본 정보",
+      href: `/project/${projectId}`,
+      icon: Home,
+    },
+    {
+      title: "모든 노트",
+      href: `/project/${projectId}/notes`,
+      icon: BookOpen,
+    },
+  ];
+
+  const worldItems = [
+    {
+      title: "관계",
+      href: `/project/${projectId}/relationships`,
+      icon: Users,
+    },
+    {
+      title: "지도",
+      href: `/project/${projectId}/maps`,
+      icon: Map,
+    },
+    {
+      title: "플롯",
+      href: `/project/${projectId}/plots`,
+      icon: Calendar,
+    },
+  ];
 
   return (
     <>
-      {/* Overlay background when sidebar is open */}
+      {/* Overlay background when sidebar is open - 데스크탑에서도 표시 */}
       {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/20 z-40 md:hidden"
-          onClick={onClose}
-        />
+        <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
       )}
 
       <div
-        className={`fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="p-3 border-b flex items-center justify-between">
+        <div className="p-3 border-none flex items-center justify-between">
           <Link
             href={`/dashboard`}
             className="text-xl font-medium text-gray-800 hover:underline"
@@ -61,30 +100,24 @@ export function ProjectSidebar({ isOpen, onClose }: ProjectSidebarProps) {
               프로젝트
             </h3>
             <div className="space-y-1">
-              <Link
-                href={`/projects/${projectId}`}
-                className={cn(
-                  "flex items-center px-2 py-2 text-sm rounded-md",
-                  pathname === `/projects/${projectId}`
-                    ? "bg-gray-100 text-mint-600"
-                    : "text-gray-700 hover:bg-gray-100 hover:text-mint-600"
-                )}
-              >
-                <Home className="h-4 w-4 mr-3 text-gray-500" />
-                기본 정보
-              </Link>
-              <Link
-                href={`/projects/${projectId}/notes`}
-                className={cn(
-                  "flex items-center px-2 py-2 text-sm rounded-md",
-                  pathname === `/projects/${projectId}/notes`
-                    ? "bg-gray-100 text-mint-600"
-                    : "text-gray-700 hover:bg-gray-100 hover:text-mint-600"
-                )}
-              >
-                <BookOpen className="h-4 w-4 mr-3 text-gray-500" />
-                모든 노트
-              </Link>
+              {menuItems.map((item) => {
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={cn(
+                      "flex items-center px-2 py-2 text-sm rounded-md transition-colors",
+                      pathname === item.href
+                        ? "bg-gray-100 text-[#81DFCF] font-medium"
+                        : "text-gray-700 hover:bg-gray-100 hover:text-[#81DFCF]"
+                    )}
+                    onClick={() => onClose()} // 링크 클릭 시 사이드바 닫기
+                  >
+                    <item.icon className="h-4 w-4 mr-3 text-gray-500" />
+                    {item.title}
+                  </Link>
+                );
+              })}
             </div>
           </div>
 
@@ -93,34 +126,35 @@ export function ProjectSidebar({ isOpen, onClose }: ProjectSidebarProps) {
               세계관 요소
             </h3>
             <div className="space-y-1">
-              <Link
-                href="#"
-                className="flex items-center px-2 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100 hover:text-mint-600"
-              >
-                <Users className="h-4 w-4 mr-3 text-gray-500" />
-                관계
-              </Link>
-              <Link
-                href="#"
-                className="flex items-center px-2 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100 hover:text-mint-600"
-              >
-                <Map className="h-4 w-4 mr-3 text-gray-500" />
-                지도
-              </Link>
-              <Link
-                href="#"
-                className="flex items-center px-2 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100 hover:text-mint-600"
-              >
-                <Calendar className="h-4 w-4 mr-3 text-gray-500" />
-                플롯
-              </Link>
+              {worldItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "flex items-center px-2 py-2 text-sm rounded-md transition-colors",
+                    pathname === item.href
+                      ? "bg-gray-100 text-[#81DFCF] font-medium"
+                      : "text-gray-700 hover:bg-gray-100 hover:text-[#81DFCF]"
+                  )}
+                  onClick={() => onClose()} // 링크 클릭 시 사이드바 닫기
+                >
+                  <item.icon className="h-4 w-4 mr-3 text-gray-500" />
+                  {item.title}
+                </Link>
+              ))}
             </div>
           </div>
 
           <div className="mt-auto">
             <Link
-              href="#"
-              className="flex items-center px-2 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100 hover:text-mint-600"
+              href={`/project/${projectId}/settings`}
+              className={cn(
+                "flex items-center px-2 py-2 text-sm rounded-md transition-colors",
+                pathname === `/project/${projectId}/settings`
+                  ? "bg-gray-100 text-[#81DFCF] font-medium"
+                  : "text-gray-700 hover:bg-gray-100 hover:text-[#81DFCF]"
+              )}
+              onClick={() => onClose()} // 링크 클릭 시 사이드바 닫기
             >
               <Settings className="h-4 w-4 mr-3 text-gray-500" />
               설정
