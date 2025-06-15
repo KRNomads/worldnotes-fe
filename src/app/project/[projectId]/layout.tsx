@@ -1,18 +1,21 @@
 "use client";
 
-import { useNoteStore } from "@/entities/note/store/noteStore";
-import { useProjectStore } from "@/entities/project/store/projectStore";
-import { ProjectSidebar } from "@/widgets/project-sidebar/project-sidebar";
-import { ProjectHeader } from "@/widgets/project-header/project-header";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import type React from "react";
+import { Menu } from "lucide-react";
+import { Button } from "@/shared/ui/button";
+import { ProjectSidebar } from "@/widgets/project-sidebar/project-sidebar";
+import { ModeToggle } from "@/widgets/mode-toggle/mode-toggle";
+import { useNoteStore } from "@/entities/note/store/noteStore";
+import { useProjectStore } from "@/entities/project/store/projectStore";
 
 export default function ProjectLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { projectId } = useParams();
+  const { id: projectId } = useParams();
   const { setCurrentProject, fetchProject } = useProjectStore();
   const { fetchNotesByProject } = useNoteStore();
 
@@ -29,13 +32,32 @@ export default function ProjectLayout({
   }, [projectId, fetchProject, fetchNotesByProject, setCurrentProject]);
 
   return (
-    <div className="relative min-h-screen bg-gray-50">
-      <ProjectHeader onMenuClick={() => setSidebarOpen(true)} />
+    <div className="flex min-h-screen bg-gray-50">
       <ProjectSidebar
         isOpen={isSidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
-      <main className="pt-16 p-4 lg:p-6 max-w-6xl mx-auto">{children}</main>
+
+      <div className="flex flex-col flex-1">
+        <header className="sticky top-0 z-10 flex items-center justify-between h-16 px-4 border-b bg-white/80 backdrop-blur-sm border-gray-200">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setSidebarOpen(true)}
+            className="md:hidden"
+          >
+            <Menu className="w-5 h-5" />
+            <span className="sr-only">Open sidebar</span>
+          </Button>
+          <div className="flex items-center">
+            <h1 className="text-xl font-bold text-[#81DFCF]">WorldNote</h1>
+          </div>
+        </header>
+
+        <main className="flex-1 pt-4 p-4 lg:p-6 max-w-6xl mx-auto w-full">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

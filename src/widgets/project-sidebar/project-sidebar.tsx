@@ -20,18 +20,21 @@ interface ProjectSidebarProps {
 }
 
 export function ProjectSidebar({ isOpen, onClose }: ProjectSidebarProps) {
-  const { projectId } = useParams();
+  const { id: projectId } = useParams();
   const pathname = usePathname();
 
   return (
     <>
       {/* Overlay background when sidebar is open */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
+        <div
+          className="fixed inset-0 bg-black/20 z-40 md:hidden"
+          onClick={onClose}
+        />
       )}
 
       <div
-        className={`fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
+        className={`fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out md:translate-x-0 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -59,10 +62,10 @@ export function ProjectSidebar({ isOpen, onClose }: ProjectSidebarProps) {
             </h3>
             <div className="space-y-1">
               <Link
-                href={`/project/${projectId}`}
+                href={`/projects/${projectId}`}
                 className={cn(
                   "flex items-center px-2 py-2 text-sm rounded-md",
-                  pathname === `/project/${projectId}`
+                  pathname === `/projects/${projectId}`
                     ? "bg-gray-100 text-mint-600"
                     : "text-gray-700 hover:bg-gray-100 hover:text-mint-600"
                 )}
@@ -71,10 +74,10 @@ export function ProjectSidebar({ isOpen, onClose }: ProjectSidebarProps) {
                 기본 정보
               </Link>
               <Link
-                href={`/project/${projectId}/notes`}
+                href={`/projects/${projectId}/notes`}
                 className={cn(
                   "flex items-center px-2 py-2 text-sm rounded-md",
-                  pathname === `/project/${projectId}/notes`
+                  pathname === `/projects/${projectId}/notes`
                     ? "bg-gray-100 text-mint-600"
                     : "text-gray-700 hover:bg-gray-100 hover:text-mint-600"
                 )}

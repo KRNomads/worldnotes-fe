@@ -1,24 +1,45 @@
-"use client";
-
-import { Menu } from "lucide-react";
 import { Button } from "@/shared/ui/button";
-import { UserProfile } from "@/features/user-profile/user-profile";
-import { WebsocketToggleButton } from "@/features/websocket/websocket-toggle-button";
+import { Edit2, Share2 } from "lucide-react";
 
-interface ProjectHeaderProps {
-  onMenuClick: () => void;
+interface Project {
+  id: string;
+  title: string;
+  description: string;
+  coverImage: string;
 }
 
-export function ProjectHeader({ onMenuClick }: ProjectHeaderProps) {
+interface ProjectHeaderProps {
+  project: Project;
+}
+
+export function ProjectHeader({ project }: ProjectHeaderProps) {
   return (
-    <div className="fixed top-0 left-0 right-0 z-40 h-14 bg-white shadow flex items-center justify-between px-4">
-      <Button variant="ghost" size="icon" onClick={onMenuClick}>
-        <Menu className="h-5 w-5" />
-      </Button>
-      <div className="flex items-center space-x-3">
-        {/* 추가적인 아이콘들 */}
-        <WebsocketToggleButton />
-        <UserProfile />
+    <div className="mb-6">
+      <div className="relative h-40 md:h-60 rounded-lg overflow-hidden mb-4">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={project.coverImage || "/placeholder.svg"}
+          alt={project.title}
+          className="object-cover w-full h-full"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="absolute bottom-0 left-0 p-4 text-white">
+          <h1 className="text-2xl md:text-3xl font-bold">{project.title}</h1>
+          <p className="mt-1 text-sm md:text-base text-gray-200">
+            {project.description}
+          </p>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" size="sm" className="gap-1">
+          <Edit2 className="w-4 h-4" />
+          편집
+        </Button>
+        <Button variant="outline" size="sm" className="gap-1">
+          <Share2 className="w-4 h-4" />
+          공유
+        </Button>
       </div>
     </div>
   );
