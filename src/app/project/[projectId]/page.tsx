@@ -35,7 +35,7 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
       {activeTab === "기본 정보" && (
         <div className="mt-6 space-y-8">
           <BlockSection title="세계관 개요" layout="vertical">
-            <div className="p-6 bg-white rounded-lg shadow-sm">
+            <div className="p-4 bg-gray-100  rounded-lg  ">
               <p className="text-gray-700">
                 이 세계는 마법이 일상적으로 존재하는 판타지 세계입니다. 다양한
                 종족들이 공존하며, 고대의 신비한 힘이 세계 곳곳에 숨겨져

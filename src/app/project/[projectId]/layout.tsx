@@ -8,6 +8,7 @@ import { Button } from "@/shared/ui/button";
 import { ProjectSidebar } from "@/widgets/project-sidebar/project-sidebar";
 import { useNoteStore } from "@/entities/note/store/noteStore";
 import { useProjectStore } from "@/entities/project/store/projectStore";
+import { Profileui } from "@/widgets/profileui/profileui";
 
 export default function ProjectLayout({
   children,
@@ -43,10 +44,12 @@ export default function ProjectLayout({
             variant="ghost"
             size="icon"
             onClick={() => setSidebarOpen(true)}
+            className="cursor-pointer"
           >
             <Menu className="w-5 h-5" />
             <span className="sr-only">Open sidebar</span>
           </Button>
+          <Profileui onMenuClick={() => setSidebarOpen(true)} />
         </header>
 
         <main className="flex-1 pt-4 p-4 lg:p-6 max-w-6xl mx-auto w-full">
