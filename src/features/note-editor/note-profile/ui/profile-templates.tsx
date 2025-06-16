@@ -13,9 +13,14 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { BasicinfoSection } from "../../basicinfo-section/ui/basicinfo-section";
+import TapinfoSection from "../../tapinfo-section/ui/tapinfo-section";
+
+type CharacterProfile = {
+  noteId: string;
+};
 
 // 캐릭터 프로필 컴포넌트
-export function CharacterProfile() {
+export function CharacterProfile({ noteId }: CharacterProfile) {
   return (
     <Card className="border-gray-200 overflow-hidden">
       <div className="relative h-32 bg-gradient-to-r from-mint-400 to-mint-600">
@@ -72,10 +77,13 @@ export function CharacterProfile() {
                 </Badge>
               </div>
             </div>
-
-            {/* 기본 정보 섹션 */}
-            <BasicinfoSection />
           </div>
+        </div>
+
+        {/* 여기부터 하단으로 이동 */}
+        <div className="mt-6 flex flex-col gap-6">
+          <BasicinfoSection noteId={noteId} />
+          <TapinfoSection />
         </div>
       </CardContent>
     </Card>

@@ -2,9 +2,10 @@ import { Accordion } from "@/shared/ui/accordion";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardHeader } from "@/shared/ui/card";
 import { BookOpen, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { BlockContainer } from "./block-container";
-import { BlockService } from "@/entities/block/service/blockService";
+import { BlockService } from "@/entities/block/model/blockService";
+import { useCustomBlocks } from "@/entities/block/model/blockSelector";
 
 type DetailinfoSectionProps = {
   noteId: string;
@@ -15,12 +16,8 @@ export function DetailinfoSection({ noteId }: DetailinfoSectionProps) {
   const [openBlocks, setOpenBlocks] = useState<string[]>(["overview"]);
   const [showToc, setShowToc] = useState(false);
 
-  const customBlocks = blockService.customBlocks;
+  const customBlocks = useCustomBlocks(noteId);
   const totalBlocksLength = customBlocks.length;
-
-  useEffect(() => {
-    blockService.fetchBlocks();
-  }, []);
 
   const scrollToBlock = (blockId: number) => {
     const element = document.getElementById(`block-${blockId}`);
@@ -86,7 +83,7 @@ export function DetailinfoSection({ noteId }: DetailinfoSectionProps) {
       {/* Editor Section */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-medium text-gray-800">상세 정보</h2>
+          <h2 className="text-lg font-medium text-gray-800 mb-3">상세 정보</h2>
         </div>
       </div>
 

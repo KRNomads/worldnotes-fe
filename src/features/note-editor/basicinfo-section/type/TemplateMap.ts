@@ -1,8 +1,15 @@
 import { BasicInfoItem } from "./BasicInfoItem";
 
+export type AnyTemplate =
+  | CharacterTemplate
+  | DetailTemplate
+  | EventTemplate
+  | ItemTemplate
+  | PlaceTemplate;
+
 export type TemplateMap = {
   CHARACTER: CharacterTemplate;
-  DETAIL: DetailTemplate;
+  DETAILS: DetailTemplate;
   EVENT: EventTemplate;
   ITEM: ItemTemplate;
   PLACE: PlaceTemplate;

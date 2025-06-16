@@ -4,74 +4,53 @@ import { create } from "zustand";
 import { Block } from "../types/block";
 import { sortBlocks } from "../utils/sortBlocks";
 
-interface BlocksForNote {
-  defaultBlocks: Block[];
-  customBlocks: Block[];
-}
-
 interface BlockState {
-  blocksByNoteId: Record<string, BlocksForNote>;
+  blocksByNoteId: Record<string, Block[]>;
   setBlocks: (noteId: string, blocks: Block[]) => void;
-  updateDefaultBlock: (noteId: string, block: Block) => void;
-  updateCustomBlock: (noteId: string, block: Block) => void;
+  addBlock: (noteId: string, block: Block) => void;
+  updateBlock: (noteId: string, block: Block) => void;
+  deleteBlock: (noteId: string, blockId: number) => void;
 }
 
 export const useBlockStore = create<BlockState>((set) => ({
   blocksByNoteId: {},
 
   setBlocks: (noteId, blocks) => {
-    const defaultBlocks = sortBlocks(blocks.filter((b) => b.fieldKey !== null));
-    const customBlocks = sortBlocks(blocks.filter((b) => b.fieldKey === null));
-
     set((state) => ({
       blocksByNoteId: {
         ...state.blocksByNoteId,
-        [noteId]: { defaultBlocks, customBlocks },
+        [noteId]: sortBlocks(blocks),
       },
     }));
   },
 
-  updateDefaultBlock: (noteId, updatedBlock) =>
-    set((state) => {
-      const prev = state.blocksByNoteId[noteId];
-      if (!prev) return state;
+  addBlock: (noteId, block) =>
+    set((state) => ({
+      blocksByNoteId: {
+        ...state.blocksByNoteId,
+        [noteId]: sortBlocks([...(state.blocksByNoteId[noteId] ?? []), block]),
+      },
+    })),
 
-      const updatedDefaultBlocks = sortBlocks(
-        prev.defaultBlocks.map((b) =>
-          b.blockId === updatedBlock.blockId ? updatedBlock : b
-        )
-      );
+  updateBlock: (noteId, updatedBlock) =>
+    set((state) => ({
+      blocksByNoteId: {
+        ...state.blocksByNoteId,
+        [noteId]: sortBlocks(
+          (state.blocksByNoteId[noteId] ?? []).map((b) =>
+            b.blockId === updatedBlock.blockId ? updatedBlock : b
+          )
+        ),
+      },
+    })),
 
-      return {
-        blocksByNoteId: {
-          ...state.blocksByNoteId,
-          [noteId]: {
-            ...prev,
-            defaultBlocks: updatedDefaultBlocks,
-          },
-        },
-      };
-    }),
-
-  updateCustomBlock: (noteId, updatedBlock) =>
-    set((state) => {
-      const prev = state.blocksByNoteId[noteId];
-      if (!prev) return state;
-
-      const updatedCustomBlocks = sortBlocks(
-        prev.customBlocks.map((b) =>
-          b.blockId === updatedBlock.blockId ? updatedBlock : b
-        )
-      );
-
-      return {
-        blocksByNoteId: {
-          ...state.blocksByNoteId,
-          [noteId]: {
-            ...prev,
-            customBlocks: updatedCustomBlocks,
-          },
-        },
-      };
-    }),
+  deleteBlock: (noteId, blockId) =>
+    set((state) => ({
+      blocksByNoteId: {
+        ...state.blocksByNoteId,
+        [noteId]: (state.blocksByNoteId[noteId] ?? []).filter(
+          (b) => b.blockId !== blockId
+        ),
+      },
+    })),
 }));

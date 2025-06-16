@@ -17,7 +17,7 @@ import { CharacterTemplate } from "../type/TemplateMap";
 export const CHARACTER_BASICINFO_TEMPLATES: CharacterTemplate = {
   basic: [
     {
-      key: "race",
+      key: "tribe",
       label: "종족",
       icon: Globe,
       color: "bg-green-100 text-green-700",

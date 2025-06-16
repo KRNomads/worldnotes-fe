@@ -1,9 +1,11 @@
+// src/entities/block/service/blockService.ts
+
 import { debounce } from "lodash";
 import { produce } from "immer";
 import { blockApi } from "../api/blockApi";
 import { getDefaultProperties } from "../lib/blockUtils";
 import { mapBlockResponseToBlock } from "../lib/mappers";
-import { Block, BlockType } from "../types/block";
+import { BlockType } from "../types/block";
 import { useBlockStore } from "../store/blockStore";
 
 const DEBOUNCE_DELAY = 500;
@@ -13,67 +15,47 @@ export class BlockService {
 
   constructor(private readonly noteId: string) {}
 
-  /**
-   * 블록 불러오기
-   */
   async fetchBlocks() {
     const data = await blockApi.fetchBlocksByNote(this.noteId);
     const blocks = data.map(mapBlockResponseToBlock);
     this.blockStore.setBlocks(this.noteId, blocks);
   }
 
-  /**
-   * 블록 추가
-   */
-  async addBlock(type: BlockType) {
+  async addDefaultBlock(title: string, fieldKey: string) {
+    const request = {
+      noteId: this.noteId,
+      title: title,
+      fieldKey: fieldKey,
+      type: "TEXT" as BlockType,
+      properties: getDefaultProperties("TEXT"),
+    };
+    const response = await blockApi.createBlock(request);
+    const newBlock = mapBlockResponseToBlock(response);
+    this.blockStore.addBlock(this.noteId, newBlock);
+  }
+
+  async addCustomBlock(type: BlockType) {
     const request = {
       noteId: this.noteId,
       title: "새 블록",
-      type,
+      type: type,
       properties: getDefaultProperties(type),
     };
     const response = await blockApi.createBlock(request);
     const newBlock = mapBlockResponseToBlock(response);
-
-    if (newBlock.fieldKey !== null) {
-      this.blockStore.updateDefaultBlock(this.noteId, newBlock);
-    } else {
-      this.blockStore.updateCustomBlock(this.noteId, newBlock);
-    }
+    this.blockStore.addBlock(this.noteId, newBlock);
   }
 
-  /**
-   * 블록 삭제
-   */
   async deleteBlock(blockId: number) {
     await blockApi.deleteBlock(blockId);
-
-    const blocks = this.blockStore.blocksByNoteId[this.noteId];
-    if (!blocks) return;
-
-    // defaultBlocks에서 삭제
-    const defaultBlocks = blocks.defaultBlocks.filter(
-      (b) => b.blockId !== blockId
-    );
-    const customBlocks = blocks.customBlocks.filter(
-      (b) => b.blockId !== blockId
-    );
-
-    this.blockStore.setBlocks(this.noteId, [...defaultBlocks, ...customBlocks]);
+    this.blockStore.deleteBlock(this.noteId, blockId);
   }
 
-  /**
-   * 디바운스된 타이틀 업데이트
-   */
   private debouncedUpdateTitle = debounce(
     async (blockId: number, title: string) => {
       const response = await blockApi.updateBlock(blockId, { title });
       const updated = mapBlockResponseToBlock(response);
-      if (updated.fieldKey !== null) {
-        this.blockStore.updateDefaultBlock(this.noteId, updated);
-      } else {
-        this.blockStore.updateCustomBlock(this.noteId, updated);
-      }
+      this.blockStore.updateBlock(this.noteId, updated);
     },
     DEBOUNCE_DELAY
   );
@@ -82,18 +64,16 @@ export class BlockService {
     this.debouncedUpdateTitle(blockId, title);
   }
 
-  /**
-   * 디바운스된 프로퍼티 업데이트
-   */
   private debouncedUpdateProperties = debounce(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async (blockId: number, path: (string | number)[], value: any) => {
       const blocks = this.blockStore.blocksByNoteId[this.noteId];
       if (!blocks) return;
 
-      const allBlocks = [...blocks.defaultBlocks, ...blocks.customBlocks];
-      const target = allBlocks.find((b) => b.blockId === blockId);
+      const target = blocks.find((b) => b.blockId === blockId);
       if (!target) return;
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const updatedProperties = produce(target.properties, (draft: any) => {
         let curr = draft;
         for (let i = 0; i < path.length - 1; i++) {
@@ -108,11 +88,7 @@ export class BlockService {
       });
 
       const updated = mapBlockResponseToBlock(response);
-      if (updated.fieldKey !== null) {
-        this.blockStore.updateDefaultBlock(this.noteId, updated);
-      } else {
-        this.blockStore.updateCustomBlock(this.noteId, updated);
-      }
+      this.blockStore.updateBlock(this.noteId, updated);
     },
     DEBOUNCE_DELAY
   );
@@ -120,36 +96,16 @@ export class BlockService {
   updateBlockProperties(
     blockId: number,
     path: (string | number)[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     value: any
   ) {
     this.debouncedUpdateProperties(blockId, path, value);
   }
 
-  /**
-   * 접힘여부 업데이트 (디바운스 없음)
-   */
   async updateBlockIsCollapsed(blockId: number, isCollapsed: boolean) {
     const response = await blockApi.updateBlock(blockId, { isCollapsed });
     const updated = mapBlockResponseToBlock(response);
-    if (updated.fieldKey !== null) {
-      this.blockStore.updateDefaultBlock(this.noteId, updated);
-    } else {
-      this.blockStore.updateCustomBlock(this.noteId, updated);
-    }
-  }
-
-  /**
-   * 현재 defaultBlocks 조회
-   */
-  get defaultBlocks(): Block[] {
-    return this.blockStore.blocksByNoteId[this.noteId]?.defaultBlocks ?? [];
-  }
-
-  /**
-   * 현재 customBlocks 조회
-   */
-  get customBlocks(): Block[] {
-    return this.blockStore.blocksByNoteId[this.noteId]?.customBlocks ?? [];
+    this.blockStore.updateBlock(this.noteId, updated);
   }
 
   // 블록 이동 함수
@@ -178,8 +134,8 @@ export class BlockService {
     // const blockToDuplicate = blocks[blockIndex];
     // const newBlock = {
     //   ...blockToDuplicate,
-    //   id: `${blockToDuplicate.id}_copy_${Date.now()}`,
-    //   title: `${blockToDuplicate.title} (복사본)`,
+    //   id: ${blockToDuplicate.id}_copy_${Date.now()},
+    //   title: ${blockToDuplicate.title} (복사본),
     // };
     // const newBlocks = [...blocks];
     // newBlocks.splice(blockIndex + 1, 0, newBlock);

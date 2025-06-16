@@ -9,24 +9,27 @@ import {
 import { Input } from "@/shared/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 import { Search } from "lucide-react";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { Block } from "@/entities/block/types/block";
-import { TemplateMap } from "../type/TemplateMap";
+import { AnyTemplate } from "../type/TemplateMap";
 import { BasicInfoItem } from "../type/BasicInfoItem";
+import { BlockService } from "@/entities/block/model/blockService";
 
-type BasicinfoTemplateSelectorProps<T extends keyof TemplateMap> = {
-  template: TemplateMap[T];
+type BasicinfoTemplateSelectorProps = {
+  template: AnyTemplate | undefined;
   defaultBlocks: Block[];
   showTemplateSelector: boolean;
   setShowTemplateSelector: Dispatch<SetStateAction<boolean>>;
+  blockService: BlockService;
 };
 
-export function BasicinfoTemplateSelector<T extends keyof TemplateMap>({
+export function BasicinfoTemplateSelector({
   template,
   defaultBlocks,
   showTemplateSelector,
   setShowTemplateSelector,
-}: BasicinfoTemplateSelectorProps<T>) {
+  blockService,
+}: BasicinfoTemplateSelectorProps) {
   const [filterSearch, setFilterSearch] = useState("");
 
   // 이미 선택된 필드 키 목록
@@ -34,30 +37,27 @@ export function BasicinfoTemplateSelector<T extends keyof TemplateMap>({
     .map((block) => block.fieldKey)
     .filter(Boolean);
 
-  // 전체 템플릿 아이템 (flat으로 펼침)
-  const allTemplates: BasicInfoItem[] = Object.values(template).flat();
+  // allTemplates 계산 (template가 undefined일 경우 빈 배열로 처리)
+  const allTemplates: BasicInfoItem[] = useMemo(
+    () => (template ? Object.values(template).flat() : []),
+    [template]
+  );
 
-  const categoryEntries = Object.entries(template) as [
-    keyof typeof template,
-    BasicInfoItem[]
-  ][];
+  const categoryEntries = useMemo(
+    () =>
+      template ? (Object.entries(template) as [string, BasicInfoItem[]][]) : [],
+    [template]
+  );
 
   // 새 필드 추가
-  const addQuickInfoField = () => {
-    // const newField = {
-    //   key: template.key,
-    //   label: template.label,
-    //   value: template.defaultValue,
-    //   icon: template.icon,
-    //   color: template.color,
-    // };
-    // setQuickInfo([...quickInfo, newField]);
-    // setShowTemplateSelector(false);
+  const addNewField = (title: string, fieldKey: string) => {
+    blockService.addDefaultBlock(title, fieldKey);
+    setShowTemplateSelector(false);
   };
 
   return (
     <Dialog open={showTemplateSelector} onOpenChange={setShowTemplateSelector}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden">
+      <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden bg-white">
         <DialogHeader>
           <DialogTitle>정보 필드 추가</DialogTitle>
           <DialogDescription>추가할 정보 필드를 선택하세요.</DialogDescription>
@@ -78,7 +78,7 @@ export function BasicinfoTemplateSelector<T extends keyof TemplateMap>({
           <Tabs defaultValue="all" className="flex-1 flex flex-col">
             <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="all">전체</TabsTrigger>
-              {Object.keys(template).map((category) => (
+              {categoryEntries.map(([category]) => (
                 <TabsTrigger key={category} value={category}>
                   {category}
                 </TabsTrigger>
@@ -104,7 +104,9 @@ export function BasicinfoTemplateSelector<T extends keyof TemplateMap>({
                         key={template.key}
                         variant="outline"
                         className="justify-start h-auto py-3 px-4 hover:border-mint-300"
-                        onClick={() => addQuickInfoField()}
+                        onClick={() =>
+                          addNewField(template.label, template.key)
+                        }
                       >
                         <div
                           className={`w-6 h-6 rounded-full flex items-center justify-center mr-3 ${template.color}`}
@@ -149,7 +151,9 @@ export function BasicinfoTemplateSelector<T extends keyof TemplateMap>({
                           key={template.key}
                           variant="outline"
                           className="justify-start h-auto py-3 px-4 hover:border-mint-300"
-                          onClick={() => addQuickInfoField()}
+                          onClick={() =>
+                            addNewField(template.label, template.key)
+                          }
                         >
                           <div
                             className={`w-6 h-6 rounded-full flex items-center justify-center mr-3 ${template.color}`}
