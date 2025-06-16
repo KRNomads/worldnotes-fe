@@ -6,8 +6,8 @@ import { useNoteStore } from "@/entities/note/store/noteStore";
 import { useNoteTagStore } from "@/entities/tag/store/noteTagStore";
 import { useTagStore } from "@/entities/tag/store/tagStore";
 
-import { TagManagementOverlay } from "@/features/tag/ui/tag-management-overlay";
-import { TagBadge } from "@/features/tag/ui/tag-badge";
+import { TagManagementOverlay } from "@/features/mmmmmmmm/tag/ui/tag-management-overlay";
+import { TagBadge } from "@/features/mmmmmmmm/tag/ui/tag-badge";
 import { Button } from "@/shared/ui/button";
 
 import { Tag } from "@/entities/tag/types/tag";
@@ -15,6 +15,7 @@ import { Tag } from "@/entities/tag/types/tag";
 export function EditorTagSection() {
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const [isEditingTags, setIsEditingTags] = useState(false);
 
   const currentProject = useProjectStore((state) => state.currentProject);
   const currentNote = useNoteStore((state) => state.currentNote);

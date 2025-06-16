@@ -15,7 +15,7 @@ export default function ProjectLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { id: projectId } = useParams();
+  const { projectId } = useParams();
   const { setCurrentProject, fetchProject } = useProjectStore();
   const { fetchNotesByProject } = useNoteStore();
 

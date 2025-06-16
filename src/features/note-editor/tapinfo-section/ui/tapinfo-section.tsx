@@ -6,11 +6,19 @@ import { MapPin, Mountain, Users } from "lucide-react";
 export default function TapinfoSection() {
   return (
     <Tabs defaultValue="overview" className="mt-6">
-      <TabsList className="grid w-full grid-cols-4">
-        <TabsTrigger value="overview">개요</TabsTrigger>
-        <TabsTrigger value="details">상세</TabsTrigger>
-        <TabsTrigger value="history">역사</TabsTrigger>
-        <TabsTrigger value="relations">관계</TabsTrigger>
+      <TabsList className="grid w-full grid-cols-4 bg-gray-100">
+        <TabsTrigger value="overview" className="data-[state=active]:bg-white">
+          개요
+        </TabsTrigger>
+        <TabsTrigger value="details" className="data-[state=active]:bg-white">
+          상세
+        </TabsTrigger>
+        <TabsTrigger value="history" className="data-[state=active]:bg-white">
+          역사
+        </TabsTrigger>
+        <TabsTrigger value="relations" className="data-[state=active]:bg-white">
+          관계
+        </TabsTrigger>
       </TabsList>
 
       <TabsContent value="overview" className="mt-4 space-y-4">

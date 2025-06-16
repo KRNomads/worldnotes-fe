@@ -8,7 +8,7 @@ export default function NoteLayout({
   children: React.ReactNode;
 }) {
   return (
-    <main className="flex justify-center min-h-screen p-4 lg:p-6">
+    <main className="flex justify-center min-h-screen p-0 lg:p-6">
       <div className="h-[400px]"> </div>
 
       {/* 모바일 전용 NoteList */}

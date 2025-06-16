@@ -14,6 +14,7 @@ import {
 import Image from "next/image";
 import { BasicinfoSection } from "../../basicinfo-section/ui/basicinfo-section";
 import TapinfoSection from "../../tapinfo-section/ui/tapinfo-section";
+import { NoteTagSection } from "../../note-tag-section/note-tag-section";
 
 type CharacterProfile = {
   noteId: string;
@@ -22,17 +23,20 @@ type CharacterProfile = {
 // 캐릭터 프로필 컴포넌트
 export function CharacterProfile({ noteId }: CharacterProfile) {
   return (
-    <Card className="border-gray-200 overflow-hidden">
-      <div className="relative h-32 bg-gradient-to-r from-mint-400 to-mint-600">
+    <Card className="border-gray-200 overflow-hidden relative">
+      <NoteTagSection />
+
+      <div className="relative h-32 bg-gradient-to-r from-orange-300 to-orange-600">
         <div className="absolute inset-0 bg-black/10"></div>
-        <Button
+        {/* <Button
           variant="ghost"
           size="icon"
           className="absolute top-3 right-3 text-black hover:bg-white/20"
         >
           <Edit3 className="h-4 w-4" />
-        </Button>
+        </Button> */}
       </div>
+
       <CardContent className="relative px-6 pb-6">
         <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-12 ">
           <div className="relative ">
@@ -44,14 +48,14 @@ export function CharacterProfile({ noteId }: CharacterProfile) {
                 height={96}
                 className="w-full h-full object-cover "
               />
+              <Button
+                variant="outline"
+                size="icon"
+                className="absolute bottom-0 left-17 sm:bottom-10 sm:right-0 h-7 w-7 rounded-full bg-white shadow-sm border-gray-300"
+              >
+                <Edit3 className="h-3 w-3" />
+              </Button>
             </div>
-            <Button
-              variant="outline"
-              size="icon"
-              className="absolute bottom-0 left-17 sm:bottom-10 sm:right-0 h-7 w-7 rounded-full bg-white shadow-sm border-gray-300"
-            >
-              <Edit3 className="h-3 w-3" />
-            </Button>
           </div>
 
           <div className="flex-1 sm:mb-2">
@@ -61,20 +65,6 @@ export function CharacterProfile({ noteId }: CharacterProfile) {
                   엘라리온
                 </h1>
                 <p className="text-gray-600 ">하이 엘프 마법사</p>
-              </div>
-              <div className="flex gap-2 sm:mb-3">
-                <Badge
-                  variant="secondary"
-                  className="bg-mint-100 text-mint-700 hover:bg-mint-200"
-                >
-                  레벨 15
-                </Badge>
-                <Badge
-                  variant="outline"
-                  className="border-mint-300 text-mint-600"
-                >
-                  활성
-                </Badge>
               </div>
             </div>
           </div>
@@ -187,7 +177,7 @@ export function LocationProfile() {
 }
 
 // 세계관 설정 프로필 템플릿
-export function WorldSettingProfile() {
+export function DetailsProfile() {
   return (
     <Card className="border-gray-200 overflow-hidden">
       <div className="relative h-32 bg-gradient-to-r from-purple-400 to-indigo-600">

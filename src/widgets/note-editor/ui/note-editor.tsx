@@ -5,7 +5,7 @@ import { useEffect, useMemo } from "react";
 import {
   CharacterProfile,
   EventProfile,
-  WorldSettingProfile,
+  DetailsProfile,
 } from "@/features/note-editor/note-profile/ui/profile-templates";
 import {
   DropdownMenu,
@@ -86,7 +86,7 @@ export function NoteEditor({ noteId }: NoteEditorProps) {
       case "PLACE":
         return <PlaceNoteProfile />;
       case "DETAILS":
-        return <WorldSettingProfile />;
+        return <DetailsProfile />;
       case "EVENT":
         return <EventProfile />;
       default:

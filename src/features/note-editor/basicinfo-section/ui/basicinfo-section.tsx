@@ -59,7 +59,7 @@ export function BasicinfoSection({ noteId }: BasicinfoSectionProps) {
   return (
     <div className="mt-4">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs text-gray-500">기본 정보</span>
+        <span className="text-xs text-gray-800">기본 정보</span>
         <div className="flex items-center gap-1">
           <Button
             variant="ghost"
