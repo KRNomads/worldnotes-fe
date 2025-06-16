@@ -11,9 +11,11 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
 import { BasicinfoItem } from "./basicinfo-item";
-import { BlockService } from "@/entities/block/service/blockService";
 import { TEMPLATE_MAP } from "../lib/available-templates";
 import { useNoteStore } from "@/entities/note/store/noteStore";
+import { AnyTemplate } from "../type/TemplateMap";
+import { useDefaultBlocks } from "@/entities/block/model/blockSelector";
+import { BlockService } from "@/entities/block/model/blockService";
 
 type BasicinfoSectionProps = {
   noteId: string;
@@ -23,32 +25,17 @@ export function BasicinfoSection({ noteId }: BasicinfoSectionProps) {
   const blockService = useMemo(() => new BlockService(noteId), [noteId]);
   const { currentNote } = useNoteStore();
 
-  const defaultBlocks = blockService.defaultBlocks;
+  const defaultBlocks = useDefaultBlocks(noteId);
 
-  const template = currentNote?.type
-    ? TEMPLATE_MAP[currentNote.type] ?? {}
-    : {};
+  const template: AnyTemplate | undefined = currentNote?.type
+    ? TEMPLATE_MAP[currentNote.type]
+    : undefined;
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingField, setEditingField] = useState<string | null>(null);
   const [showTemplateSelector, setShowTemplateSelector] = useState(false);
 
   const sensors = useSensors(useSensor(PointerSensor));
-
-  // 필드 삭제
-  const removeQuickInfoField = (key: string) => {
-    // setQuickInfo(quickInfo.filter((info) => info.key !== key));
-  };
-
-  // 필드 값 업데이트 왜 안씀>??
-  const updateQuickInfoField = (key: string, newValue: string) => {
-    // setQuickInfo(
-    //   quickInfo.map((info) =>
-    //     info.key === key ? { ...info, value: newValue } : info
-    //   )
-    // );
-    // setEditingField(null);
-  };
 
   // 드래그 앤 드롭
   const handleDragEnd = (event: any) => {
@@ -60,6 +47,14 @@ export function BasicinfoSection({ noteId }: BasicinfoSectionProps) {
     //   setQuickInfo(arrayMove(quickInfo, oldIndex, newIndex));
     // }
   };
+
+  if (!template) {
+    return (
+      <div className="p-4 bg-red-100 text-red-700 rounded-md">
+        ⚠️ 템플릿 정보를 불러올 수 없습니다.
+      </div>
+    );
+  }
 
   return (
     <div className="mt-4">
@@ -91,6 +86,7 @@ export function BasicinfoSection({ noteId }: BasicinfoSectionProps) {
                 defaultBlocks={defaultBlocks}
                 showTemplateSelector={showTemplateSelector}
                 setShowTemplateSelector={setShowTemplateSelector}
+                blockService={blockService}
               />
             </>
           )}
@@ -115,8 +111,7 @@ export function BasicinfoSection({ noteId }: BasicinfoSectionProps) {
                 isEditMode={isEditMode}
                 editingField={editingField}
                 setEditingField={setEditingField}
-                updateQuickInfoField={updateQuickInfoField}
-                removeQuickInfoField={removeQuickInfoField}
+                blockService={blockService}
               />
             ))}
           </div>

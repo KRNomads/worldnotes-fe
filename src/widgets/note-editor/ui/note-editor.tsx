@@ -17,7 +17,7 @@ import LoadingSpinner from "@/shared/ui/LoadingSpinner/LoadingSpinner";
 import { PlaceNoteProfile } from "@/features/note-editor/note-profile/ui/place-note-profile";
 import { DetailinfoSection } from "@/features/note-editor/detailinfo-section/ui/detailinfo-section";
 import { BlockType } from "@/entities/block/types/block";
-import { BlockService } from "@/entities/block/service/blockService";
+import { BlockService } from "@/entities/block/model/blockService";
 import { useNoteEditorStore } from "@/features/note-editor/store/noteEditorStore";
 
 type NoteEditorProps = {
@@ -45,7 +45,7 @@ export function NoteEditor({ noteId }: NoteEditorProps) {
   const currentNote = useNoteStore((state) => state.currentNote);
 
   const handleAddBlock = async (type: BlockType) => {
-    await blockService.addBlock(type);
+    await blockService.addCustomBlock(type);
   };
 
   // useEffect(() => {
@@ -82,15 +82,15 @@ export function NoteEditor({ noteId }: NoteEditorProps) {
     if (!currentNote) return null;
     switch (currentNote.type) {
       case "CHARACTER":
-        return <CharacterProfile />;
+        return <CharacterProfile noteId={noteId} />;
       case "PLACE":
         return <PlaceNoteProfile />;
-      case "DETAIL":
+      case "DETAILS":
         return <WorldSettingProfile />;
       case "EVENT":
         return <EventProfile />;
       default:
-        return <CharacterProfile />;
+        return <CharacterProfile noteId={noteId} />;
     }
   };
 

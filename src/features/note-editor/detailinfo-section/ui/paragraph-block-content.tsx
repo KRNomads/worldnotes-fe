@@ -10,7 +10,7 @@ import Highlight from "@tiptap/extension-highlight";
 import { useEffect, useCallback, useState } from "react";
 import { Block, ParagraphBlockProperties } from "@/entities/block/types/block";
 import FormatToolbar from "./format-toolbar";
-import { BlockService } from "@/entities/block/service/blockService";
+import { BlockService } from "@/entities/block/model/blockService";
 
 interface ParagraphBlockContentProps {
   block: Block;

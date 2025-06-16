@@ -23,7 +23,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { BlockService } from "@/entities/block/service/blockService";
+import { BlockService } from "@/entities/block/model/blockService";
 
 type BlockContainerProps = {
   block: Block;

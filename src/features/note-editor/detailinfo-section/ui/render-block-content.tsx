@@ -1,7 +1,7 @@
 import { Textarea } from "@/shared/ui/textarea";
 import { Block, TextBlockProperties } from "@/entities/block/types/block";
 import ParagraphBlockContent from "./paragraph-block-content";
-import { BlockService } from "@/entities/block/service/blockService";
+import { BlockService } from "@/entities/block/model/blockService";
 
 interface RenderBlockContentProps {
   block: Block;
