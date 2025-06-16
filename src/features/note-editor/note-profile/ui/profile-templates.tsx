@@ -38,9 +38,9 @@ export function CharacterProfile({ noteId }: CharacterProfile) {
       </div>
 
       <CardContent className="relative px-6 pb-6">
-        <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-12 ">
+        <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-15 sm:-mt-15 sm:h-30">
           <div className="relative ">
-            <div className="w-24 h-24 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-100 sm:-mt-34">
+            <div className="w-30 h-30 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-100 ">
               <Image
                 src="/placeholder.svg?height=96&width=96"
                 alt="캐릭터 프로필"
@@ -51,19 +51,17 @@ export function CharacterProfile({ noteId }: CharacterProfile) {
               <Button
                 variant="outline"
                 size="icon"
-                className="absolute bottom-0 left-17 sm:bottom-10 sm:right-0 h-7 w-7 rounded-full bg-white shadow-sm border-gray-300"
+                className="absolute bottom-1 left-21 sm:bottom-1 sm:left-21 h-9 w-9 rounded-full bg-white shadow-sm border-gray-300"
               >
-                <Edit3 className="h-3 w-3" />
+                <Edit3 className="h-5 w-5" />
               </Button>
             </div>
           </div>
 
           <div className="flex-1 sm:mb-2">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <div className="flex flex-col sm:gap-2">
-                <h1 className="text-2xl font-bold text-gray-900 sm:mt-3">
-                  엘라리온
-                </h1>
+            <div className="flex flex-col pl-3 sm:flex-row sm:items-center sm: sm:justify-between sm:h-30 sm:pt-3">
+              <div className="flex flex-col sm:gap-4">
+                <h1 className="text-2xl font-bold text-gray-900 ">엘라리온</h1>
                 <p className="text-gray-600 ">하이 엘프 마법사</p>
               </div>
             </div>

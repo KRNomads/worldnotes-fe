@@ -136,7 +136,7 @@ export function NoteTagManagementOverlay({
             <h4 className="text-sm font-medium mb-3">
               현재 노트의 태그 ({selectedTags.length}개)
             </h4>
-            <div className="flex gap-2 flex-wrap p-4 bg-gray-50 rounded-lg min-h-[60px]">
+            <div className="flex gap-2 flex-wrap p-4 bg-white rounded-lg min-h-[60px]">
               {selectedTags.length > 0 ? (
                 selectedTags.map((tag) => (
                   <Button
@@ -159,13 +159,13 @@ export function NoteTagManagementOverlay({
           </div>
 
           {/* 태그 검색 */}
-          <div className="relative">
+          <div className="relative ">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
             <Input
               placeholder="태그 검색..."
               value={tagSearchQuery}
               onChange={(e) => setTagSearchQuery(e.target.value)}
-              className="pl-9"
+              className="pl-9 border border-gray-300 focus-visible:outline-none focus-visible:ring-0 "
             />
           </div>
 
@@ -209,7 +209,7 @@ export function NoteTagManagementOverlay({
           </div>
 
           {/* 새 태그 추가 */}
-          <div className="border-t pt-4">
+          <div className="border-none pt-4">
             <h4 className="text-sm font-medium mb-3">새 태그 추가</h4>
             <div className="flex gap-2">
               <Input
@@ -222,10 +222,10 @@ export function NoteTagManagementOverlay({
                     handleCreateAndAddTag();
                   }
                 }}
-                className="flex-1"
+                className="flex-1 border border-gray-300 focus-visible:outline-none focus-visible:ring-0"
               />
               <Button
-                className="bg-emerald-600 hover:bg-emerald-700"
+                className="bg-white hover:text-blue-500 cursor-pointer "
                 onClick={handleCreateAndAddTag}
                 disabled={!newTagInput.trim()}
               >
@@ -239,7 +239,7 @@ export function NoteTagManagementOverlay({
           </div>
         </div>
 
-        <div className="flex justify-end pt-4 border-t">
+        <div className="flex justify-end pt-4 border-none">
           <Button onClick={() => setShowTagManager(false)}>완료</Button>
         </div>
       </DialogContent>
