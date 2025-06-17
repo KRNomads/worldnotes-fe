@@ -20,7 +20,7 @@ export const noteApi = {
     noteId: string,
     data: NoteUpdateRequest
   ): Promise<NoteResponse> =>
-    api.put(`/api/v1/notes/${noteId}`, data).then((res) => res.data),
+    api.patch(`/api/v1/notes/${noteId}`, data).then((res) => res.data),
 
   deleteNote: (noteId: string): Promise<void> =>
     api.delete(`/api/v1/notes/${noteId}`).then(() => {}),

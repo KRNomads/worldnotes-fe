@@ -261,7 +261,7 @@ export default function CharacterDefaultUi({
                 <BasicField
                   block={genderBlock}
                   onPropChange={(path, value) =>
-                    onPropChange(genderBlock.blockId, path, value)
+                    onPropChange(genderBlock.id, path, value)
                   }
                 />
               </div>
@@ -276,7 +276,7 @@ export default function CharacterDefaultUi({
                 <BasicField
                   block={ageBlock}
                   onPropChange={(path, value) =>
-                    onPropChange(ageBlock.blockId, path, value)
+                    onPropChange(ageBlock.id, path, value)
                   }
                 />
               </div>
@@ -291,7 +291,7 @@ export default function CharacterDefaultUi({
                 <BasicField
                   block={tribeBlock}
                   onPropChange={(path, value) =>
-                    onPropChange(tribeBlock.blockId, path, value)
+                    onPropChange(tribeBlock.id, path, value)
                   }
                 />
               </div>
@@ -306,7 +306,7 @@ export default function CharacterDefaultUi({
                 <BasicField
                   block={personalityBlock}
                   onPropChange={(path, value) =>
-                    onPropChange(personalityBlock.blockId, path, value)
+                    onPropChange(personalityBlock.id, path, value)
                   }
                 />
               </div>

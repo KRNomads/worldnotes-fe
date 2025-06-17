@@ -1,7 +1,6 @@
 // src/entities/project/api/projectApi.ts
 import {
-  CreateProjectRequest,
-  CreateProjectResponse,
+  ProjectCreateRequest,
   ProjectResponse,
 } from "@/entities/project/types/project";
 import api from "@/shared/lib/api";
@@ -13,14 +12,14 @@ export const projectApi = {
   fetchProject: (projectId: string): Promise<ProjectResponse> =>
     api.get(`/api/v1/projects/${projectId}`).then((res) => res.data),
 
-  createProject: (data: CreateProjectRequest): Promise<CreateProjectResponse> =>
+  createProject: (data: ProjectCreateRequest): Promise<ProjectResponse> =>
     api.post("/api/v1/projects", data),
 
   updateProject: (
     projectId: string,
-    data: Partial<CreateProjectRequest>
+    data: Partial<ProjectCreateRequest>
   ): Promise<ProjectResponse> =>
-    api.put(`/api/v1/projects/${projectId}`, data).then((res) => res.data),
+    api.patch(`/api/v1/projects/${projectId}`, data).then((res) => res.data),
 
   deleteProject: (projectId: string): Promise<void> =>
     api.delete(`/api/v1/projects/${projectId}`).then(() => {}),

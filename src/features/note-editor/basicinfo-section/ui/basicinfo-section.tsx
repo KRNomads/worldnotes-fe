@@ -99,13 +99,13 @@ export function BasicinfoSection({ noteId }: BasicinfoSectionProps) {
         onDragEnd={handleDragEnd}
       >
         <SortableContext
-          items={defaultBlocks.map((block) => block.blockId)}
+          items={defaultBlocks.map((block) => block.id)}
           strategy={rectSortingStrategy}
         >
           <div className="flex gap-2 flex-wrap">
             {defaultBlocks.map((block) => (
               <BasicinfoItem
-                key={block.blockId}
+                key={block.id}
                 template={template}
                 block={block}
                 isEditMode={isEditMode}

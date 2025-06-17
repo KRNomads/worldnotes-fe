@@ -38,7 +38,7 @@ export const useBlockStore = create<BlockState>((set) => ({
         ...state.blocksByNoteId,
         [noteId]: sortBlocks(
           (state.blocksByNoteId[noteId] ?? []).map((b) =>
-            b.blockId === updatedBlock.blockId ? updatedBlock : b
+            b.id === updatedBlock.id ? updatedBlock : b
           )
         ),
       },
@@ -49,7 +49,7 @@ export const useBlockStore = create<BlockState>((set) => ({
       blocksByNoteId: {
         ...state.blocksByNoteId,
         [noteId]: (state.blocksByNoteId[noteId] ?? []).filter(
-          (b) => b.blockId !== blockId
+          (b) => b.id !== blockId
         ),
       },
     })),

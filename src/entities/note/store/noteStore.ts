@@ -5,8 +5,8 @@ import {
   NoteCreateRequest,
   NoteUpdateRequest,
 } from "@/entities/note/types/note";
-import { mapNoteResponseToNote } from "@/entities/block/lib/mappers";
 import { noteApi } from "../api/noteApi";
+import { mapNoteResponseToNote } from "../lib/mapper";
 
 interface NoteState {
   notes: Note[];

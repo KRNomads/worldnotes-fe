@@ -1,13 +1,11 @@
-// src/entities/project/model/projectStore.ts
 import { create } from "zustand";
-import { AxiosResponse } from "axios";
 import {
   Project,
-  CreateProjectRequest,
-  CreateProjectResponse,
+  ProjectCreateRequest,
+  ProjectUpdateRequest,
 } from "@/entities/project/types/project";
-import { mapProjectResponseToProject } from "@/entities/block/lib/mappers";
 import { projectApi } from "../api/projectApi";
+import { mapProjectResponseToProject } from "../utils/mapper";
 
 interface ProjectState {
   projects: Project[];
@@ -18,13 +16,10 @@ interface ProjectState {
   fetchUserProjects: () => Promise<void>;
   fetchProject: (projectId: string) => Promise<void>;
   setCurrentProject: (projectId: string) => void;
-  createProject: (data: {
-    title: string;
-    description?: string;
-  }) => Promise<Project>;
+  createProject: (data: ProjectCreateRequest) => Promise<Project>;
   updateProject: (
     projectId: string,
-    data: { title?: string; description?: string }
+    data: ProjectUpdateRequest
   ) => Promise<Project>;
   deleteProject: (projectId: string) => Promise<void>;
 }
@@ -39,7 +34,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const data = await projectApi.fetchProjects();
-      const projects: Project[] = data.map(mapProjectResponseToProject);
+      const projects = data.map(mapProjectResponseToProject);
       set({ projects, isLoading: false });
     } catch (err) {
       set({ error: "프로젝트를 불러오는데 실패했습니다", isLoading: false });
@@ -66,28 +61,16 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     set({ currentProject: project });
   },
 
-  createProject: async ({ title, description }) => {
+  createProject: async (requestData) => {
     set({ isLoading: true, error: null });
     try {
-      const requestData: CreateProjectRequest = {
-        name: title,
-        description,
-      };
-      const response: AxiosResponse<CreateProjectResponse> =
-        await projectApi.createProject(requestData);
-
-      const newProject: Project = {
-        id: response.data.projectId,
-        title: response.data.title,
-        lastModified: new Date().toISOString(),
-      };
-
+      const response = await projectApi.createProject(requestData);
+      const newProject = mapProjectResponseToProject(response);
       set((state) => ({
         projects: [...state.projects, newProject],
         currentProject: newProject,
         isLoading: false,
       }));
-
       return newProject;
     } catch (err) {
       set({ error: "프로젝트 생성에 실패했습니다", isLoading: false });
@@ -95,16 +78,14 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     }
   },
 
-  updateProject: async (projectId, { title, description }) => {
+  updateProject: async (projectId, requestData) => {
     set({ isLoading: true, error: null });
     try {
-      const requestData = { name: title, description };
       const updatedData = await projectApi.updateProject(
         projectId,
         requestData
       );
-
-      const updatedProject: Project = mapProjectResponseToProject(updatedData);
+      const updatedProject = mapProjectResponseToProject(updatedData);
 
       set((state) => ({
         projects: state.projects.map((p) =>

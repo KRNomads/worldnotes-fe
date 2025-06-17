@@ -70,7 +70,7 @@ export class BlockService {
       const blocks = this.blockStore.blocksByNoteId[this.noteId];
       if (!blocks) return;
 
-      const target = blocks.find((b) => b.blockId === blockId);
+      const target = blocks.find((b) => b.id === blockId);
       if (!target) return;
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

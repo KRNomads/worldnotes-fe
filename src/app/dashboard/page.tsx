@@ -63,18 +63,18 @@ export default function Dashboard() {
     e.stopPropagation();
   };
 
-  // 상대적 시간 계산 함수
-  const getRelativeTime = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  // // 상대적 시간 계산 함수
+  // const getRelativeTime = (dateString: string) => {
+  //   const date = new Date(dateString);
+  //   const now = new Date();
+  //   const diffTime = Math.abs(now.getTime() - date.getTime());
+  //   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 1) return "어제";
-    if (diffDays <= 7) return `${diffDays}일 전`;
-    if (diffDays <= 30) return `${Math.ceil(diffDays / 7)}주 전`;
-    return dateString.slice(5); // MM-DD 형태로 표시
-  };
+  //   if (diffDays === 1) return "어제";
+  //   if (diffDays <= 7) return `${diffDays}일 전`;
+  //   if (diffDays <= 30) return `${Math.ceil(diffDays / 7)}주 전`;
+  //   return dateString.slice(5); // MM-DD 형태로 표시
+  // };
 
   // 새 프로젝트 생성 핸들러
   const handleNewProject = async () => {
@@ -215,7 +215,7 @@ export default function Dashboard() {
                         </div>
                       </div>
                       <p className="text-gray-500 text-sm mb-4 line-clamp-2 leading-relaxed h-10">
-                        {project.description}
+                        {project.overview}
                       </p>
                       <div className="flex items-center justify-between text-xs text-gray-400">
                         <div className="flex items-center gap-4">
@@ -234,7 +234,7 @@ export default function Dashboard() {
                           </span>
                           <span className="flex items-center gap-1 text-gray-500">
                             <Calendar className="w-3 h-3" />
-                            {getRelativeTime(project.lastModified)}
+                            {/* {getRelativeTime(project.lastModified)} */}
                           </span>
                         </div>
                       </div>
@@ -279,7 +279,7 @@ export default function Dashboard() {
                       </h3>
 
                       <p className="text-gray-500 text-xs mb-3 line-clamp-2 leading-relaxed h-8">
-                        {project.description}
+                        {project.overview}
                       </p>
 
                       <div className="flex items-center justify-between text-xs text-gray-400 mt-auto">
@@ -299,7 +299,7 @@ export default function Dashboard() {
                           </span>
                           <span className="flex items-center gap-1 text-gray-500 text-[11px]">
                             <Calendar className="w-2.5 h-2.5" />
-                            {getRelativeTime(project.lastModified)}
+                            {/* {getRelativeTime(project.lastModified)} */}
                           </span>
                         </div>
                       </div>

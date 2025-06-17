@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import stompClient from "@/processes/websocket/lib/stompClient";
 import { Message, StompSubscription } from "@stomp/stompjs";
-import { handleMessage } from "@/processes/websocket/lib/handler";
+
 import { WebSocketMessage } from "../types/socketMessage";
 
 interface WebSocketState {
@@ -64,7 +64,7 @@ export const useWebSocketStore = create<WebSocketState>((set, get) => ({
       destination,
       (message: Message) => {
         const parsed: WebSocketMessage<unknown> = JSON.parse(message.body);
-        handleMessage(parsed);
+        //handleMessage(parsed);
       }
     );
     set((state) => ({

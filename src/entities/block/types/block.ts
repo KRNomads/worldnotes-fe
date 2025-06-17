@@ -48,7 +48,7 @@ export interface ParagraphBlockProperties extends BaseBlockProperties {
  * - position 필드는 서버 응답에 있으므로 유지
  */
 export interface Block {
-  blockId: number;
+  id: number;
   // projectId는 API 명세의 BlockDto에 명시적으로 없으므로 제거된 상태 유지.
   noteId: string; // UUID
   title: string | null;

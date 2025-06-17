@@ -1,22 +1,24 @@
-// src/hooks/useAuth.ts
+// src/features/auth/hooks/useAuth.ts
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+import { authApi } from "../api/authApi";
+import { useUserStore } from "@/entities/user/store/userStore";
 
 export function useAuth() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const clearUserInfo = useUserStore((state) => state.clearUserInfo);
 
-  // 로그아웃
   const logout = async () => {
     try {
       setIsLoading(true);
-      await axios.post(`${API_BASE_URL}/logout`, {
-        withCredentials: true,
-      });
-      // 로그아웃 후 홈페이지로 리다이렉트
+      await authApi.logout();
+
+      // zustand 유저 상태 초기화
+      clearUserInfo();
+
+      // 로그아웃 후 홈페이지로 이동
       router.push("/");
     } catch (error) {
       console.error("로그아웃 실패:", error);

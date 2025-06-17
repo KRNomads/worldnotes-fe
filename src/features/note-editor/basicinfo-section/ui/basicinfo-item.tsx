@@ -37,7 +37,7 @@ export function BasicinfoItem({
     transition,
     isDragging,
   } = useSortable({
-    id: block.blockId,
+    id: block.id,
   });
 
   const textProps = block.properties as TextBlockProperties;
@@ -65,7 +65,7 @@ export function BasicinfoItem({
   const handleBlur = () => {
     const path: (string | number)[] = ["value"];
     if (localValue !== textProps.value) {
-      blockService.updateBlockProperties(block.blockId, path, localValue);
+      blockService.updateBlockProperties(block.id, path, localValue);
     }
     setEditingField(null);
   };
@@ -77,7 +77,7 @@ export function BasicinfoItem({
   };
 
   const removeField = () => {
-    blockService.deleteBlock(block.blockId);
+    blockService.deleteBlock(block.id);
   };
 
   const displayValue = textProps.value?.trim() || "미입력";

@@ -10,12 +10,12 @@ export default function TapinfoSection() {
         <TabsTrigger value="overview" className="data-[state=active]:bg-white">
           개요
         </TabsTrigger>
-        <TabsTrigger value="details" className="data-[state=active]:bg-white">
+        {/* <TabsTrigger value="details" className="data-[state=active]:bg-white">
           상세
         </TabsTrigger>
         <TabsTrigger value="history" className="data-[state=active]:bg-white">
           역사
-        </TabsTrigger>
+        </TabsTrigger> */}
         <TabsTrigger value="relations" className="data-[state=active]:bg-white">
           관계
         </TabsTrigger>

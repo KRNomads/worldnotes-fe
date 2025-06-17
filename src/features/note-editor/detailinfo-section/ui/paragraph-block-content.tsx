@@ -49,7 +49,7 @@ export default function ParagraphBlockContent({
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
       blockService.updateBlockProperties(
-        block.blockId,
+        block.id,
         ["content"],
         editor.getJSON()
       );

@@ -21,7 +21,7 @@ export const blockApi = {
     blockId: number,
     data: Partial<BlockUpdateRequest>
   ): Promise<Block> =>
-    api.put(`/api/v1/blocks/${blockId}`, data).then((res) => res.data),
+    api.patch(`/api/v1/blocks/${blockId}`, data).then((res) => res.data),
 
   deleteBlock: (blockId: number): Promise<void> =>
     api.delete(`/api/v1/blocks/${blockId}`).then(() => {}),

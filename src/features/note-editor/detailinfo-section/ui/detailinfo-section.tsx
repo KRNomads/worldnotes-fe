@@ -67,8 +67,8 @@ export function DetailinfoSection({ noteId }: DetailinfoSectionProps) {
               <nav className="space-y-1">
                 {customBlocks.map((block) => (
                   <button
-                    key={block.blockId}
-                    onClick={() => scrollToBlock(block.blockId)}
+                    key={block.id}
+                    onClick={() => scrollToBlock(block.id)}
                     className="w-full text-left px-2 py-1.5 text-sm text-gray-600 hover:text-mint-600 hover:bg-mint-50 rounded-md transition-colors"
                   >
                     {block.title}
@@ -95,7 +95,7 @@ export function DetailinfoSection({ noteId }: DetailinfoSectionProps) {
       >
         {customBlocks.map((block, index) => (
           <BlockContainer
-            key={block.blockId}
+            key={block.id}
             block={block}
             index={index}
             totalBlocks={totalBlocksLength}

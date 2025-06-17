@@ -67,7 +67,7 @@ export const useBlockHandlers = ({
   const handleUpdateBlockTitle = useCallback(
     (id: number, newTitle: string) => {
       setCustomBlocks((prev) =>
-        prev.map((b) => (b.blockId === id ? { ...b, title: newTitle } : b))
+        prev.map((b) => (b.id === id ? { ...b, title: newTitle } : b))
       );
       debouncedSave.blockTitle(id, newTitle);
     },
@@ -85,7 +85,7 @@ export const useBlockHandlers = ({
 
       updater((prev) =>
         produce(prev, (draft) => {
-          const block = draft.find((b) => b.blockId === id);
+          const block = draft.find((b) => b.id === id);
           if (!block) return;
 
           let curr: any = block.properties;
@@ -114,7 +114,7 @@ export const useBlockHandlers = ({
         const createdBlock = await createBlock(newBlockData);
         if (createdBlock) {
           setCustomBlocks((prev) => [...prev, createdBlock]);
-          setTimeout(() => setFocusedBlockId(createdBlock.blockId), 0);
+          setTimeout(() => setFocusedBlockId(createdBlock.id), 0);
         }
       } catch (error) {
         console.error("블록 생성 실패:", error);
@@ -125,7 +125,7 @@ export const useBlockHandlers = ({
 
   const handleDeleteBlock = useCallback(
     async (id: number) => {
-      setCustomBlocks((prev) => prev.filter((b) => b.blockId !== id));
+      setCustomBlocks((prev) => prev.filter((b) => b.id !== id));
 
       try {
         await deleteBlock(id, noteId);
@@ -139,14 +139,14 @@ export const useBlockHandlers = ({
 
   const handleToggleCollapse = useCallback(
     async (id: number) => {
-      const targetBlock = customBlocks.find((b) => b.blockId === id);
+      const targetBlock = customBlocks.find((b) => b.id === id);
       if (!targetBlock) return;
 
       const newIsCollapsed = !targetBlock.isCollapsed;
 
       setCustomBlocks((prev) =>
         prev.map((b) =>
-          b.blockId === id ? { ...b, isCollapsed: newIsCollapsed } : b
+          b.id === id ? { ...b, isCollapsed: newIsCollapsed } : b
         )
       );
 
@@ -195,8 +195,8 @@ export const useBlockHandlers = ({
 
         setCustomBlocks((prev) => {
           const result = [...prev];
-          const sourceIndex = result.findIndex((b) => b.blockId === isDragging);
-          const targetIndex = result.findIndex((b) => b.blockId === targetId);
+          const sourceIndex = result.findIndex((b) => b.id === isDragging);
+          const targetIndex = result.findIndex((b) => b.id === targetId);
           if (sourceIndex === -1) return prev;
 
           const [removed] = result.splice(sourceIndex, 1);
@@ -217,10 +217,10 @@ export const useBlockHandlers = ({
       if (e.key === "ArrowUp" || e.key === "ArrowDown") {
         e.preventDefault();
         const direction = e.key === "ArrowUp" ? -1 : 1;
-        const index = customBlocks.findIndex((b) => b.blockId === blockId);
+        const index = customBlocks.findIndex((b) => b.id === blockId);
         const nextBlock = customBlocks[index + direction];
         if (nextBlock) {
-          setFocusedBlockId(nextBlock.blockId);
+          setFocusedBlockId(nextBlock.id);
         }
       }
     },

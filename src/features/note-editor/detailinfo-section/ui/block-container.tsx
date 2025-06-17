@@ -49,10 +49,10 @@ export function BlockContainer({
 
   return (
     <AccordionItem
-      key={block.blockId}
-      value={block.blockId.toString()}
+      key={block.id}
+      value={block.id.toString()}
       className="border border-gray-200 rounded-lg bg-white shadow-sm group relative"
-      id={`block-${block.blockId}`}
+      id={`block-${block.id}`}
     >
       {/* 트리거는 block.title만 포함 */}
       <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-gray-50 rounded-t-lg data-[state=open]:rounded-b-none">
@@ -61,7 +61,7 @@ export function BlockContainer({
             ref={inputRef}
             value={block.title || ""}
             onChange={(e) =>
-              blockService.updateBlockTitle(block.blockId, e.target.value)
+              blockService.updateBlockTitle(block.id, e.target.value)
             }
             onBlur={() => setIsEditingTitle(false)}
             onKeyDown={(e) => {
@@ -114,7 +114,7 @@ export function BlockContainer({
             <DropdownMenuItem
               onClick={(e) => {
                 e.stopPropagation();
-                blockService.moveBlock(block.blockId, "up");
+                blockService.moveBlock(block.id, "up");
               }}
               disabled={index === 0}
             >
@@ -124,7 +124,7 @@ export function BlockContainer({
             <DropdownMenuItem
               onClick={(e) => {
                 e.stopPropagation();
-                blockService.moveBlock(block.blockId, "down");
+                blockService.moveBlock(block.id, "down");
               }}
               disabled={index === totalBlocks - 1}
             >
@@ -135,7 +135,7 @@ export function BlockContainer({
             <DropdownMenuItem
               onClick={(e) => {
                 e.stopPropagation();
-                blockService.duplicateBlock(block.blockId);
+                blockService.duplicateBlock(block.id);
               }}
             >
               <Copy className="h-4 w-4 mr-2" />
@@ -145,7 +145,7 @@ export function BlockContainer({
             <DropdownMenuItem
               onClick={(e) => {
                 e.stopPropagation();
-                blockService.deleteBlock(block.blockId);
+                blockService.deleteBlock(block.id);
               }}
               className="text-red-600 focus:text-red-600"
               disabled={totalBlocks <= 1}

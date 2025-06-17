@@ -1,3 +1,4 @@
+import { useUserStore } from "@/entities/user/store/userStore";
 import { useAuthStore } from "@/shared/store/authStore";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
@@ -10,16 +11,10 @@ import {
   DropdownMenuSeparator,
 } from "@/shared/ui/dropdown-menu";
 import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
-import {
-  Bell,
-  CreditCard,
-  HelpCircle,
-  LogOut,
-  Settings,
-  User,
-} from "lucide-react";
+import { HelpCircle, LogOut, Settings, User } from "lucide-react";
 
 export function UserProfile() {
+  const { userInfo } = useUserStore();
   const { logout } = useAuthStore();
   const handleLogout = () => {
     logout();
@@ -29,13 +24,19 @@ export function UserProfile() {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-            <Avatar className="h-10 w-10">
+          <Button
+            variant="ghost"
+            className="relative h-8 w-8 rounded-full focus-visible:ring-0"
+          >
+            <Avatar className="h-8 w-8">
               <AvatarImage
-                src="/placeholder.svg?height=40&width=40"
+                src={
+                  userInfo?.profileImg || "/placeholder.svg?height=40&width=40"
+                }
                 alt="프로필"
+                className="rounded-full object-cover w-full h-full"
               />
-              <AvatarFallback>김철수</AvatarFallback>
+              <AvatarFallback>{userInfo?.name}</AvatarFallback>
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
@@ -46,9 +47,11 @@ export function UserProfile() {
         >
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
-              <p className="text-sm font-medium leading-none">김철수</p>
+              <p className="text-sm font-medium leading-none">
+                {userInfo?.name}
+              </p>
               <p className="text-xs leading-none text-muted-foreground">
-                kim.chulsoo@example.com
+                {userInfo?.email}
               </p>
             </div>
           </DropdownMenuLabel>

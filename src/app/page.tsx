@@ -3,12 +3,10 @@
 import React from "react";
 import Link from "next/link";
 import styles from "./page.module.scss";
+import { useGoogleAuth } from "@/features/auth/hooks/useGoogleAuth";
 
 export default function Home() {
-  const handleGoogleLogin = () => {
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-    window.location.href = `${backendUrl}/oauth2/authorization/google`;
-  };
+  const { loginWithGoogle } = useGoogleAuth();
 
   return (
     <div className={styles.container}>
@@ -17,7 +15,7 @@ export default function Home() {
           <Link href="/" className={styles.logo}>
             WorldNote
           </Link>
-          <button onClick={handleGoogleLogin} className={styles.loginButton}>
+          <button onClick={loginWithGoogle} className={styles.loginButton}>
             로그인
           </button>
         </div>

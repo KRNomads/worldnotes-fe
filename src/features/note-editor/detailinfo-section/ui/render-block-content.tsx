@@ -22,7 +22,7 @@ export default function RenderBlockContent({
           value={textProps.value}
           onChange={(e) =>
             blockService.updateBlockProperties(
-              block.blockId,
+              block.id,
               ["value"],
               e.target.value
             )

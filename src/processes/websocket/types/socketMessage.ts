@@ -1,8 +1,5 @@
-import {
-  BlockPropertiesUnion,
-  BlockType,
-} from "../../entities/block/types/block";
-import { NoteType } from "../../entities/note/types/note";
+import { BlockPropertiesUnion, BlockType } from "@/entities/block/types/block";
+import { NoteType } from "@/entities/note/types/note";
 
 export interface WebSocketMessage<T> {
   type: MessageType;
@@ -41,7 +38,7 @@ export interface NotePayload {
 }
 
 export interface BlockPayload {
-  blockId: number;
+  id: number;
   noteId: string;
   title: string | null;
   type: BlockType;
