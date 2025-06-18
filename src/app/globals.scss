@@ -2,6 +2,12 @@
 
 @use "tailwindcss";
 
+@layer base {
+  body {
+    @apply font-sans; /* 👈 이 부분을 추가하거나 확인해주세요. */
+  }
+}
+
 a {
   color: inherit;
   text-decoration: none;

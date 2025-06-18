@@ -69,14 +69,14 @@ export function BasicinfoTemplateSelector({
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
               placeholder="검색..."
-              className="pl-10"
+              className="pl-10 focus-visible:outline-none focus-visible:ring-1 "
               value={filterSearch}
               onChange={(e) => setFilterSearch(e.target.value)}
             />
           </div>
 
           <Tabs defaultValue="all" className="flex-1 flex flex-col">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-5 ">
               <TabsTrigger value="all">전체</TabsTrigger>
               {categoryEntries.map(([category]) => (
                 <TabsTrigger key={category} value={category}>
@@ -103,7 +103,14 @@ export function BasicinfoTemplateSelector({
                       <Button
                         key={template.key}
                         variant="outline"
-                        className="justify-start h-auto py-3 px-4 hover:border-mint-300"
+                        className="justify-start h-auto py-3 px-4 cursor-pointer focus-visible:outline-none"
+                        style={{ borderColor: "		#808080" }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.borderColor = "#000000";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.borderColor = "		#808080";
+                        }}
                         onClick={() =>
                           addNewField(template.label, template.key)
                         }
@@ -134,7 +141,7 @@ export function BasicinfoTemplateSelector({
                 value={category as string}
                 className="flex-1 overflow-y-auto mt-4"
               >
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 ">
                   {templates
                     .filter(
                       (template) =>
@@ -150,7 +157,14 @@ export function BasicinfoTemplateSelector({
                         <Button
                           key={template.key}
                           variant="outline"
-                          className="justify-start h-auto py-3 px-4 hover:border-mint-300"
+                          className="justify-start h-auto py-3 px-4 cursor-pointer focus-visible:outline-none"
+                          style={{ borderColor: "	#808080" }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.borderColor = "#000000"; //
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.borderColor = "	#808080"; //
+                          }}
                           onClick={() =>
                             addNewField(template.label, template.key)
                           }

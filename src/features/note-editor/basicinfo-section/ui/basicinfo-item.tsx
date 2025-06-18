@@ -127,14 +127,14 @@ export function BasicinfoItem({
             <Button
               variant="ghost"
               size="icon"
-              className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100 hover:text-red-600"
+              className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100 hover:text-red-600 cursor-pointer"
               onPointerDown={(e) => e.stopPropagation()}
               onClick={(e) => {
                 e.stopPropagation();
                 removeField();
               }}
             >
-              <X className="h-2.5 w-2.5" />
+              <X className="h-2.5 w-2.5 " />
             </Button>
           )}
         </div>
