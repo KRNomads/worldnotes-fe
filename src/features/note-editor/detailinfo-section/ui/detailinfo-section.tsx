@@ -46,7 +46,7 @@ export function DetailinfoSection({ noteId }: DetailinfoSectionProps) {
             className="fixed inset-0 bg-black/20 z-40"
             onClick={() => setShowToc(false)}
           />
-          <Card className="fixed top-16 right-4 z-50 w-64 border-gray-200 shadow-xl">
+          <Card className="fixed top-16 left-4 z-50 w-64 border-gray-200 shadow-xl bg-white">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
