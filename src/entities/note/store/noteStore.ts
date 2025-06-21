@@ -21,7 +21,6 @@ interface NoteState {
   deleteNote: (noteId: string) => Promise<boolean>;
 
   setCurrentNote: (noteId: string | null) => void;
-  getNotesByType: (type: string, projectId?: string) => Note[];
   clearNotes: () => void;
 
   createNoteInStore: (note: Note) => void;
@@ -29,7 +28,7 @@ interface NoteState {
   deleteNoteInStore: (noteId: string) => void;
 }
 
-export const useNoteStore = create<NoteState>((set, get) => ({
+export const useNoteStore = create<NoteState>()((set, get) => ({
   notes: [],
   currentNote: null,
   isLoading: false,
@@ -167,14 +166,6 @@ export const useNoteStore = create<NoteState>((set, get) => ({
       ? get().notes.find((n) => n.id === noteId) || null
       : null;
     set({ currentNote: note });
-  },
-
-  getNotesByType: (type, projectId) => {
-    return get()
-      .notes.filter(
-        (n) => n.type === type && (!projectId || n.projectId === projectId)
-      )
-      .sort((a, b) => a.position - b.position);
   },
 
   clearNotes: () =>
