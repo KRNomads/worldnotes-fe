@@ -13,6 +13,9 @@ module.exports = {
   safelist: [],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["Pretendard", ...defaultTheme.fontFamily.sans],
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",

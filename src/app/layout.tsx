@@ -1,9 +1,13 @@
 import "./globals.scss";
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import localFont from "next/font/local"; // next/font/local 임포트 확인
 
-// Inter 폰트 설정
-const inter = Inter({ subsets: ["latin"] });
+// Pretendard 폰트 설정
+const pretendard = localFont({
+  src: "./fonts/PretendardVariable.woff2",
+  display: "swap",
+  weight: "45 920",
+});
 
 export const metadata: Metadata = {
   title: "World Note",
@@ -24,7 +28,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className={inter.className}>{children}</body>
+      <body className={pretendard.className}>{children}</body>
     </html>
   );
 }

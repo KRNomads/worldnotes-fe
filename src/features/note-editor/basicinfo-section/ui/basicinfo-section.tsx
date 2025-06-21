@@ -75,7 +75,7 @@ export function BasicinfoSection({ noteId }: BasicinfoSectionProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 text-xs text-mint-600 hover:text-mint-700"
+                className="h-6 text-xs text-mint-600 hover:text-mint-700 cursor-pointer"
                 onClick={() => setShowTemplateSelector(true)}
               >
                 <Plus className="h-3 w-3 mr-1" />
