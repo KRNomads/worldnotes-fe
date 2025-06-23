@@ -13,7 +13,7 @@ export const projectApi = {
     api.get(`/api/v1/projects/${projectId}`).then((res) => res.data),
 
   createProject: (data: ProjectCreateRequest): Promise<ProjectResponse> =>
-    api.post("/api/v1/projects", data),
+    api.post("/api/v1/projects", data).then((res) => res.data),
 
   updateProject: (
     projectId: string,

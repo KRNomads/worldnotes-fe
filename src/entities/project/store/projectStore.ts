@@ -65,7 +65,9 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await projectApi.createProject(requestData);
+      console.log("응답:", response);
       const newProject = mapProjectResponseToProject(response);
+      console.log("응답:", newProject);
       set((state) => ({
         projects: [...state.projects, newProject],
         currentProject: newProject,
