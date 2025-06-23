@@ -11,7 +11,7 @@ interface ProjectHeaderProps {
 
 export function Profileui({ onMenuClick }: ProjectHeaderProps) {
   return (
-    <div className="fixed top-0 left-0 right-0 z-40 h-16 bg-white shadow flex items-center justify-between px-4">
+    <div className="fixed top-0 left-0 right-0 z-40 h-16 bg-white shadow flex items-center justify-between px-4 overflow-hidden">
       <Button variant="ghost" size="icon" onClick={onMenuClick}>
         <Menu className="h-5 w-5" />
       </Button>

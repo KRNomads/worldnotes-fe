@@ -48,7 +48,7 @@ export function NoteTagSection() {
   if (!currentNote) return <div>노트가 로드되지 않았습니다.</div>;
 
   return (
-    <div className="absolute top-4 right-4 z-10 max-w-[50%]">
+    <div className="absolute top-4 right-4 z-1 max-w-[50%]">
       <div className="flex flex-col gap-2 items-end">
         <div className="flex gap-1 flex-wrap justify-end">
           {visibleTags.map((tag) => (
