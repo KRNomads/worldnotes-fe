@@ -23,7 +23,7 @@ type CharacterProfile = {
 // 캐릭터 프로필 컴포넌트
 export function CharacterProfile({ noteId }: CharacterProfile) {
   return (
-    <Card className="border-gray-200 overflow-hidden relative">
+    <Card className="border-gray-200 overflow-hidden relative bg-white">
       <NoteTagSection />
 
       <div className="relative h-32 bg-gradient-to-r from-orange-300 to-orange-600">
@@ -37,10 +37,10 @@ export function CharacterProfile({ noteId }: CharacterProfile) {
         </Button> */}
       </div>
 
-      <CardContent className="relative px-6 pb-6">
-        <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-15 sm:-mt-15 sm:h-30">
+      <CardContent className="relative px-6 pb-6 ">
+        <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-15 sm:-mt-15 sm:h-30 ">
           <div className="relative ">
-            <div className="w-30 h-30 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-100 ">
+            <div className="w-30 h-30 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-100  ">
               <Image
                 src="/placeholder.svg?height=96&width=96"
                 alt="캐릭터 프로필"
