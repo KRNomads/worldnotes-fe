@@ -108,7 +108,7 @@ export function NoteEditor({ noteId }: NoteEditorProps) {
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              className="gap-2 border-dashed border-muted-foreground/50 bg-background/50 hover:bg-muted/50 hover:border-muted-foreground transition-all duration-200 rounded-full px-4 shadow-sm"
+              className="gap-2 border-dashed border-muted-foreground/50 bg-background/50 hover:bg-muted/50 hover:border-muted-foreground transition-all duration-200 rounded-full px-4 shadow-sm cursor-pointer"
             >
               <PlusCircle className="h-4 w-4 text-primary" />
               <span className="font-medium">블록 추가</span>

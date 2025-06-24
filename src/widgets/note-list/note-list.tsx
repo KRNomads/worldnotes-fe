@@ -92,13 +92,13 @@ function NoteCreateButton({
       <Button
         variant="ghost"
         size="sm"
-        className="text-mint-600 hover:text-mint-700 hover:bg-mint-50"
+        className="text-mint-600 hover:text-mint-700 hover:bg-mint-50 cursor-pointer"
         onClick={() => setOpen((prev) => !prev)}
       >
-        <Plus className="h-4 w-4 mr-1" /> 새 노트
+        <Plus className="h-4 w-4 mr-1 " /> 새 노트
       </Button>
       {open && (
-        <div className="absolute z-10 mt-2 w-25 bg-white border rounded-md shadow-md">
+        <div className="absolute z-10 mt-2 w-25 bg-white border rounded-md shadow-md border-gray-300">
           {NOTE_TYPES.map((type) => (
             <button
               key={type}
@@ -220,13 +220,13 @@ export function NoteList() {
       >
         <div className="p-4 space-y-4 h-full overflow-y-auto">
           {/* 헤더 - 모바일 */}
-          <div className="lg:hidden flex justify-between items-center mb-4">
+          <div className="lg:hidden flex justify-between items-center mb-4 ">
             <h2 className="text-lg font-medium text-gray-800">노트 목록</h2>
             <NoteCreateButton onSelectType={handleCreateNote} />
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8"
+              className="h-8 w-8 cursor-pointer"
               onClick={() => setIsOpen(false)}
             >
               <X className="h-4 w-4" />
@@ -250,10 +250,10 @@ export function NoteList() {
                     activeFilter === noteType.type ? "default" : "outline"
                   }
                   size="sm"
-                  className={`text-xs ${
+                  className={`text-xs border border-gray-300 ${
                     activeFilter === noteType.type
-                      ? "bg-teal-600 hover:bg-teal-700"
-                      : "hover:bg-teal-50 hover:text-teal-600"
+                      ? "bg-teal-400 hover:bg-teal-400 text-white"
+                      : "hover:bg-teal-50 hover:text-teal-400 "
                   }`}
                   onClick={() => setActiveFilter(noteType.type)}
                 >
@@ -291,7 +291,7 @@ export function NoteList() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-xs flex items-center gap-1"
+                    className="text-xs flex items-center gap-1 cursor-pointer"
                   >
                     <SortDesc className="h-3 w-3" />
                     {
@@ -300,11 +300,14 @@ export function NoteList() {
                     }
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent
+                  align="end"
+                  className="bg-white flex flex-col gap-2 border-gray-300"
+                >
                   {sortOptions.map((option) => (
                     <DropdownMenuItem
                       key={option.value}
-                      className="text-xs"
+                      className="text-xs cursor-pointer hover:bg-gray-100"
                       onClick={() => setSortBy(option.value)}
                     >
                       {option.label}
@@ -327,17 +330,18 @@ export function NoteList() {
               displayedNotes.map((note) => (
                 <Card
                   key={note.id}
-                  className={`hover:border-mint-200 cursor-pointer transition-colors ${
-                    selectedNoteId === note.id
-                      ? "border-mint-400 bg-mint-50"
+                  className={`border-gray-300  bg-white  cursor-pointer transition-colors ${
+                    String(selectedNoteId) === String(note.id)
+                      ? "border-teal-400  bg-teal-100"
                       : ""
                   }`}
                   onClick={() => {
+                    setSelectedNoteId(note.id);
                     router.push(`/project/${projectId}/notes/${note.id}`);
                     setIsOpen(false);
                   }}
                 >
-                  <CardContent className="p-3">
+                  <CardContent className="p-3 rounded-lg">
                     <div className="flex flex-col">
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium text-gray-800">
