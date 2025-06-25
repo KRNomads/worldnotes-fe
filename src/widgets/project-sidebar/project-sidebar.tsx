@@ -59,8 +59,8 @@ export function ProjectSidebar({ isOpen, onClose }: ProjectSidebarProps) {
       icon: Map,
     },
     {
-      title: "플롯",
-      href: `/project/${projectId}/plots`,
+      title: "타임라인",
+      href: `/project/${projectId}/timelines`,
       icon: Calendar,
     },
   ];
