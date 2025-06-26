@@ -30,7 +30,7 @@ import {
   Edge,
   TimelineEvent,
 } from "./types/timeline-editor-types";
-import { TimelineHeader } from "./timeline-header";
+import { TimelineEditorHeader } from "./timeline-editor-header";
 
 const initialEvents: TimelineEvent[] = [
   {
@@ -334,7 +334,7 @@ export function TimelineEditor() {
   return (
     <>
       {/* 헤더 */}
-      <TimelineHeader
+      <TimelineEditorHeader
         showMinimap={showMinimap}
         setShowMinimap={setShowMinimap}
         setShowSettings={setShowSettings}

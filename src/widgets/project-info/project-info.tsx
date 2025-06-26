@@ -1,355 +1,263 @@
-import Link from "next/link";
-import Image from "next/image";
-import {
-  ArrowLeft,
-  Edit,
-  BookOpen,
-  MapPin,
-  Users,
-  Calendar,
-  PlusCircle,
-  MoreHorizontal,
-} from "lucide-react";
-import { Button } from "@/shared/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
-import { useParams } from "next/navigation";
-import { Badge } from "@/shared/ui/badge";
-import { Card, CardContent } from "@/shared/ui/card";
 import { useState } from "react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/shared/ui/dropdown-menu";
-import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
-import { useProjectStore } from "@/entities/project/store/projectStore";
-import { useNoteStore } from "@/entities/note/store/noteStore";
-import { useBlockStore } from "@/entities/block/store/blockStore";
-import { platform } from "os";
+import { ProjectInfoHeader } from "./project-info-header";
+import { ProjectTabs } from "./components/project-tabs";
+import { BlockSection } from "./components/block-section";
+import { CharacterBlock } from "./components/blocks/character-block";
+import { LocationBlock } from "./components/blocks/location-block";
+import { TimelineBlock } from "./components/blocks/timeline-block";
+import { NotesBlock } from "./components/blocks/notes-block";
 
-export default function ProjectInfo() {
-  const { projectId } = useParams();
-  const [activeTab, setActiveTab] = useState("overview");
+// 샘플 프로젝트 데이터
+const projectData = {
+  id: "1",
+  title: "판타지 세계관",
+  description: "마법과 신비가 공존하는 판타지 세계",
+  lastUpdated: "2024-06-10",
+  coverImage: "/placeholder.svg?height=300&width=800",
+  tabs: ["기본 정보", "캐릭터", "지역", "역사", "메모"],
+};
 
-  const { currentProject, fetchProject, updateProject } = useProjectStore();
-  const { getNotesByType, fetchNotesByProject, createNote } = useNoteStore();
-  const { fetchBlocksByNote, createBlock, updateBlock, blocksByNoteId } =
-    useBlockStore();
-
-  if (currentProject == null) {
-    return null;
-  }
-
-  // 샘플 프로젝트 데이터
-  const project = {
-    id: projectId,
-    title: "아쿠아 판타지아",
-    genre: "판타지",
-    creator: "김민지",
-    description: "물의 세계 이야기",
-    synopsis:
-      "물의 힘을 다루는 능력자들이 사는 세계. 바다와 육지의 경계가 무너지고 새로운 문명이 탄생하는 과정에서 벌어지는 모험과 갈등을 다룬다. 수천 년간 잠들어 있던 고대 신의 부활로 세계의 균형이 깨지고, 주인공은 이를 바로잡기 위한 여정을 떠난다.",
-    platform: "웹소설",
-    targetAudience: "10 ~ 20 대",
-    image: "/placeholder.svg?height=400&width=800",
-    createdAt: "2024-04-20",
-    updatedAt: "2024-05-15",
-    notes: [
-      { id: "n1", title: "주요 캐릭터", type: "character", count: 5 },
-      { id: "n2", title: "주요 사건", type: "event", count: 3 },
-      { id: "n3", title: "중요 장소", type: "location", count: 4 },
-      { id: "n4", title: "마법 체계", type: "setting", count: 1 },
-    ],
-  };
-
+export function ProjectInfo() {
+  const [activeTab, setActiveTab] = useState("기본 정보");
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <main className="container mx-auto px-4 py-6">
-        {/* <div className="mb-6">
-          <Link
-            href="/"
-            className="flex items-center text-gray-500 hover:text-gray-700 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            <span>돌아가기</span>
-          </Link>
-        </div> */}
+    <div>
+      <ProjectInfoHeader project={projectData} />
 
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden mb-8">
-          <div className="relative h-48 md:h-64 w-full">
-            <Image
-              src={project.image || "/placeholder.svg"}
-              alt={currentProject.title}
-              fill
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-            <div className="absolute bottom-0 left-0 p-6 text-white">
-              <h1 className="text-2xl md:text-3xl font-bold">
-                {currentProject.title}
-              </h1>
-              <Badge className="bg-teal-500 hover:bg-mint-600 mb-2">
-                {project.genre}
-              </Badge>
-            </div>
+      <ProjectTabs
+        tabs={projectData.tabs}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+      />
 
-            <div className="absolute top-4 right-4 flex gap-2 z-10">
-              <Button
-                size="sm"
-                variant="outline"
-                className="bg-white/90 hover:bg-white"
-              >
-                <Edit className="w-4 h-4 mr-1" />
-                편집
-              </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    className="bg-white/90 hover:bg-white"
-                  >
-                    <MoreHorizontal className="w-4 h-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem>공유</DropdownMenuItem>
-                  <DropdownMenuItem>내보내기</DropdownMenuItem>
-                  <DropdownMenuItem className="text-red-500">
-                    삭제
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+      {activeTab === "기본 정보" && (
+        <div className="mt-6 space-y-8">
+          <BlockSection title="세계관 개요" layout="vertical">
+            <div className="p-4 bg-gray-100  rounded-lg  ">
+              <p className="text-gray-700">
+                이 세계는 마법이 일상적으로 존재하는 판타지 세계입니다. 다양한
+                종족들이 공존하며, 고대의 신비한 힘이 세계 곳곳에 숨겨져
+                있습니다. 대륙은 여러 왕국으로 나뉘어 있으며, 각 왕국은 독특한
+                문화와 역사를 가지고 있습니다.
+              </p>
             </div>
+          </BlockSection>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <BlockSection title="주요 종족" layout="horizontal">
+              <CharacterBlock
+                name="인간"
+                description="적응력이 뛰어나고 다양한 문화를 가진 종족"
+                image="/placeholder.svg?height=100&width=100"
+              />
+              <CharacterBlock
+                name="엘프"
+                description="자연과 조화를 이루며 장수하는 종족"
+                image="/placeholder.svg?height=100&width=100"
+              />
+              <CharacterBlock
+                name="드워프"
+                description="뛰어난 장인 정신을 가진 산악 거주 종족"
+                image="/placeholder.svg?height=100&width=100"
+              />
+            </BlockSection>
+
+            <BlockSection title="주요 지역" layout="horizontal">
+              <LocationBlock
+                name="아르카디아 왕국"
+                description="인간의 중심 왕국, 풍요로운 평원 지대"
+                image="/placeholder.svg?height=100&width=100"
+              />
+              <LocationBlock
+                name="실버우드"
+                description="엘프들의 고대 숲, 마법의 기운이 넘침"
+                image="/placeholder.svg?height=100&width=100"
+              />
+              <LocationBlock
+                name="아이언마운트"
+                description="드워프의 산악 요새, 풍부한 광물 자원"
+                image="/placeholder.svg?height=100&width=100"
+              />
+            </BlockSection>
           </div>
 
-          {/* 탭 네비게이션 */}
-          <Tabs
-            defaultValue="overview"
-            className="w-full"
-            onValueChange={setActiveTab}
-          >
-            <div className="px-6 border-b">
-              <TabsList className="h-12 bg-transparent">
-                <TabsTrigger
-                  value="overview"
-                  className={`data-[state=active]:border-emerald-500 data-[state=active]:text-emerald-700 border-b-2 border-transparent rounded-none`}
-                >
-                  개요
-                </TabsTrigger>
-                <TabsTrigger
-                  value="notes"
-                  className={`data-[state=active]:border-emerald-500 data-[state=active]:text-emerald-700 border-b-2 border-transparent rounded-none`}
-                >
-                  노트
-                </TabsTrigger>
-                <TabsTrigger
-                  value="tags"
-                  className={`data-[state=active]:border-emerald-500 data-[state=active]:text-emerald-700 border-b-2 border-transparent rounded-none`}
-                >
-                  태그 관리
-                </TabsTrigger>
-                <TabsTrigger
-                  value="settings"
-                  className={`data-[state=active]:border-emerald-500 data-[state=active]:text-emerald-700 border-b-2 border-transparent rounded-none`}
-                >
-                  설정
-                </TabsTrigger>
-              </TabsList>
-            </div>
+          <BlockSection title="주요 사건" layout="vertical">
+            <TimelineBlock
+              events={[
+                {
+                  year: "1200",
+                  title: "대마법 전쟁",
+                  description:
+                    "마법사들 간의 대규모 전쟁으로 대륙의 지형이 변화함",
+                },
+                {
+                  year: "1450",
+                  title: "연합 협약",
+                  description: "주요 종족들 간의 평화 협약 체결",
+                },
+                {
+                  year: "1780",
+                  title: "암흑의 부활",
+                  description: "고대의 악이 깨어나 세계를 위협하기 시작함",
+                },
+              ]}
+            />
+          </BlockSection>
 
-            {/* 탭 콘텐츠 */}
-            <div className="p-6">
-              <TabsContent value="overview" className="m-0">
-                <div className="grid gap-6 md:grid-cols-3">
-                  <div className="md:col-span-2">
-                    <div className="mb-6">
-                      <h2 className="mb-2 text-lg font-medium text-gray-800">
-                        세계관 요약
-                      </h2>
-                      <p className="text-gray-600 leading-relaxed">
-                        {project.description}
-                      </p>
-                    </div>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            <BlockSection title="마법 체계" layout="horizontal">
+              <NotesBlock content="이 세계의 마법은 원소(불, 물, 바람, 땅)와 정신, 빛과 어둠의 영역으로 나뉩니다. 마법을 사용하기 위해서는 타고난 재능과 오랜 수련이 필요합니다." />
+            </BlockSection>
 
-                    <div className="mb-6">
-                      <div>
-                        <h2 className="mb-2 text-lg font-medium text-gray-800">
-                          시놉시스
-                        </h2>
-                        <p className="text-gray-600 leading-relaxed">
-                          {project.synopsis}
-                        </p>
-                      </div>
-                    </div>
+            <BlockSection title="정치 체계" layout="horizontal">
+              <NotesBlock content="대부분의 인간 왕국은 세습 군주제를 따르며, 엘프들은 원로원 중심의 의회제, 드워프는 씨족 중심의 체제를 가지고 있습니다." />
+            </BlockSection>
 
-                    <div className="mb-6">
-                      <div>
-                        <h2 className="mb-2 text-lg font-medium text-gray-800">
-                          플랫폼
-                        </h2>
-                        <p className="text-gray-600 leading-relaxed">
-                          {project.platform}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div>
-                      <h2 className="mb-2 text-lg font-medium text-gray-800">
-                        타깃층
-                      </h2>
-                      <p className="text-gray-600 leading-relaxed">
-                        {project.targetAudience}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <Card>
-                      <CardContent className="p-4">
-                        <h3 className="mb-4 text-sm font-medium text-gray-500 uppercase">
-                          세계관 정보
-                        </h3>
-                        <div className="space-y-3">
-                          <div className="flex items-center">
-                            <BookOpen className="w-4 h-4 mr-2 text-emerald-500" />
-                            <span className="text-sm font-medium text-gray-700 w-20">
-                              장르
-                            </span>
-                            <span className="text-sm text-gray-600">
-                              {project.genre}
-                            </span>
-                          </div>
-                          <div className="flex items-center">
-                            <Users className="w-4 h-4 mr-2 text-emerald-500" />
-                            <span className="text-sm font-medium text-gray-700 w-20">
-                              제작자
-                            </span>
-                            <span className="text-sm text-gray-600">
-                              {project.creator}
-                            </span>
-                          </div>
-                          <div className="flex items-center">
-                            <MapPin className="w-4 h-4 mr-2 text-emerald-500" />
-                            <span className="text-sm font-medium text-gray-700 w-20">
-                              배경
-                            </span>
-                            <span className="text-sm text-gray-600">
-                              {"뭐임"}
-                            </span>
-                          </div>
-                          <div className="flex items-center">
-                            <Calendar className="w-4 h-4 mr-2 text-emerald-500" />
-                            <span className="text-sm font-medium text-gray-700 w-20">
-                              생성일
-                            </span>
-                            <span className="text-sm text-gray-600">
-                              {project.createdAt}
-                            </span>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="notes" className="m-0">
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {notes.map((note) => (
-                    <Card
-                      key={note.id}
-                      className="overflow-hidden hover:shadow-md transition-shadow"
-                    >
-                      <CardContent className="p-0">
-                        <div className="p-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="px-2 py-1 text-xs text-emerald-700 bg-emerald-50 rounded-full">
-                              {note.category}
-                            </span>
-                            <span className="text-xs text-gray-400">
-                              {note.updatedAt}
-                            </span>
-                          </div>
-                          <h3 className="mb-1 text-lg font-medium text-gray-800">
-                            {note.title}
-                          </h3>
-                          <p className="text-sm text-gray-600 line-clamp-2">
-                            {note.content}
-                          </p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-
-                  <Button
-                    variant="outline"
-                    className="flex items-center justify-center h-full min-h-[180px] border-dashed"
-                  >
-                    <PlusCircle className="w-5 h-5 mr-2 text-emerald-500" />새
-                    노트 추가
-                  </Button>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="tags" className="m-0">
-                <div className="flex items-center justify-center h-40 text-gray-500">
-                  태그 관리 콘텐츠가 여기에 표시됩니다.
-                </div>
-              </TabsContent>
-
-              <TabsContent value="settings" className="m-0">
-                <div className="flex items-center justify-center h-40 text-gray-500">
-                  설정 콘텐츠가 여기에 표시됩니다.
-                </div>
-              </TabsContent>
-            </div>
-          </Tabs>
+            <BlockSection title="경제 체계" layout="horizontal">
+              <NotesBlock content="금화, 은화, 동화를 기본 화폐로 사용하며, 지역 간 무역이 활발합니다. 마법 아이템은 고가의 교역품으로 취급됩니다." />
+            </BlockSection>
+          </div>
         </div>
-      </main>
+      )}
+
+      {activeTab === "캐릭터" && (
+        <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <CharacterBlock
+            name="아서 펜드라곤"
+            description="아르카디아의 젊은 왕자, 정의롭고 용맹한 성격"
+            image="/placeholder.svg?height=200&width=200"
+            detailed
+          />
+          <CharacterBlock
+            name="엘리아나"
+            description="실버우드의 엘프 마법사, 수백 년의 지혜를 가짐"
+            image="/placeholder.svg?height=200&width=200"
+            detailed
+          />
+          <CharacterBlock
+            name="토린 스톤해머"
+            description="아이언마운트의 드워프 대장장이, 전설적인 무기 제작자"
+            image="/placeholder.svg?height=200&width=200"
+            detailed
+          />
+          <CharacterBlock
+            name="모르가나"
+            description="어둠의 여마법사, 고대의 금지된 마법을 추구"
+            image="/placeholder.svg?height=200&width=200"
+            detailed
+          />
+          <CharacterBlock
+            name="그레이 늑대"
+            description="미스터리한 방랑자, 과거에 대한 비밀을 간직함"
+            image="/placeholder.svg?height=200&width=200"
+            detailed
+          />
+        </div>
+      )}
+
+      {activeTab === "지역" && (
+        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+          <LocationBlock
+            name="아르카디아 왕국"
+            description="인간의 중심 왕국, 풍요로운 평원 지대가 특징이며 강력한 기사단을 보유하고 있다. 수도 캐멜롯은 웅장한 성과 번화한 시장으로 유명하다."
+            image="/placeholder.svg?height=250&width=400"
+            detailed
+          />
+          <LocationBlock
+            name="실버우드"
+            description="엘프들의 고대 숲, 마법의 기운이 넘치는 신비로운 지역. 천년 된 나무들이 하늘을 찌르고, 숲 깊은 곳에는 시간의 흐름이 다른 구역이 존재한다."
+            image="/placeholder.svg?height=250&width=400"
+            detailed
+          />
+          <LocationBlock
+            name="아이언마운트"
+            description="드워프의 산악 요새, 풍부한 광물 자원과 정교한 지하 도시가 특징. 용암의 열기를 이용한 대장간과 복잡한 터널 시스템이 발달해 있다."
+            image="/placeholder.svg?height=250&width=400"
+            detailed
+          />
+          <LocationBlock
+            name="암흑 황무지"
+            description="대마법 전쟁 이후 황폐화된 지역, 기이한 마법 현상과 위험한 생물들이 서식. 과거 번영했던 문명의 폐허가 곳곳에 남아있다."
+            image="/placeholder.svg?height=250&width=400"
+            detailed
+          />
+        </div>
+      )}
+
+      {activeTab === "역사" && (
+        <div className="mt-6">
+          <TimelineBlock
+            events={[
+              {
+                year: "고대",
+                title: "창세 시대",
+                description: "신들이 세계를 창조하고 첫 생명체들이 탄생한 시기",
+              },
+              {
+                year: "800",
+                title: "첫 문명의 등장",
+                description: "인간, 엘프, 드워프 문명의 기초가 형성됨",
+              },
+              {
+                year: "1100",
+                title: "마법의 발견",
+                description: "원소 마법의 체계화와 마법 학교의 설립",
+              },
+              {
+                year: "1200",
+                title: "대마법 전쟁",
+                description:
+                  "마법사들 간의 대규모 전쟁으로 대륙의 지형이 변화함",
+              },
+              {
+                year: "1300",
+                title: "암흑기",
+                description: "전쟁 후 혼란과 기근의 시대",
+              },
+              {
+                year: "1450",
+                title: "연합 협약",
+                description: "주요 종족들 간의 평화 협약 체결",
+              },
+              {
+                year: "1600",
+                title: "탐험의 시대",
+                description: "미지의 대륙과 바다를 탐험하기 시작",
+              },
+              {
+                year: "1780",
+                title: "암흑의 부활",
+                description: "고대의 악이 깨어나 세계를 위협하기 시작함",
+              },
+              {
+                year: "현재",
+                title: "불안한 평화",
+                description: "표면적 평화 속에 커져가는 긴장감",
+              },
+            ]}
+            detailed
+          />
+        </div>
+      )}
+
+      {activeTab === "메모" && (
+        <div className="mt-6 space-y-6">
+          <NotesBlock
+            title="세계관 구축 아이디어"
+            content="- 각 종족별 언어 체계 개발 필요\n- 마법 시스템의 한계와 부작용 설정\n- 주요 종교와 신앙 체계 상세화\n- 일상 생활과 문화적 차이점 구체화"
+            detailed
+          />
+          <NotesBlock
+            title="스토리 아이디어"
+            content="- 잃어버린 마법 유물을 찾는 모험\n- 종족 간 금지된 사랑 이야기\n- 예언된 영웅의 등장과 시련\n- 고대 악의 부활을 막기 위한 여정"
+            detailed
+          />
+          <NotesBlock
+            title="참고 자료"
+            content="- 북유럽 신화\n- 아서왕 전설\n- 중세 유럽의 정치 체계\n- 다양한 판타지 소설과 게임의 마법 시스템"
+            detailed
+          />
+        </div>
+      )}
     </div>
   );
 }
-
-const notes = [
-  {
-    id: "1",
-    title: "아쿠아폴리스",
-    category: "장소",
-    content:
-      "태평양 중앙에 위치한 세계 최대의 수중 도시. 인구 50만 명이 거주하며 해양 연구의 중심지이자 국제 무역의 허브로 기능한다. 거대한 투명 돔 구조물로 이루어져 있으며, 내부에는 인공 생태계와 다양한 구역이 존재한다.",
-    updatedAt: "2일 전",
-  },
-  {
-    id: "2",
-    title: "마리나 킴",
-    category: "캐릭터",
-    content:
-      "아쿠아폴리스의 해양 생물학자. 32세 여성으로 수중 생물과 특별한 교감 능력을 가지고 있다. 해저 깊은 곳에서 발견된 미지의 생명체를 연구하던 중 고대 문명의 비밀을 발견하게 된다.",
-    updatedAt: "1주 전",
-  },
-  {
-    id: "3",
-    title: "딥 트렌치 탐사",
-    category: "사건",
-    content:
-      "마리아나 해구 최심부에서 발견된 미지의 에너지원을 조사하기 위한 탐사대가 파견되었다. 그러나 탐사 도중 예상치 못한 현상으로 인해 통신이 두절되고, 구조대가 파견되었을 때는 탐사선만 발견되었을 뿐 대원들의 흔적은 찾을 수 없었다.",
-    updatedAt: "2주 전",
-  },
-  {
-    id: "4",
-    title: "아쿠아 테크놀로지",
-    category: "세계관 설정",
-    content:
-      "수중 생활을 가능하게 하는 핵심 기술들. 산소 추출 시스템, 수압 조절 장치, 해수 정화 및 담수화 기술, 수중 통신 네트워크 등이 포함된다. 특히 '아쿠아 젤'이라 불리는 특수 물질은 인체를 보호하면서도 물속에서의 자유로운 활동을 가능하게 한다.",
-    updatedAt: "3주 전",
-  },
-  {
-    id: "5",
-    title: "해저 문명의 유적",
-    category: "장소",
-    content:
-      "태평양 심해에서 발견된 미지의 구조물들. 현재의 과학 기술로는 설명할 수 없는 재료와 기술로 만들어졌으며, 수만 년 전에 건설된 것으로 추정된다. 이 유적에는 알 수 없는 상형문자와 함께 고대 문명의 흔적이 남아있다.",
-    updatedAt: "1달 전",
-  },
-];

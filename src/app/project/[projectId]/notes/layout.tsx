@@ -1,5 +1,6 @@
 "use client";
 
+import { BasicHeader } from "@/widgets/basic-header/basic-header";
 import { NoteList } from "../../../../widgets/note-list/note-list";
 
 export default function NoteLayout({
@@ -8,21 +9,25 @@ export default function NoteLayout({
   children: React.ReactNode;
 }) {
   return (
-    <main className="flex justify-center min-h-screen p-0 lg:p-6">
-      <div className="h-[400px]"> </div>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <BasicHeader />
 
-      {/* 모바일 전용 NoteList */}
-      <div className="lg:hidden">
-        <NoteList />
-      </div>
+      <main className="flex justify-center items-start px-4 lg:px-8 py-6 w-full">
+        <div className="flex flex-col lg:flex-row gap-10 max-w-screen-xl w-full">
+          {/* 모바일 전용 NoteList */}
+          <div className="lg:hidden mb-4 w-full">
+            <NoteList />
+          </div>
 
-      {/* 데스크탑 레이아웃 */}
-      <div className="flex w-full gap-6 mt-8">
-        <div className="hidden lg:block w-90 shrink-0">
-          <NoteList />
+          {/* 데스크탑 전용 NoteList */}
+          <aside className="hidden lg:block w-80 shrink-0">
+            <NoteList />
+          </aside>
+
+          {/* 본문 콘텐츠 */}
+          <section className="flex-1 p-4 overflow-hidden">{children}</section>
         </div>
-        <div className="flex-1 overflow-hidden">{children}</div>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }

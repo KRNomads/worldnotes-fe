@@ -419,7 +419,7 @@ export function SettingsDialog({
             isMobile
               ? "max-w-[95vw] max-h-[95vh] w-full h-full"
               : "max-w-4xl max-h-[90vh]"
-          } overflow-hidden flex flex-col p-0`}
+          } overflow-hidden flex flex-col p-0 bg-white`}
         >
           <DialogHeader className="p-4 pb-0 border-b border-gray-200">
             <DialogTitle className="flex items-center justify-between">

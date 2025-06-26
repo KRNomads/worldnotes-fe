@@ -5,11 +5,11 @@ interface Project {
   coverImage: string;
 }
 
-interface ProjectHeaderProps {
+interface ProjectInfoHeaderProps {
   project: Project;
 }
 
-export function ProjectHeader({ project }: ProjectHeaderProps) {
+export function ProjectInfoHeader({ project }: ProjectInfoHeaderProps) {
   return (
     <div className="mb-6">
       <div className="relative h-40 md:h-60 rounded-lg overflow-hidden mb-4">

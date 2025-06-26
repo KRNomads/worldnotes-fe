@@ -144,7 +144,7 @@ export function NoteLinkModal({
           isMobile
             ? "max-w-[95vw] max-h-[95vh] w-full h-full"
             : "max-w-5xl max-h-[90vh]"
-        } overflow-hidden flex flex-col p-0`}
+        } overflow-hidden flex flex-col p-0 bg-white`}
       >
         {/* Header */}
         <DialogHeader className="p-4 pb-0 border-b border-gray-200">

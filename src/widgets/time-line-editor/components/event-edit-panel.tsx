@@ -110,7 +110,7 @@ export function EventEditPanel({
             isMobile
               ? "max-w-[95vw] max-h-[95vh] w-full h-full"
               : "max-w-2xl max-h-[90vh]"
-          } overflow-hidden flex flex-col p-0`}
+          } overflow-hidden flex flex-col p-0 bg-white`}
         >
           {/* Header */}
           <DialogHeader className="p-4 pb-0 border-b border-gray-200">
@@ -194,39 +194,6 @@ export function EventEditPanel({
                   </div>
                 </div>
 
-                {!isMobile && (
-                  <div>
-                    <Label className="text-sm font-medium">위치</Label>
-                    <div className="flex gap-2 mt-2">
-                      <div className="flex-1">
-                        <Label className="text-xs text-gray-500">X</Label>
-                        <Input
-                          type="number"
-                          value={Math.round(editedEvent.x)}
-                          onChange={(e) =>
-                            setEditedEvent((prev) => ({
-                              ...prev,
-                              x: Number.parseInt(e.target.value) || 0,
-                            }))
-                          }
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <Label className="text-xs text-gray-500">Y</Label>
-                        <Input
-                          type="number"
-                          value={Math.round(editedEvent.y)}
-                          onChange={(e) =>
-                            setEditedEvent((prev) => ({
-                              ...prev,
-                              y: Number.parseInt(e.target.value) || 0,
-                            }))
-                          }
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
 
               {/* Linked Notes Section */}
