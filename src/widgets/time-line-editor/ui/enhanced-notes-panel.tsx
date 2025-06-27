@@ -16,9 +16,7 @@ import {
 import { TimelineEvent } from "../types/timeline-editor-types";
 import {
   filterNotes,
-  Note,
   NOTE_COLORS,
-  NoteType,
   sampleNotes,
   sortNotes,
   TYPE_LABELS,
@@ -35,6 +33,7 @@ import {
 } from "@/shared/ui/dropdown-menu";
 import { ScrollArea } from "@/shared/ui/scroll-area";
 import { Card, CardContent } from "@/shared/ui/card";
+import { Note, NoteType } from "@/entities/note/types/note";
 
 interface EnhancedNotesPanelProps {
   onClose: () => void;
@@ -286,7 +285,7 @@ export function EnhancedNotesPanel({
                                 <GripVertical className="h-3 w-3 text-gray-400 flex-shrink-0" />
                               </div>
                               <p className="text-xs text-gray-600 line-clamp-2 mb-2">
-                                {note.description}
+                                {note.summary}
                               </p>
                               <div className="flex items-center justify-between">
                                 <Badge

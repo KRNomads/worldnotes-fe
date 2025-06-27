@@ -24,14 +24,6 @@ export type ConnectionMode =
   | "delete"
   | null;
 
-export interface Note {
-  id: string;
-  title: string;
-  description: string;
-  color: string;
-  category: string;
-}
-
 export interface TimeColumn {
   id: string;
   name: string; // 단위날짜 (1일, 2일, 3일...)

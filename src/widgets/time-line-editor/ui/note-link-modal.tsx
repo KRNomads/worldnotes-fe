@@ -17,7 +17,6 @@ import {
 import {
   filterNotes,
   NOTE_COLORS,
-  NoteType,
   sampleNotes,
   sortNotes,
   TYPE_LABELS,
@@ -41,6 +40,7 @@ import {
 } from "@/shared/ui/dropdown-menu";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Checkbox } from "@/shared/ui/checkbox";
+import { NoteType } from "@/entities/note/types/note";
 
 interface NoteLinkModalProps {
   isOpen: boolean;
@@ -382,7 +382,7 @@ export function NoteLinkModal({
                               </h4>
                             </div>
                             <p className="text-xs text-gray-600 line-clamp-2 mb-2">
-                              {note.description}
+                              {note.summary}
                             </p>
                             <div className="flex items-center justify-between">
                               <Badge

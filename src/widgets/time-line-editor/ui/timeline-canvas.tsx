@@ -505,37 +505,36 @@ export function TimelineCanvas({
             d3.select(this).attr("transform", `translate(${newX}, ${newY})`);
 
             // 드래그 중 엣지 실시간 업데이트
-            contentGroup
-              .selectAll(".edge-group")
-              .each(function (edge: TimelineEdge) {
-                const sourceEvent = events.find(
-                  (e) => e.id === edge.sourceEventId
-                );
-                const targetEvent = events.find(
-                  (e) => e.id === edge.targetEventId
-                );
+            contentGroup.selectAll(".edge-group").each(function (d) {
+              const edge = d as TimelineEdge;
+              const sourceEvent = events.find(
+                (e) => e.id === edge.sourceEventId
+              );
+              const targetEvent = events.find(
+                (e) => e.id === edge.targetEventId
+              );
 
-                if (!sourceEvent || !targetEvent) return;
+              if (!sourceEvent || !targetEvent) return;
 
-                // 드래그 중인 이벤트의 좌표 업데이트
-                let updatedSourceEvent = sourceEvent;
-                let updatedTargetEvent = targetEvent;
+              // 드래그 중인 이벤트의 좌표 업데이트
+              let updatedSourceEvent = sourceEvent;
+              let updatedTargetEvent = targetEvent;
 
-                if (sourceEvent.id === d.id) {
-                  updatedSourceEvent = { ...sourceEvent, x: newX, y: newY };
-                }
-                if (targetEvent.id === d.id) {
-                  updatedTargetEvent = { ...targetEvent, x: newX, y: newY };
-                }
+              if (sourceEvent.id === edge.id) {
+                updatedSourceEvent = { ...sourceEvent, x: newX, y: newY };
+              }
+              if (targetEvent.id === edge.id) {
+                updatedTargetEvent = { ...targetEvent, x: newX, y: newY };
+              }
 
-                const style = getEdgeStyle(edge.type);
-                const pathData = createReactFlowBezier(
-                  updatedSourceEvent,
-                  updatedTargetEvent
-                );
+              const style = getEdgeStyle(edge.type);
+              const pathData = createReactFlowBezier(
+                updatedSourceEvent,
+                updatedTargetEvent
+              );
 
-                d3.select(this).select("path").attr("d", pathData);
-              });
+              d3.select(this).select("path").attr("d", pathData);
+            });
           })
           .on("end", (event, d) => {
             if (!moved) return;

@@ -8,7 +8,7 @@ import { useNoteStore } from "@/entities/note/store/noteStore";
 import { useParams, useRouter } from "next/navigation";
 import { Note, NoteType } from "@/entities/note/types/note";
 import SearchInput from "@/features/serchinput/serchInput";
-import { getInitialConsonantsWithEsHangul } from "@/shared/utils/hangul";
+import { getInitialConsonantsWithEsHangul } from "@/shared/lib/hangul";
 import styles from "./note-list.module.scss";
 import {
   DropdownMenu,

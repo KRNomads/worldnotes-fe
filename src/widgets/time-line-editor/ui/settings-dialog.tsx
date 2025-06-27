@@ -27,12 +27,12 @@ import {
 } from "@dnd-kit/sortable";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { COLUMN_TEMPLATES } from "../lib/timeline-utils";
 import {
-  COLUMN_TEMPLATES,
   TimeColumn,
+  TimelineEvent,
   TimelineSettings,
-} from "../lib/timeline-utils";
-import { TimelineEvent } from "../types/timeline-editor-types";
+} from "../types/timeline-editor-types";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Label } from "@/shared/ui/label";

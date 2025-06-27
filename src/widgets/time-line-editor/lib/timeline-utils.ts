@@ -1,22 +1,11 @@
-export interface TimeColumn {
-  id: string
-  name: string // 단위날짜 (1일, 2일, 3일...)
-  subtitle: string // 실제 날짜 (1시대 200년, 1시대 201년...)
-  position: number
-}
-
-export interface TimelineSettings {
-  columnCount: number
-  columnWidth: number
-  columns: TimeColumn[]
-}
+import { TimeColumn, TimelineSettings } from "../types/timeline-editor-types";
 
 // 템플릿 타입
 export interface ColumnTemplate {
-  id: string
-  name: string
-  description: string
-  generator: (count: number) => TimeColumn[]
+  id: string;
+  name: string;
+  description: string;
+  generator: (count: number) => TimeColumn[];
 }
 
 // 기본 템플릿들
@@ -98,13 +87,13 @@ export const COLUMN_TEMPLATES: ColumnTemplate[] = [
     name: "연도",
     description: "2024년, 2025년, 2026년... 형태",
     generator: (count: number) => {
-      const startYear = new Date().getFullYear()
+      const startYear = new Date().getFullYear();
       return Array.from({ length: count }, (_, i) => ({
         id: `year${startYear + i}`,
         name: `${startYear + i}년`,
         subtitle: `Year ${startYear + i}`,
         position: i,
-      }))
+      }));
     },
   },
   {
@@ -119,25 +108,29 @@ export const COLUMN_TEMPLATES: ColumnTemplate[] = [
         position: i,
       })),
   },
-]
+];
 
 export function generateTimeColumns(settings: TimelineSettings): TimeColumn[] {
   // 설정에 저장된 컬럼들이 있으면 그것을 사용
   if (settings.columns && settings.columns.length === settings.columnCount) {
-    return settings.columns.map((col, i) => ({ ...col, position: i }))
+    return settings.columns.map((col, i) => ({ ...col, position: i }));
   }
 
   // 없으면 기본 커스텀 템플릿으로 생성
-  const customTemplate = COLUMN_TEMPLATES.find((t) => t.id === "custom")!
-  return customTemplate.generator(settings.columnCount)
+  const customTemplate = COLUMN_TEMPLATES.find((t) => t.id === "custom")!;
+  return customTemplate.generator(settings.columnCount);
 }
 
 // 컬럼 순서 변경 함수
-export function reorderColumns(columns: TimeColumn[], fromIndex: number, toIndex: number): TimeColumn[] {
-  const result = [...columns]
-  const [removed] = result.splice(fromIndex, 1)
-  result.splice(toIndex, 0, removed)
+export function reorderColumns(
+  columns: TimeColumn[],
+  fromIndex: number,
+  toIndex: number
+): TimeColumn[] {
+  const result = [...columns];
+  const [removed] = result.splice(fromIndex, 1);
+  result.splice(toIndex, 0, removed);
 
   // position 재정렬
-  return result.map((col, i) => ({ ...col, position: i }))
+  return result.map((col, i) => ({ ...col, position: i }));
 }

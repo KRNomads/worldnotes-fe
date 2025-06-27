@@ -3,11 +3,13 @@
 import type React from "react";
 import { useState } from "react";
 import { X, GripVertical, Trash2, Edit3 } from "lucide-react";
-import { Note, TimelineEvent } from "../types/timeline-editor-types";
+import { TimelineEvent } from "../types/timeline-editor-types";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
 import { Textarea } from "@/shared/ui/textarea";
+import { Note } from "@/entities/note/types/note";
+import { sampleNotes2, TYPE_LABELS } from "@/entities/note/lib/note-utils";
 
 interface NotesPanelProps {
   onClose: () => void;
@@ -16,54 +18,6 @@ interface NotesPanelProps {
   events: TimelineEvent[];
   setEvents: React.Dispatch<React.SetStateAction<TimelineEvent[]>>;
 }
-
-const sampleNotes: Note[] = [
-  {
-    id: "note1",
-    title: "엘프 왕자 아리온",
-    description:
-      "왕국의 마지막 왕자, 강력한 마법 능력을 보유하고 있으며 운명의 검을 찾아 나선다",
-    color: "#3b82f6",
-    category: "캐릭터",
-  },
-  {
-    id: "note2",
-    title: "어둠의 마법사 모르간",
-    description:
-      "고대의 어둠 마법을 사용하는 강력한 적대자, 왕국을 멸망시키려 한다",
-    color: "#3b82f6",
-    category: "캐릭터",
-  },
-  {
-    id: "note3",
-    title: "운명의 검 엑스칼리온",
-    description: "전설의 마법 검으로 왕국을 구할 수 있는 유일한 무기",
-    color: "#f59e0b",
-    category: "아이템",
-  },
-  {
-    id: "note4",
-    title: "마법 체계",
-    description: "이 세계의 마법 시스템과 규칙들에 대한 설정",
-    color: "#8b5cf6",
-    category: "설정",
-  },
-  {
-    id: "note5",
-    title: "어둠의 침입",
-    description: "평화로운 왕국에 어둠의 세력이 침입하는 사건",
-    color: "#ef4444",
-    category: "사건",
-  },
-  {
-    id: "note6",
-    title: "마법의 숲",
-    description:
-      "고대 엘프들이 거주하는 신비로운 숲, 강력한 마법이 깃들어 있다",
-    color: "#10b981",
-    category: "장소",
-  },
-];
 
 export function NotesPanel({
   onClose,
@@ -136,7 +90,7 @@ export function NotesPanel({
               노트를 타임라인으로 드래그하여 이벤트를 생성하세요
             </p>
 
-            {sampleNotes.map((note) => (
+            {sampleNotes2.map((note) => (
               <Card
                 key={note.id}
                 className="cursor-move hover:shadow-md transition-shadow"
@@ -157,10 +111,10 @@ export function NotesPanel({
                         <GripVertical className="h-3 w-3 text-gray-400 flex-shrink-0" />
                       </div>
                       <p className="text-xs text-gray-600 line-clamp-2">
-                        {note.description}
+                        {note.summary}
                       </p>
                       <span className="inline-block mt-1 px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded">
-                        {note.category}
+                        {TYPE_LABELS[note.type]}
                       </span>
                     </div>
                   </div>
