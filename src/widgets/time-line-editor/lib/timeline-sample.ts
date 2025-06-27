@@ -1,7 +1,7 @@
 import {
   TimelineEvent,
   TimelineSettings,
-} from "../types/timeline-editor-types";
+} from "@/entities/timeline/types/timeline-types";
 
 export const initialEvents: TimelineEvent[] = [
   {

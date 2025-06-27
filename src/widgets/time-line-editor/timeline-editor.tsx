@@ -22,14 +22,15 @@ import { TimelineCanvas } from "./ui/timeline-canvas";
 import { NotesPanel } from "./ui/notes-panel";
 import { EventEditPanel } from "./ui/event-edit-panel";
 import { SettingsDialog } from "./ui/settings-dialog";
+import { ConnectionMode } from "./types/timeline-editor-types";
+import { TimelineEditorHeader } from "./timeline-editor-header";
+import { initialEvents, initialSettings } from "./lib/timeline-sample";
 import {
-  ConnectionMode,
   TimeColumn,
   TimelineEdge,
   TimelineEvent,
-} from "./types/timeline-editor-types";
-import { TimelineEditorHeader } from "./timeline-editor-header";
-import { initialEvents, initialSettings } from "./lib/timeline-sample";
+} from "@/entities/timeline/types/timeline-types";
+import { Note } from "@/entities/note/types/note";
 
 export function TimelineEditor() {
   const [events, setEvents] = useState<TimelineEvent[]>(initialEvents);
@@ -174,7 +175,7 @@ export function TimelineEditor() {
   };
 
   const handleNotesDrop = (
-    note: any,
+    note: Note,
     x: number,
     y: number,
     chapterId: string
@@ -182,7 +183,7 @@ export function TimelineEditor() {
     const newEvent: TimelineEvent = {
       id: `event-${Date.now()}`,
       title: note.title,
-      description: note.description,
+      description: note.summary,
       time: chapterId,
       x,
       y,
