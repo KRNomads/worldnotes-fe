@@ -3,19 +3,11 @@
 import type React from "react";
 import { useState } from "react";
 import { X, GripVertical, Trash2, Edit3 } from "lucide-react";
-import { TimelineEvent } from "../types/timeline-editor-types";
+import { Note, TimelineEvent } from "../types/timeline-editor-types";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
 import { Textarea } from "@/shared/ui/textarea";
-
-interface Note {
-  id: string;
-  title: string;
-  description: string;
-  color: string;
-  category: string;
-}
 
 interface NotesPanelProps {
   onClose: () => void;

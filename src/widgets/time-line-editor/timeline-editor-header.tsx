@@ -1,5 +1,5 @@
 import { Button } from "@/shared/ui/button";
-import { Eye, Menu, Map, Settings } from "lucide-react";
+import { Menu, Map, Settings } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
 import { ProjectSidebar } from "../project-sidebar/project-sidebar";
 

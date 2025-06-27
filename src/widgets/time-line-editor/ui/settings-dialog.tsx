@@ -262,7 +262,7 @@ export function SettingsDialog({
             return {
               ...event,
               x: newBoundary - 100, // 마지막 컬럼 근처
-              chapter:
+              time:
                 pendingSettings.columns[pendingSettings.columns.length - 1]
                   ?.id || "ch1",
             };

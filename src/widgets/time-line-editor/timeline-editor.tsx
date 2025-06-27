@@ -5,8 +5,6 @@ import {
   Plus,
   Search,
   Menu,
-  Settings,
-  Eye,
   Trash2,
   ArrowRight,
   Zap,
@@ -15,19 +13,19 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
-  Map,
 } from "lucide-react";
-import { generateTimeColumns, TimeColumn } from "./lib/timeline-utils";
+import { generateTimeColumns } from "./lib/timeline-utils";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
-import { Minimap } from "./components/minimap";
-import { TimelineCanvas } from "./components/timeline-canvas";
-import { NotesPanel } from "./components/notes-panel";
-import { EventEditPanel } from "./components/event-edit-panel";
-import { SettingsDialog } from "./components/settings-dialog";
+import { Minimap } from "./ui/minimap";
+import { TimelineCanvas } from "./ui/timeline-canvas";
+import { NotesPanel } from "./ui/notes-panel";
+import { EventEditPanel } from "./ui/event-edit-panel";
+import { SettingsDialog } from "./ui/settings-dialog";
 import {
   ConnectionMode,
-  Edge,
+  TimeColumn,
+  TimelineEdge,
   TimelineEvent,
 } from "./types/timeline-editor-types";
 import { TimelineEditorHeader } from "./timeline-editor-header";
@@ -37,7 +35,7 @@ const initialEvents: TimelineEvent[] = [
     id: "event1",
     title: "#1 엘프 왕국의 전성기",
     description: "마지막 황금시대의 시작",
-    chapter: "ch1",
+    time: "ch1",
     x: 100,
     y: 100,
     color: "#3b82f6",
@@ -47,7 +45,7 @@ const initialEvents: TimelineEvent[] = [
     id: "event2",
     title: "#2 어둠의 침입",
     description: "신비한 세력의 등장",
-    chapter: "ch3",
+    time: "ch3",
     x: 500,
     y: 150,
     color: "#8b5cf6",
@@ -57,7 +55,7 @@ const initialEvents: TimelineEvent[] = [
     id: "event3",
     title: "#3 마법사의 예언",
     description: "운명을 바꿀 예언의 등장",
-    chapter: "ch4",
+    time: "ch4",
     x: 700,
     y: 200,
     color: "#ef4444",
@@ -68,7 +66,7 @@ const initialEvents: TimelineEvent[] = [
     id: "event4",
     title: "#4 멀리 있는 이벤트",
     description: "경계를 벗어날 수 있는 이벤트",
-    chapter: "ch8",
+    time: "ch8",
     x: 1500, // 기본 설정(10컬럼 × 200px = 2000px)에서는 괜찮지만, 줄어들면 문제가 될 수 있음
     y: 250,
     color: "#10b981",
@@ -77,7 +75,7 @@ const initialEvents: TimelineEvent[] = [
     id: "event5",
     title: "#5 아주 멀리 있는 이벤트",
     description: "확실히 경계를 벗어날 이벤트",
-    chapter: "ch10",
+    time: "ch10",
     x: 1800,
     y: 300,
     color: "#f59e0b",
@@ -103,7 +101,7 @@ const initialSettings = {
 
 export function TimelineEditor() {
   const [events, setEvents] = useState<TimelineEvent[]>(initialEvents);
-  const [edges, setEdges] = useState<Edge[]>([]);
+  const [edges, setEdges] = useState<TimelineEdge[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
   const [showNotesPanel, setShowNotesPanel] = useState(false);
@@ -173,7 +171,7 @@ export function TimelineEditor() {
           "and",
           eventId
         );
-        const newEdge: Edge = {
+        const newEdge: TimelineEdge = {
           id: `edge-${Date.now()}`,
           type: connectionMode,
           sourceEventId: firstSelectedEvent,
@@ -222,7 +220,7 @@ export function TimelineEditor() {
       id: `event-${Date.now()}`,
       title: "새로운 사건",
       description: "사건 설명을 입력하세요",
-      chapter: timeColumns[0]?.id || "ch1",
+      time: timeColumns[0]?.id || "ch1",
       x: Math.max(0, Math.min(totalTimelineWidth, worldCenterX)),
       y: Math.max(0, Math.min(totalTimelineHeight, worldCenterY)),
       color: "#6b7280",
@@ -253,7 +251,7 @@ export function TimelineEditor() {
       id: `event-${Date.now()}`,
       title: note.title,
       description: note.description,
-      chapter: chapterId,
+      time: chapterId,
       x,
       y,
       color: note.color || "#6b7280",
@@ -533,8 +531,8 @@ export function TimelineEditor() {
                     </p>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-xs text-gray-400">
-                        {timeColumns.find((ch) => ch.id === event.chapter)
-                          ?.name || "Unknown"}
+                        {timeColumns.find((ch) => ch.id === event.time)?.name ||
+                          "Unknown"}
                       </span>
                       <span className="text-xs text-gray-300">•</span>
                       <span className="text-xs text-gray-400">

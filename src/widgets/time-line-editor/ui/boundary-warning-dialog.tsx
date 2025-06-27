@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { AlertTriangle, ArrowRight, RotateCcw, Trash2 } from "lucide-react";
-import { TimelineEvent } from "../types/timeline-editor-types";
-import { TimeColumn } from "../lib/timeline-utils";
+import { TimeColumn, TimelineEvent } from "../types/timeline-editor-types";
 import {
   Dialog,
   DialogContent,

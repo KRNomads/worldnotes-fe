@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import {
   TimelineEvent,
-  Edge,
+  TimelineEdge,
   ConnectionMode,
 } from "../types/timeline-editor-types";
 import { generateTimeColumns, TimeColumn } from "../lib/timeline-utils";
@@ -29,7 +29,7 @@ interface Dimensions {
 
 interface TimelineState {
   events: TimelineEvent[];
-  edges: Edge[];
+  edges: TimelineEdge[];
   selectedEvent: string | null;
   firstSelectedEvent: string | null;
   connectionMode: ConnectionMode;
@@ -44,8 +44,8 @@ interface TimelineState {
   updateEvent: (event: TimelineEvent) => void;
   deleteEvent: (eventId: string) => void;
 
-  setEdges: (edges: Edge[]) => void;
-  addEdge: (edge: Edge) => void;
+  setEdges: (edges: TimelineEdge[]) => void;
+  addEdge: (edge: TimelineEdge) => void;
   deleteEdge: (edgeId: string) => void;
 
   setSelectedEvent: (id: string | null) => void;
@@ -65,7 +65,7 @@ const initialEvents: TimelineEvent[] = [
     id: "event1",
     title: "#1 엘프 왕국의 전성기",
     description: "마지막 황금시대의 시작",
-    chapter: "ch1",
+    time: "ch1",
     x: 100,
     y: 100,
     color: "#3b82f6",
@@ -75,7 +75,7 @@ const initialEvents: TimelineEvent[] = [
     id: "event2",
     title: "#2 어둠의 침입",
     description: "신비한 세력의 등장",
-    chapter: "ch3",
+    time: "ch3",
     x: 500,
     y: 150,
     color: "#8b5cf6",
@@ -85,7 +85,7 @@ const initialEvents: TimelineEvent[] = [
     id: "event3",
     title: "#3 마법사의 예언",
     description: "운명을 바꿀 예언의 등장",
-    chapter: "ch4",
+    time: "ch4",
     x: 700,
     y: 200,
     color: "#ef4444",
@@ -95,7 +95,7 @@ const initialEvents: TimelineEvent[] = [
     id: "event4",
     title: "#4 멀리 있는 이벤트",
     description: "경계를 벗어날 수 있는 이벤트",
-    chapter: "ch8",
+    time: "ch8",
     x: 1500,
     y: 250,
     color: "#10b981",
@@ -104,7 +104,7 @@ const initialEvents: TimelineEvent[] = [
     id: "event5",
     title: "#5 아주 멀리 있는 이벤트",
     description: "확실히 경계를 벗어날 이벤트",
-    chapter: "ch10",
+    time: "ch10",
     x: 1800,
     y: 300,
     color: "#f59e0b",

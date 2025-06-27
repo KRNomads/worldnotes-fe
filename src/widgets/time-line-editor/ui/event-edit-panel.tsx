@@ -12,7 +12,11 @@ import {
 } from "lucide-react";
 import { NoteLinkModal } from "./note-link-modal";
 import { TimelineEvent } from "../types/timeline-editor-types";
-import { NOTE_COLORS, sampleNotes, TYPE_LABELS } from "../lib/note-utils";
+import {
+  NOTE_COLORS,
+  sampleNotes,
+  TYPE_LABELS,
+} from "../../../entities/note/lib/note-utils";
 import {
   Dialog,
   DialogContent,
@@ -193,7 +197,6 @@ export function EventEditPanel({
                     ))}
                   </div>
                 </div>
-
               </div>
 
               {/* Linked Notes Section */}

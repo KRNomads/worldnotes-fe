@@ -3,8 +3,7 @@
 import { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
 import { X, Maximize2 } from "lucide-react";
-import { TimeColumn } from "../lib/timeline-utils";
-import { TimelineEvent } from "../types/timeline-editor-types";
+import { TimeColumn, TimelineEvent } from "../types/timeline-editor-types";
 import { Button } from "@/shared/ui/button";
 
 interface MinimapProps {

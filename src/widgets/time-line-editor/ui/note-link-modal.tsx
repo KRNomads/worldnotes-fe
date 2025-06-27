@@ -21,7 +21,7 @@ import {
   sampleNotes,
   sortNotes,
   TYPE_LABELS,
-} from "../lib/note-utils";
+} from "../../../entities/note/lib/note-utils";
 import {
   Dialog,
   DialogContent,

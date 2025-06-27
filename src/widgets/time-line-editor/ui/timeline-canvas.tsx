@@ -3,17 +3,17 @@
 import type React from "react";
 import { useRef, useEffect, useState, useCallback } from "react";
 import * as d3 from "d3";
-import { TimeColumn } from "../lib/timeline-utils";
 import {
   ConnectionMode,
-  Edge,
+  TimeColumn,
+  TimelineEdge,
   TimelineEvent,
 } from "../types/timeline-editor-types";
 
 interface TimelineCanvasProps {
   chapters: TimeColumn[];
   events: TimelineEvent[];
-  edges: Edge[];
+  edges: TimelineEdge[];
   onEventMove: (eventId: string, x: number, y: number) => void;
   onEventClick: (eventId: string) => void;
   onEdgeClick: (edgeId: string) => void;
@@ -65,7 +65,7 @@ export function TimelineCanvas({
     return () => window.removeEventListener("resize", updateDimensions);
   }, []);
 
-  const getEdgeStyle = (type: Edge["type"]) => {
+  const getEdgeStyle = (type: TimelineEdge["type"]) => {
     switch (type) {
       case "sequence":
         return {
@@ -505,35 +505,37 @@ export function TimelineCanvas({
             d3.select(this).attr("transform", `translate(${newX}, ${newY})`);
 
             // 드래그 중 엣지 실시간 업데이트
-            contentGroup.selectAll(".edge-group").each(function (edge: Edge) {
-              const sourceEvent = events.find(
-                (e) => e.id === edge.sourceEventId
-              );
-              const targetEvent = events.find(
-                (e) => e.id === edge.targetEventId
-              );
+            contentGroup
+              .selectAll(".edge-group")
+              .each(function (edge: TimelineEdge) {
+                const sourceEvent = events.find(
+                  (e) => e.id === edge.sourceEventId
+                );
+                const targetEvent = events.find(
+                  (e) => e.id === edge.targetEventId
+                );
 
-              if (!sourceEvent || !targetEvent) return;
+                if (!sourceEvent || !targetEvent) return;
 
-              // 드래그 중인 이벤트의 좌표 업데이트
-              let updatedSourceEvent = sourceEvent;
-              let updatedTargetEvent = targetEvent;
+                // 드래그 중인 이벤트의 좌표 업데이트
+                let updatedSourceEvent = sourceEvent;
+                let updatedTargetEvent = targetEvent;
 
-              if (sourceEvent.id === d.id) {
-                updatedSourceEvent = { ...sourceEvent, x: newX, y: newY };
-              }
-              if (targetEvent.id === d.id) {
-                updatedTargetEvent = { ...targetEvent, x: newX, y: newY };
-              }
+                if (sourceEvent.id === d.id) {
+                  updatedSourceEvent = { ...sourceEvent, x: newX, y: newY };
+                }
+                if (targetEvent.id === d.id) {
+                  updatedTargetEvent = { ...targetEvent, x: newX, y: newY };
+                }
 
-              const style = getEdgeStyle(edge.type);
-              const pathData = createReactFlowBezier(
-                updatedSourceEvent,
-                updatedTargetEvent
-              );
+                const style = getEdgeStyle(edge.type);
+                const pathData = createReactFlowBezier(
+                  updatedSourceEvent,
+                  updatedTargetEvent
+                );
 
-              d3.select(this).select("path").attr("d", pathData);
-            });
+                d3.select(this).select("path").attr("d", pathData);
+              });
           })
           .on("end", (event, d) => {
             if (!moved) return;

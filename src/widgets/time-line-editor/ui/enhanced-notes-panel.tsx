@@ -22,7 +22,7 @@ import {
   sampleNotes,
   sortNotes,
   TYPE_LABELS,
-} from "../lib/note-utils";
+} from "../../../entities/note/lib/note-utils";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/shared/ui/tabs";
