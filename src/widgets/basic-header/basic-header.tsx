@@ -36,7 +36,7 @@ export function BasicHeader() {
             </Button>
             <div className="flex items-center space-x-3">
               {/* 추가적인 아이콘들 */}
-              <WebsocketToggleButton />
+              {/* <WebsocketToggleButton /> */}
               <UserProfile />
             </div>
           </div>

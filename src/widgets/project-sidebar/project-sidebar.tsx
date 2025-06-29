@@ -45,6 +45,11 @@ export function ProjectSidebar({ isOpen, onClose }: ProjectSidebarProps) {
       href: `/project/${projectId}/notes`,
       icon: BookOpen,
     },
+    {
+      title: "타임라인",
+      href: `/project/${projectId}/timelines`,
+      icon: Calendar,
+    },
   ];
 
   const worldItems = [
@@ -121,6 +126,7 @@ export function ProjectSidebar({ isOpen, onClose }: ProjectSidebarProps) {
             </div>
           </div>
 
+          {/* 
           <div>
             <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-3 px-2">
               세계관 요소
@@ -143,9 +149,9 @@ export function ProjectSidebar({ isOpen, onClose }: ProjectSidebarProps) {
                 </Link>
               ))}
             </div>
-          </div>
+          </div> */}
 
-          <div className="mt-auto">
+          {/* <div className="mt-auto">
             <Link
               href={`/project/${projectId}/settings`}
               className={cn(
@@ -159,7 +165,7 @@ export function ProjectSidebar({ isOpen, onClose }: ProjectSidebarProps) {
               <Settings className="h-4 w-4 mr-3 text-gray-500" />
               설정
             </Link>
-          </div>
+          </div> */}
         </nav>
       </div>
     </>

@@ -1,4 +1,7 @@
-import { TimeColumn, TimelineSettings } from "../types/timeline-editor-types";
+import {
+  TimeColumn,
+  TimelineSettings,
+} from "@/entities/timeline/types/timeline-types";
 
 // 템플릿 타입
 export interface ColumnTemplate {

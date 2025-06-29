@@ -33,8 +33,11 @@ import {
 import { Note } from "@/entities/note/types/note";
 
 export function TimelineEditor() {
-  const [events, setEvents] = useState<TimelineEvent[]>(initialEvents);
-  const [edges, setEdges] = useState<TimelineEdge[]>([]);
+  // 새로운 간단한 설정 구조
+  const [timelineSettings, setTimelineSettings] = useState(initialSettings); // 엔티티
+  const [events, setEvents] = useState<TimelineEvent[]>(initialEvents); // 엔티티
+  const [edges, setEdges] = useState<TimelineEdge[]>([]); // 엔티티
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
   const [showNotesPanel, setShowNotesPanel] = useState(false);
@@ -42,9 +45,6 @@ export function TimelineEditor() {
   const [firstSelectedEvent, setFirstSelectedEvent] = useState<string | null>(
     null
   );
-
-  // 새로운 간단한 설정 구조
-  const [timelineSettings, setTimelineSettings] = useState(initialSettings);
 
   const [showSettings, setShowSettings] = useState(false);
   const [showMinimap, setShowMinimap] = useState(false);
